@@ -1,3 +1,5 @@
+# Kataglyphis-WebDavClient
+
 <div align="center">
   <a href="https://jonasheinle.de">
     <img src="images/logo.png" alt="logo" width="200" />
@@ -22,7 +24,7 @@ For the official docs follow this [link](https://webdavclient.jonasheinle.de/).
 [![Automatic Dependency Submission](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/dependency-graph/auto-submission)
 [![Codecov Coverage](https://codecov.io/gh/Kataglyphis/WebDavClient/branch/main/graph/badge.svg)](https://codecov.io/gh/Kataglyphis/WebDavClient)
 [![CodeQL](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/github-code-scanning/codeql)
-[![TopLang](https://img.shields.io/github/languages/top/Kataglyphis/WebDavClient)]()
+[![TopLang](https://img.shields.io/github/languages/top/Kataglyphis/WebDavClient)](https://github.com/Kataglyphis/WebDavClient)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/JonasHeinle)
 [![Twitter](https://img.shields.io/twitter/follow/Cataglyphis_?style=social)](https://twitter.com/Cataglyphis_)
 [![YouTube](https://img.shields.io/youtube/channel/subscribers/UC3LZiH4sZzzaVBCUV8knYeg?style=social)](https://www.youtube.com/channel/UC3LZiH4sZzzaVBCUV8knYeg)
@@ -84,6 +86,10 @@ This enumeration also includes submodules.
 
 * Python dependencies are listed in requirements.txt and in the 
   requirements folder
+
+```bash
+./scripts/linux/ci_static_analysis.sh > "ci_analysis_$(date +%Y%m%d_%H%M%S).log" 2>&1
+```
 
 ```bash
   conda create --name WebDavClient python=3.11
