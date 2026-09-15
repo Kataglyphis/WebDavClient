@@ -42,7 +42,7 @@ reorganisation.
 | Bind mount vs tar-pipe, Dev Drive filter setup, container reuse | `docs/windows-container-build-performance.md` |
 | Opting a commit into the heavy CI lanes | `docs/ci-build-triggers.md` |
 | Python CI lanes and the uv traps | [`docs/python-ci.md`](third_party/ANTfrastructure/docs/python-ci.md) |
-| The five shell-safety bug classes | ANTfrastructure `AGENTS.md` § *Shell safety conventions* |
+| The five shell-safety bug classes | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md) § *Shell safety conventions* |
 
 **Every `scripts/linux/*.sh` here is a wrapper, not an implementation.** Each
 sources `scripts/linux/lib/antfrastructure.sh` and calls `antfrastructure_exec`

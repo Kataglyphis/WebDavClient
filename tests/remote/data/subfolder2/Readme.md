@@ -59,7 +59,7 @@ Guidelines for contributing to the project.
 5. Open a pull request.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://opensource.org/license/mit) file for details.
 
 ## Contact
 Your Name - [your.email@example.com](mailto:your.email@example.com)
