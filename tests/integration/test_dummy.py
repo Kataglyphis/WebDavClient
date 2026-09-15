@@ -19,9 +19,22 @@ def test_pipeline(monkeypatch: pytest.MonkeyPatch) -> None:
             ]
         )
 
+    class _FixedGenerator:
+        """Stands in for a numpy Generator, returning the fixture above."""
+
+        normal = staticmethod(_mock_random_normal)
+
+    def _mock_default_rng(*_args: object, **_kwargs: object) -> _FixedGenerator:
+        return _FixedGenerator()
+
+    # SimpleMLPreprocessor calls np.random.default_rng().normal(...), the
+    # Generator API. Patching the LEGACY numpy.random.normal here intercepted
+    # nothing, so the pipeline ran on real random data and the label assertion
+    # below was a coin flip: each row is a sum of three N(5, 2) draws tested
+    # against 15, so [1, 0, 1, 1] came up about one run in sixteen.
     monkeypatch.setattr(
-        "numpy.random.normal",
-        _mock_random_normal,
+        "numpy.random.default_rng",
+        _mock_default_rng,
     )
 
     ml = SimpleMLPreprocessor(4)
