@@ -1,0 +1,12 @@
+# Functions over the 80-line limit, frozen at their present length on
+# 2026-09-15, the day `--ratchets` was turned on here. Four-way contract: a new
+# offender, growth, an unrecorded shrink and a stale row all fail, so shrinking
+# one means updating its number here, and deleting the row once it drops under.
+#
+# Format: <path> | <function> | <lines> | <reason>
+#
+# Length is weak evidence on its own. Both rows below are a queue entry, not an
+# accusation; each names the seam it would be split at and what is missing.
+
+kataglyphis_webdavclient/webdavclient.py | WebDavClient.download_files | 86 | Frozen 2026-09-15 at adoption, seam named. 36 of the 86 measured lines are the Google-style docstring (the signature and body together are ~50), so the row overstates the code. The body is one loop over list_files(url), and the seam is the per-entry REMOTE-PATH-TO-LOCAL-PATH derivation: filter_after_global_base_path, urllib unquote, get_sub_path, then the two sub_path trims that turn a listing path into `local_base_path / sub_path / decoded_filename`. That is ~20 lines and would go to a helper, leaving the request and the streamed write. Not split in this pass because it is the package's public download API: the pieces of that derivation each have a unit test (test_filter_after_global_base_path, test_get_sub_path) but their COMPOSITION is covered only end-to-end against the mock server in tests/test_webdav_client.py, so the split wants a direct test first
+setup.py | StripWheel._strip_wheel | 104 | Frozen 2026-09-15 at adoption, reviewed KEEP: one wheel rewrite that has to stay a single transaction. It mkstemp's a sibling .whl, reads the input zip and selects the entries to keep (dropping directory entries, the old RECORD, dist-info signatures and the configured exclude_suffixes), writes those into the temp wheel while accumulating each entry's sha256 and size, appends the regenerated RECORD, then shutil.move's over the original under a finally: that unlinks the temp. The phases do not separate: the RECORD lines are produced BY the write loop, because a hash only means anything once the entry set is final, and the temp-file lifetime has to span all of it. An early return between the phases leaves a half-written wheel, which is worse than a long function

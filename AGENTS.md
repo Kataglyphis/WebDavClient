@@ -51,9 +51,16 @@ change, change it **upstream** — a fix made in the wrapper is a fix the other
 Python consumers never get.
 
 `run-lint-gates.sh` is the same shape over the hub lint aggregator
-(`linux/scripts/run-lint-gates.sh`): six gates — shell lint, workflow lint plus
-the CI image-ref check, secret scan, `ruff`, the shared-config drift check and
-the consumer pin-forwarding check. `.github/workflows/lint-gates.yml` runs that
+(`linux/scripts/run-lint-gates.sh`): seven gates — shell lint, workflow lint
+plus the CI image-ref check, secret scan, `ruff`, the shared-config drift check,
+the consumer pin-forwarding check, and the ratchets. The wrapper passes
+`--ratchets` itself, so the seventh is not optional here: it runs the doc-link
+gate and the eight measurement gates over this tree, each reading its freeze
+file from the repo root (`comment-size.allow`, `function-size.allow`,
+`code-complexity.allow`; the other five are empty and absent, which means
+nothing frozen). A row in one of those files is a queue entry with a reason, not
+a permanent exemption — shrink the thing and delete the row in the same commit,
+because a stale row fails the gate exactly like a new offender. `.github/workflows/lint-gates.yml` runs that
 one command, so the CI step and the local command are the same string. The
 consumer root is passed explicitly, because the hub half of that script lives
 inside the submodule and a self-derived root would grade the wrong tree.
