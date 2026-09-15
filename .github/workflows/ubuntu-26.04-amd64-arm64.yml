@@ -1,0 +1,36 @@
+name: Build + test + run on Linux natively - x86-64/arm64
+
+# The whole lane lives in ANTfrastructure as a reusable workflow. This file is
+# the configuration for it, nothing more. Do not re-inline the steps here: this
+# repo and OrchestrANT previously carried 112-line copies that differed on 14
+# lines, all of them parameters.
+#
+# Everything this repo used to leave unset was already the driver default, so it
+# is left unset here too - only the test matrix is a real override.
+#
+# THE FILE NAME NAMES THE RUNNER, and the runner is the reusable lane's, not
+# this file's: python-ci-linux.yml pins ubuntu-26.04 and ubuntu-26.04-arm for
+# its two matrix legs. It was called ubuntu-24.04-*.yml until 2026-09-15, which
+# had been false since the lane was adopted. `runs-on` is deliberately NOT
+# overridden here, and no image is named either - the lane resolves the family
+# Linux image through its own fallback, held against versions.env upstream.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  linux:
+    uses: Kataglyphis/ANTfrastructure/.github/workflows/python-ci-linux.yml@main
+    with:
+      package-name: kataglyphis_webdavclient
+      test-python-versions: '3.14 3.14t'
+    secrets:
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}
+      FTP_SERVER: ${{ secrets.SERVER }}
+      FTP_USERNAME: ${{ secrets.USERNAME }}
+      # This repo stores the FTP password as PASSWORD; OrchestrANT calls it PW.
+      # The reusable workflow takes a neutral name so neither has to rename.
+      FTP_PASSWORD: ${{ secrets.PASSWORD }}
