@@ -34,7 +34,31 @@ jobs:
     uses: Kataglyphis/ANTfrastructure/.github/workflows/python-ci-linux.yml@main
     with:
       package-name: kataglyphis_webdavclient
-      test-python-versions: '3.14 3.14t'
+      # 3.13 EVERYWHERE A LANE SYNCS THIS PROJECT, and the reason is one
+      # dependency. `tests` declares atheris, every lane syncs with
+      # --all-extras, and atheris 3.0.0 publishes manylinux x86_64 wheels for
+      # cp311, cp312 and cp313 and nothing newer (uv.lock records all three).
+      # On 3.14 uv therefore falls back to the sdist, whose build needs a Clang
+      # with libFuzzer and dies:
+      #   RuntimeError: Failed to find libFuzzer; set either $CLANG_BIN ...
+      # That source build used to succeed in the family image (2026-08-14, run
+      # 31823466662, ~3 minutes of it per venv); it no longer does, on the
+      # runner or on a dev box with the same image. So this is not a CI-only
+      # accident and pinning is not papering over it: 3.13 is the newest
+      # interpreter every locked dependency of this project actually ships.
+      #
+      # 3.14t stays: the driver treats it as EXPERIMENTAL, so its sync failure
+      # warns instead of failing the matrix, which is the point of listing it.
+      # Restore 3.14 here the day atheris ships a cp314 wheel - or the day this
+      # repo decides atheris is worth a marker rather than a pin.
+      #
+      # docs-python-version is still unset because the driver already defaults
+      # it to 3.13, and that is also the version ci_build_docs.sh looks for when
+      # it copies coverage-<version>.xml - which it could never find while the
+      # tests ran on 3.14 alone.
+      test-python-versions: '3.13 3.14t'
+      static-analysis-python-version: '3.13'
+      packaging-python-version: '3.13'
     secrets:
       GHCR_PAT: ${{ secrets.GHCR_PAT }}
       FTP_SERVER: ${{ secrets.SERVER }}

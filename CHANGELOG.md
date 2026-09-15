@@ -88,6 +88,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that named the hub’s `AGENTS.md` and `docs/adopting-in-a-new-project.md` as if
   they were this repo’s, and a relative `LICENSE` link in the two WebDAV test
   fixtures that has never existed beside them.
+- **The Linux lane pinned 3.14, where this project cannot install.** `tests`
+  declares `atheris`, every lane syncs `--all-extras`, and atheris 3.0.0 ships
+  cp311/cp312/cp313 wheels and nothing newer, so 3.14 falls back to an sdist
+  whose build needs a Clang with libFuzzer and fails. That build did succeed in
+  the family image on 2026-08-14 (run `31823466662`); it no longer does, on a
+  runner or on a dev box with the same image. The lane's test, static-analysis
+  and packaging interpreters are 3.13 now — the newest every locked dependency
+  of this project actually ships; 3.14t stays because the driver treats it as
+  experimental and its sync failure only warns. Restore 3.14 when atheris ships
+  a cp314 wheel, or give atheris a marker instead of the lane a pin.
 
 ### Security
 - Placeholder for vulnerabilities patched.
