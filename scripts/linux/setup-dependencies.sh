@@ -1,22 +1,18 @@
 #!/usr/bin/env bash
-# setup-dependencies.sh - project wrapper around ContainerHub's dependency
+# setup-dependencies.sh - project wrapper around ANTfrastructure's dependency
 # installer (linux/scripts/02-toolchain/setup-dependencies.sh).
 #
-# The driver moved from linux/scripts/ into linux/scripts/02-toolchain/ during
-# the scripts reorg; this wrapper still pointed at the old top-level path, so
-# `source` of a nonexistent file aborted under `set -e` with only a bash
-# "No such file or directory" and no hint that the submodule layout had changed.
-# Guarded explicitly now so the next move fails with an actionable message.
+# SOURCED, not exec'd: the upstream driver exports toolchain paths into the
+# calling shell, so `. scripts/linux/setup-dependencies.sh` is the documented
+# use and antfrastructure_exec would throw those exports away with the process.
+#
+# The hand-rolled resolver this replaced repeated the submodule path, the
+# not-found guard and the hint text inline - and had already pointed at a driver
+# path that moved upstream, failing with nothing but bash's "No such file or
+# directory". antfrastructure_source owns all three now, so the next upstream
+# move fails with an actionable message instead.
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONTAINERHUB_SETUP_SCRIPT="$SCRIPT_DIR/../../ExternalLib/Kataglyphis-ContainerHub/linux/scripts/02-toolchain/setup-dependencies.sh"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/antfrastructure.sh"
 
-if [ ! -f "$CONTAINERHUB_SETUP_SCRIPT" ]; then
-  echo "Error: ContainerHub driver not found at $CONTAINERHUB_SETUP_SCRIPT." >&2
-  echo "Run: git submodule update --init --recursive ExternalLib/Kataglyphis-ContainerHub" >&2
-  exit 1
-fi
-
-# shellcheck disable=SC1090
-source "$CONTAINERHUB_SETUP_SCRIPT"
+antfrastructure_source "linux/scripts/02-toolchain/setup-dependencies.sh"

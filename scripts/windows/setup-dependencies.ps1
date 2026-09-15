@@ -7,8 +7,8 @@ Param(
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
-$containerHubModulesPath = Join-Path $repoRoot "ExternalLib\Kataglyphis-ContainerHub\windows\scripts\modules"
-$sharedModulePath = Join-Path $containerHubModulesPath "WindowsScripts.Shared.psm1"
+$antfrastructureModulesPath = Join-Path $repoRoot "third_party\ANTfrastructure\windows\scripts\modules"
+$sharedModulePath = Join-Path $antfrastructureModulesPath "WindowsScripts.Shared.psm1"
 
 if (-not (Test-Path -Path $sharedModulePath)) {
     throw "Required shared module not found: $sharedModulePath"

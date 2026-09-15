@@ -1,14 +1,14 @@
 #requires -Version 7.0
 
-# Copied verbatim from Kataglyphis-ContainerHub
+# Copied verbatim from ANTfrastructure
 # `shared/windows/templates/Resolve-BuildModule.ps1` — do not hand-edit; sync
 # from upstream instead. This is the one build-tooling file that cannot be
 # imported out of the submodule, because it is what *finds* the submodule: it
 # runs before anything upstream is importable.
 #
-# Contract (ContainerHub docs/adopting-in-a-new-project.md § 1):
+# Contract (ANTfrastructure docs/adopting-in-a-new-project.md § 1):
 #
-#   1. ExternalLib/Kataglyphis-ContainerHub/windows/scripts/modules/<Name>.psm1
+#   1. third_party/ANTfrastructure/windows/scripts/modules/<Name>.psm1
 #   2. <this script's directory>/modules/<Name>.psm1   (project-specific fallback)
 #   3. throw, naming BOTH probed paths
 #
@@ -16,20 +16,39 @@
 # automatically, so this repo never silently keeps building against a stale
 # vendored copy. Keep ONLY genuinely project-specific modules in the local
 # fallback directory.
-
+#
+# LOCAL DELTA vs the template: this header block, and nothing else. Everything
+# from `Set-StrictMode` down is byte-identical to the upstream file.
+#
+# That was NOT true before the 2026-09-15 ANTfrastructure migration: this copy had
+# fallen 16 body lines behind canonical — the `.ps1` arm of Resolve-BuildModule,
+# which is what makes Initialize-CiEnvironment.ps1 reachable at all, and the
+# dot-source guard in Import-BuildModule. Nothing could see it, because the only
+# claim of freshness was the word "verbatim" in this header.
+#
+# So the claim is now MACHINE-CHECKED instead of asserted. This copy is registry
+# row `resolve-build-module` (body mode) in ANTfrastructure
+# `shared/config/shared-assets.manifest`, declared in `.antfrastructure-shared.manifest`
+# at this repo's root. Only this header prose and the VALUE of
+# $script:RepoRootRelativeToHere are local; every other line is compared:
+#   bash third_party/ANTfrastructure/shared/config/sync-shared-config.sh --repo-root . --check
+#
+# The template's "ADJUST $script:RepoRootRelativeToHere" note does not apply
+# here - this script does sit exactly two directories below the repo root, so
+# the upstream default (two levels up) is already correct.
 Set-StrictMode -Version Latest
 
 $script:RepoRootRelativeToHere = '..\..'
 
 $script:BuildModuleSearchRoots = @(
-    [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot (Join-Path $script:RepoRootRelativeToHere 'ExternalLib\Kataglyphis-ContainerHub\windows\scripts\modules'))),
+    [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot (Join-Path $script:RepoRootRelativeToHere 'third_party\ANTfrastructure\windows\scripts\modules'))),
     [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'modules'))
 )
 
 function Get-BuildModuleSearchRoot {
     <#
     .SYNOPSIS
-        The module search roots in preference order (ContainerHub first).
+        The module search roots in preference order (ANTfrastructure first).
     #>
     return @($script:BuildModuleSearchRoots)
 }
@@ -37,7 +56,7 @@ function Get-BuildModuleSearchRoot {
 function Resolve-BuildModule {
     <#
     .SYNOPSIS
-        Resolves a build-module name to its .psm1, ContainerHub first.
+        Resolves a build-module name to its .psm1, ANTfrastructure first.
     .PARAMETER Name
         Module name with or without the .psm1 suffix, e.g. 'WindowsBuild.Common'.
     #>
@@ -46,7 +65,16 @@ function Resolve-BuildModule {
         [string] $Name
     )
 
-    $fileName = if ($Name.EndsWith('.psm1', [System.StringComparison]::OrdinalIgnoreCase)) { $Name } else { "$Name.psm1" }
+    # An explicit .psm1 OR .ps1 extension is honoured; a bare name means .psm1.
+    # The .ps1 arm is what makes the repo's dot-sourced helpers reachable at all:
+    # ANTfrastructure ships windows/scripts/modules/Initialize-CiEnvironment.ps1
+    # (New-CiSession + the Write-CiLog family), and because this resolver used to
+    # append '.psm1' unconditionally, every consumer hand-rolled that CI-session
+    # preamble instead. Dot-source it:
+    #     . (Resolve-BuildModule -Name 'Initialize-CiEnvironment.ps1')
+    $known = @('.psm1', '.ps1')
+    $hasExt = $known | Where-Object { $Name.EndsWith($_, [System.StringComparison]::OrdinalIgnoreCase) }
+    $fileName = if ($hasExt) { $Name } else { "$Name.psm1" }
 
     $probed = [System.Collections.Generic.List[string]]::new()
     foreach ($root in $script:BuildModuleSearchRoots) {
@@ -61,8 +89,8 @@ function Resolve-BuildModule {
     # always "submodule not checked out", and the first probed path says so.
     throw ("Build module '$Name' not found. Probed:" + [Environment]::NewLine +
         '  ' + ($probed -join ([Environment]::NewLine + '  ')) + [Environment]::NewLine +
-        'If the ContainerHub path is missing, the submodule is not checked out: ' +
-        'git submodule update --init --recursive ExternalLib/Kataglyphis-ContainerHub')
+        'If the ANTfrastructure path is missing, the submodule is not checked out: ' +
+        'git submodule update --init --recursive third_party/ANTfrastructure')
 }
 
 # Back-compat alias for consumers that adopted the earlier name.
@@ -78,7 +106,7 @@ function Import-BuildModule {
     .DESCRIPTION
         Imports with -Force -Global, in the order given. List modules in
         DEPENDENCY ORDER (WindowsScripts.Shared and WindowsBuild.Common first):
-        ContainerHub's modules pull their own dependencies in with a plain,
+        ANTfrastructure's modules pull their own dependencies in with a plain,
         guarded Import-Module, so one forced top-level import gives every module
         the same copy, whereas forcing a dependency *after* its dependents can
         yank it back out of the global session state — the shadowing pitfall
@@ -90,6 +118,11 @@ function Import-BuildModule {
     )
 
     foreach ($moduleName in $Name) {
+        if ($moduleName.EndsWith('.ps1', [System.StringComparison]::OrdinalIgnoreCase)) {
+            # Import-Module on a plain .ps1 runs it in a throwaway scope and defines
+            # nothing for the caller -- a silent no-op. Dot-source those instead.
+            throw "'$moduleName' is a dot-source script, not a module. Use: . (Resolve-BuildModule -Name '$moduleName')"
+        }
         Import-Module (Resolve-BuildModule -Name $moduleName) -Force -Global -DisableNameChecking
     }
 

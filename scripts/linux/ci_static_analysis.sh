@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ci_static_analysis.sh - project wrapper around ContainerHub's generic Python
+# ci_static_analysis.sh - project wrapper around ANTfrastructure's generic Python
 # static-analysis runner (linux/scripts/02-toolchain/python/ci_static_analysis.sh).
 #
 # The local copy reimplemented the same codespell/bandit/vulture/ruff/ty pipeline
@@ -7,6 +7,6 @@
 # from pyproject.toml.
 set -euo pipefail
 
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/containerhub.sh"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/antfrastructure.sh"
 
-containerhub_exec "linux/scripts/02-toolchain/python/ci_static_analysis.sh" "$@"
+antfrastructure_exec "linux/scripts/02-toolchain/python/ci_static_analysis.sh" "$@"
