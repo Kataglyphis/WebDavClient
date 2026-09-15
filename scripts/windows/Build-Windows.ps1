@@ -12,7 +12,7 @@ $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 Set-Location $repoRoot
 
 # Modules resolve through the shared bootstrap (a verbatim copy of
-# ContainerHub's shared/windows/templates/Resolve-BuildModule.ps1) instead of a
+# ANTfrastructure's shared/windows/templates/Resolve-BuildModule.ps1) instead of a
 # hard-coded submodule path: a module that moves upstream is picked up without
 # editing this script, and a missing submodule reports the exact
 # `git submodule update` command rather than a bare path.
@@ -212,7 +212,7 @@ function Ensure-TestResultsDir {
 # Neue Funktion: FÃ¼hrt einen Schritt aus und trackt Erfolg/Fehler
 
 function Invoke-Step {
-	# Delegates to ContainerHub's Invoke-BuildStep (WindowsBuild.Common), which
+	# Delegates to ANTfrastructure's Invoke-BuildStep (WindowsBuild.Common), which
 	# this script already imports. The local body replaced here was an older fork
 	# of exactly that function - same parameters, same log format, same
 	# StopOnError-and-Critical rethrow - but it tracked allowed failures in
@@ -235,7 +235,7 @@ function Invoke-Step {
 }
 
 function Write-Summary {
-	# Delegates to ContainerHub's Write-BuildSummary. The 39-line local body this
+	# Delegates to ANTfrastructure's Write-BuildSummary. The 39-line local body this
 	# replaced printed the same three sections from the same Results object; the
 	# upstream one additionally reports per-step durations and writes the
 	# machine-readable build-summary JSON to $Context.SummaryPath.
