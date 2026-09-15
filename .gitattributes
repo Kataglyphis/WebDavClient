@@ -16,4 +16,4 @@
 *.bat   text eol=crlf
 
 # exclude vendored trees from language analysis
-ExternalLib/** linguist-vendored
+third_party/** linguist-vendored
