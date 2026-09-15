@@ -40,6 +40,11 @@ MANIFEST
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
+# ... but `*.manifest` is unanchored, so it also swallows the shared-config
+# declaration at the repo root. Without it tracked, the hub's shared-config gate
+# fails on a clean checkout with "no .antfrastructure-shared.manifest" - a red
+# that looks like a missing file and is really a gitignore rule.
+!/.antfrastructure-shared.manifest
 *.spec
 
 # Installer logs
@@ -175,7 +180,7 @@ cython_debug/
 # The bare `lib/` in the Python-template block above is UNANCHORED, so it does
 # not just catch setuptools' build output at the repo root - it swallows any
 # directory named lib at any depth, including scripts/linux/lib/. That directory
-# holds containerhub.sh, the ContainerHub bootstrap every ci_*.sh wrapper
+# holds antfrastructure.sh, the ANTfrastructure bootstrap every ci_*.sh wrapper
 # sources; leaving it untracked pushes wrappers that reference a file no clean
 # checkout has. Git cannot re-include a file whose parent directory is excluded,
 # so the directory has to be un-excluded first - hence both lines.
