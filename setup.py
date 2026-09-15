@@ -1,3 +1,5 @@
+# Copyright (c) 2024 Jonas Heinle
+
 """Build configuration for packaging and optional Cython compilation."""
 
 import base64

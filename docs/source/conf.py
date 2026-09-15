@@ -1,3 +1,5 @@
+# Copyright (c) 2024 Jonas Heinle
+
 """Sphinx configuration for WebDavClient documentation."""
 
 # -- Project information -----------------------------------------------------
@@ -80,6 +82,7 @@ _SPHINX_EXPORTS = (
     html_theme,
     html_theme_options,
     html_static_path,
+    myst_heading_anchors,
     source_suffix,
     html_css_files,
 )

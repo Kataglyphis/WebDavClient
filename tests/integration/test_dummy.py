@@ -1,3 +1,5 @@
+# Copyright (c) 2024 Jonas Heinle
+
 """Integration test for the dummy ML preprocessing pipeline."""
 
 import numpy as np

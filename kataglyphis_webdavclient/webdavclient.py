@@ -1,3 +1,5 @@
+# Copyright (c) 2024 Jonas Heinle
+
 """WebDAV client implementation for listing and downloading remote files."""
 
 import urllib.parse

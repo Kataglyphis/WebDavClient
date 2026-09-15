@@ -1,3 +1,5 @@
+# Copyright (c) 2024 Jonas Heinle
+
 """Tests for the WebDavClient against a local mock WebDAV server."""
 
 import shutil
