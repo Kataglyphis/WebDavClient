@@ -17,6 +17,12 @@ on:
   pull_request:
     branches: [main]
 
+# Same reasoning as the Linux lane: python-ci-windows.yml declares
+# `contents: read` itself, a called workflow runs on the caller's token, and
+# the only registry credential in the lane is secrets.GHCR_PAT.
+permissions:
+  contents: read
+
 jobs:
   windows:
     uses: Kataglyphis/ANTfrastructure/.github/workflows/python-ci-windows.yml@main
