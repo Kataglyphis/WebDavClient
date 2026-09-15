@@ -1,0 +1,7 @@
+# Functions over the complexity limits (cc > 15, nesting > 5), frozen at their
+# present numbers on 2026-09-15, the day `--ratchets` was turned on here. Same
+# four-way contract as function-size.allow.
+#
+# Format: <path> | <function> | <metric: cc|nesting> | <count> | <reason>
+
+setup.py | StripWheel._strip_wheel | cc | 16 | Frozen 2026-09-15 at adoption: the paths are a lookup fallback plus a skip table, not control flow worth trading away. One arm is the RECORD ladder -- find the `.dist-info/RECORD` entry, and when a wheel has none, derive it from the `.dist-info/` directory entry or raise. The rest are the four per-entry skips (directory entry, the old RECORD, a dist-info .jws/.asc/.sig signature that any RECORD rewrite invalidates, and the configured exclude_suffixes). Each is one way a rewritten wheel comes out subtly wrong rather than loudly. The 104-line row in function-size.allow owns the shape; this number moves with it

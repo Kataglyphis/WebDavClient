@@ -8,6 +8,12 @@
 *.sh    text eol=lf
 *.bash  text eol=lf
 
+# The ratchet freeze files, for the same reason: they are read only by the
+# hub's Python gates, which run in the Linux container over this working copy.
+# The parsers strip each line, so a CR would not actually break them today -
+# the rule is here so that stays true by construction rather than by luck.
+*.allow text eol=lf
+
 # Windows-only scripts stay CRLF-friendly; they never run under bash.
 *.ps1   text eol=crlf
 *.psm1  text eol=crlf

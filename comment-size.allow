@@ -1,0 +1,33 @@
+# Comment blocks over the 10-line limit, frozen at the count this repo had on
+# 2026-09-15, the day `--ratchets` was turned on here. Four-way contract: a new
+# block, a grown one, an unrecorded shrink and a stale row all fail, so
+# shortening one means DELETING its row in the same commit.
+#
+# Format: <file>	<first line of the block, truncated to 60 chars>
+# third_party/ANTfrastructure/docs/code-quality-tooling.md
+#
+# Row by row, because the three are not the same case:
+#
+# 1. scripts/linux/lib/antfrastructure.sh:85 (16 lines) -- NOT this repo's to
+#    shrink. The file is the `antfrastructure-sh` shared asset: everything from
+#    its first code line down is the hub's
+#    shared/linux/templates/antfrastructure.sh, and the drift gate compares it.
+#    Shortening the block here would fail shared-config drift on the next run.
+#    It has to be shortened upstream, or not at all.
+#
+# 2. scripts/linux/run-lint-gates.sh:1 (33 lines) -- the header states which six
+#    gates the hub aggregator owns, why the consumer root is passed explicitly
+#    (a self-derived root grades ANTfrastructure's tree and reports green over
+#    the wrong repo), and why the paragraph about the shell linter is phrased
+#    the way it is: a comment whose FIRST word is that linter's name parses as a
+#    DIRECTIVE, and an unparseable one is itself an SC1073 error. That last
+#    point cannot move to docs/ -- it explains the shape of the text it sits in.
+#
+# 3. scripts/linux/setup-dependencies.sh:1 (13 lines) -- records the one thing a
+#    reader will otherwise get wrong: this wrapper is SOURCED, not exec'd,
+#    because the upstream driver exports toolchain paths into the calling shell.
+#    Three lines over the limit for a fact that has already been got wrong once.
+
+scripts/linux/lib/antfrastructure.sh	# Replace this process with a ANTfrastructure driver, forwar
+scripts/linux/run-lint-gates.sh	#!/usr/bin/env bash
+scripts/linux/setup-dependencies.sh	#!/usr/bin/env bash

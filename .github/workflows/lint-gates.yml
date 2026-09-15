@@ -6,7 +6,7 @@ name: Lint gates - shell, workflows, secrets
 #   bash scripts/linux/run-lint-gates.sh
 #
 # ANTfrastructure's linux/scripts/run-lint-gates.sh is the hub lint aggregator
-# (six gates; the list is in that file's header), and owns their pinned and
+# (seven gates; the list is in that file's header), and owns their pinned and
 # SHA-verified bootstraps, the git-ls-files scope construction, the
 # empty-scope vacuity guards and the secret-scanner self-test. This repo's
 # wrapper only passes the consumer root, which upstream refuses to infer - its

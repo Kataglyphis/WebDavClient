@@ -4,7 +4,7 @@
 # raised once at the end.
 #
 # A wrapper around ANTfrastructure's linux/scripts/run-lint-gates.sh, which owns
-# the six gates (listed in its header), their pinned + SHA-verified bootstraps,
+# the seven gates (listed in its header), their pinned + SHA-verified bootstraps,
 # the git-ls-files scope construction, the empty-scope vacuity guards and the
 # secret-scanner self-test (an empty tree must scan clean, a planted PAT must be
 # reported at the path that was passed in - otherwise "no findings" cannot be
@@ -29,10 +29,22 @@
 # third_party/ANTfrastructure is a submodule graded in its own repository at its
 # own ratchet.
 #
+# --ratchets IS PASSED HERE, NOT LEFT TO THE CALLER. It adds the doc-link gate
+# and the eight measurement gates (comment size, code size, complexity, dead
+# functions, masked declarations, trailing conditionals, stdout-in-substituted-
+# functions, and the shellcheck warning baseline) over this repo's tree, each
+# reading its freeze file from the repo root. Upstream keeps it opt-in because a
+# tree with no freeze files is red on its first run and that first report is what
+# seeds them; this repo's are seeded and committed, so there is nothing left to
+# opt into. Leaving it to the caller would mean the gate the owner runs and the
+# gate CI runs are different gates, which is the one thing this wrapper exists to
+# prevent. The flag is idempotent, so passing it again on the command line is
+# harmless.
+#
 #   scripts/linux/run-lint-gates.sh                     # the whole repo
 #   scripts/linux/run-lint-gates.sh --exclude <dir>     # additional exclusions
 set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/antfrastructure.sh"
 
-antfrastructure_exec "linux/scripts/run-lint-gates.sh" "$KATAGLYPHIS_REPO_ROOT" "$@"
+antfrastructure_exec "linux/scripts/run-lint-gates.sh" "$KATAGLYPHIS_REPO_ROOT" --ratchets "$@"
