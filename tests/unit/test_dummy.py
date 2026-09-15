@@ -1,3 +1,5 @@
+# Copyright (c) 2024 Jonas Heinle
+
 """Unit tests for the dummy ML preprocessor."""
 
 import numpy as np

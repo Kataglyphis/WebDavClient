@@ -98,6 +98,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   of this project actually ships; 3.14t stays because the driver treats it as
   experimental and its sync failure only warns. Restore 3.14 when atheris ships
   a cp314 wheel, or give atheris a marker instead of the lane a pin.
+- **Neither half of the Linux lane's gating ran, for one shared reason.**
+  Upstream's `uv_run` is `uv run --active` with the image's
+  `UV_PYTHON=/opt/venv/bin/python` and `VIRTUAL_ENV=/opt/venv` still in scope,
+  while its sibling `uv_sync_project` clears exactly those two for its own call
+  and documents why. Static analysis: its driver never activates the venv it
+  creates (`uv_venv_ensure` activates only one that already existed), so all six
+  gates hit root-owned `/opt/venv` and died with `Permission denied` before
+  running a check. Tests: `uv_run` found the activated `.venv-<ver>` disagreeing
+  with `UV_PYTHON`, deleted it, rebuilt it with the image's interpreter and
+  default groups — and `pytest` is in the `tests` EXTRA, so the run died with
+  ``Failed to spawn: `pytest` ``. The matrix only ever escaped that by testing
+  the one interpreter the image happens to ship. The two wrappers now clear
+  those variables (and static analysis names `UV_PROJECT_ENVIRONMENT`, doing
+  what the `uv_venv_activate` `ci_build_docs.sh` already carries would do).
+  Invisible until the pin reached `604294e2`: upstream ran those six behind
+  `|| true` until 2026-09-08.
+- The two findings that surfaced once the analysers ran for real, fixed rather
+  than ignored: `ruff` CPY001 over twelve files (the MIT `LICENSE`'s notice now
+  heads each one), and `vulture` on `myst_heading_anchors`, which was the one
+  Sphinx setting missing from `conf.py`'s own `_SPHINX_EXPORTS` tuple.
 
 ### Security
 - Placeholder for vulnerabilities patched.

@@ -1,3 +1,5 @@
+# Copyright (c) 2024 Jonas Heinle
+
 """Module to set up and run a WebDAV server using Cheroot WSGI server and WsgiDAVApp.
 
 The server is configured to serve files from the 'tests/remote' directory and listens on port 8081.

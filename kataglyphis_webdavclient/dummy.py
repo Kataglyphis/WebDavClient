@@ -1,3 +1,5 @@
+# Copyright (c) 2024 Jonas Heinle
+
 """Dummy ML preprocessing helpers used by tests and demos."""
 
 import numpy as np
