@@ -1,11 +1,11 @@
-# Kataglyphis-WebDavClient
+# WebDavClient
 
 <div align="center">
   <a href="https://jonasheinle.de">
     <img src="images/logo.png" alt="logo" width="200" />
   </a>
 
-  <h1>Kataglyphis-WebDavClient 🚀</h1>
+  <h1>WebDavClient 🚀</h1>
 
   <h4>Download files via webdav easily. Use it to communicate to cloud storage provider (e.g. Nextcloud, ownCloud, Magenta, Synology NAS,
 QNAPS NAS) and automate your personal storage tasks.  </h4>
@@ -15,15 +15,12 @@ QNAPS NAS) and automate your personal storage tasks.  </h4>
 
 For the official docs follow this [link](https://webdavclient.jonasheinle.de/).
 
-<!-- [![Linux build](https://github.com/Kataglyphis/GraphicsEngineVulkan/actions/workflows/Linux.yml/badge.svg)](https://github.com/Kataglyphis/GraphicsEngineVulkan/actions/workflows/Linux.yml)
-[![Windows build](https://github.com/Kataglyphis/GraphicsEngineVulkan/actions/workflows/Windows.yml/badge.svg)](https://github.com/Kataglyphis/GraphicsEngineVulkan/actions/workflows/Windows.yml)
--->
-[![Ubuntu 24.04 Workflow](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/ubuntu-24.04.yml/badge.svg)](https://github.com/Kataglyphis/Kataglyphis-PythonProjectTemplate/actions/workflows/ubuntu-24.04.yml)
-[![Windows 2025 Workflow](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/windows-2025.yml/badge.svg)](https://github.com/Kataglyphis/Kataglyphis-PythonProjectTemplate/actions/workflows/windows-2025.yml)
-[![Ubuntu 24.04 ARM Workflow](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/ubuntu-24.04-arm.yml/badge.svg)](https://github.com/Kataglyphis/Kataglyphis-PythonProjectTemplate/actions/workflows/ubuntu-24.04-arm.yml)
-[![Automatic Dependency Submission](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/dependency-graph/auto-submission)
+[![Build + test + run on Linux natively - x86-64/arm64](https://github.com/Kataglyphis/WebDavClient/actions/workflows/ubuntu-26.04-amd64-arm64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/ubuntu-26.04-amd64-arm64.yml)
+[![Windows 2025 Workflow](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-2025.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-2025.yml)
+[![Lint gates](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml)
+[![Automatic Dependency Submission](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission)
 [![Codecov Coverage](https://codecov.io/gh/Kataglyphis/WebDavClient/branch/main/graph/badge.svg)](https://codecov.io/gh/Kataglyphis/WebDavClient)
-[![CodeQL](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Kataglyphis/Kataglyphis-WebDavClient/actions/workflows/github-code-scanning/codeql)
+[![CodeQL](https://github.com/Kataglyphis/WebDavClient/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/github-code-scanning/codeql)
 [![TopLang](https://img.shields.io/github/languages/top/Kataglyphis/WebDavClient)](https://github.com/Kataglyphis/WebDavClient)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/JonasHeinle)
 [![Twitter](https://img.shields.io/twitter/follow/Cataglyphis_?style=social)](https://twitter.com/Cataglyphis_)
@@ -111,7 +108,7 @@ This enumeration also includes submodules.
 
 1. Clone the repo
    ```sh
-   git clone --recurse-submodules git@github.com:Kataglyphis/Kataglyphis-WebDavClient.git
+   git clone --recurse-submodules git@github.com:Kataglyphis/WebDavClient.git
    ```
 
 ## Tests

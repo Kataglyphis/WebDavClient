@@ -1,5 +1,5 @@
-Kataglyphis-WebDavClient
-========================
+WebDavClient
+============
 
 .. automodule:: kataglyphis_webdavclient.webdavclient
     :members:

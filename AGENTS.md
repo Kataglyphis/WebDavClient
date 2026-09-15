@@ -1,12 +1,11 @@
 # AGENTS.md
 
-Guidance for coding agents (and new contributors) working in
-Kataglyphis-WebDavClient.
+Guidance for coding agents (and new contributors) working in WebDavClient.
 
-Laid out per ContainerHub's
-[`shared/templates/AGENTS.md.template`](ExternalLib/Kataglyphis-ContainerHub/shared/templates/README.md).
+Laid out per ANTfrastructure's
+[`shared/templates/AGENTS.md.template`](third_party/ANTfrastructure/shared/templates/README.md).
 The rule that shapes it: *would this still be true in a different project?* If
-yes, ContainerHub owns it and § 2 links to it. If no, it is written out in § 3.
+yes, ANTfrastructure owns it and § 2 links to it. If no, it is written out in § 3.
 
 ## 1. What this project is
 
@@ -19,43 +18,67 @@ the other Python repos here.
 | `kataglyphis_webdavclient/` | The package — `webdavclient.py` is the substance |
 | `tests/` | `unit/`, `integration/`, `fuzzy/`, `remote/`, plus `mock_webdav_server.py` |
 | `bench/`, `demo/` | Benchmarks and a runnable example |
-| `scripts/linux/` | Four ~15–30 line wrappers over ContainerHub's Python CI drivers |
+| `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh` |
 | `scripts/windows/` | `Build-Windows.ps1` + the `Resolve-BuildModule.ps1` bootstrap |
-| `ExternalLib/Kataglyphis-ContainerHub` | The submodule owning every reusable script, module and doc |
+| `third_party/ANTfrastructure` | The submodule owning every reusable script, module and doc |
 
 Distribution name and module name agree here (`kataglyphis_webdavclient`), so
 upstream's `PACKAGE_NAME` derivation from `pyproject.toml` is correct and no
 wrapper overrides it.
 
-## 2. What ContainerHub owns — links only
+## 2. What ANTfrastructure owns — links only
 
 **Do not restate these procedures here.** Start at
-[`ExternalLib/Kataglyphis-ContainerHub/docs/INDEX.md`](ExternalLib/Kataglyphis-ContainerHub/docs/INDEX.md),
+[`third_party/ANTfrastructure/docs/INDEX.md`](third_party/ANTfrastructure/docs/INDEX.md),
 which maps topic → owning document, so these links survive upstream
 reorganisation.
 
 | Topic | Where |
 | --- | --- |
-| Wiring this repo to ContainerHub — resolver, actions, libraries | `docs/adopting-in-a-new-project.md` |
+| Wiring this repo to ANTfrastructure — resolver, actions, libraries | `docs/adopting-in-a-new-project.md` |
 | Linux container builds | `docs/linux-build-basics.md` |
 | Running Linux containers on a Windows host | `docs/rancher-desktop-linux-containers.md` |
 | The Windows image, its entrypoint and known traps | `docs/windows-builds.md` |
 | Bind mount vs tar-pipe, Dev Drive filter setup, container reuse | `docs/windows-container-build-performance.md` |
 | Opting a commit into the heavy CI lanes | `docs/ci-build-triggers.md` |
-| The five shell-safety bug classes | ContainerHub `AGENTS.md` § *Shell safety conventions* |
+| Python CI lanes and the uv traps | [`docs/python-ci.md`](third_party/ANTfrastructure/docs/python-ci.md) |
+| The five shell-safety bug classes | ANTfrastructure `AGENTS.md` § *Shell safety conventions* |
 
-**The four `scripts/linux/ci_*.sh` are wrappers, not implementations.** Each
-sources `scripts/linux/lib/containerhub.sh` and calls `containerhub_exec` into
-`ExternalLib/Kataglyphis-ContainerHub/linux/scripts/02-toolchain/python/`. When
-behaviour needs to change, change it **upstream** — a fix made in the wrapper is
-a fix the other Python consumers never get.
+**Every `scripts/linux/*.sh` here is a wrapper, not an implementation.** Each
+sources `scripts/linux/lib/antfrastructure.sh` and calls `antfrastructure_exec`
+(or `antfrastructure_source`) into the submodule. When behaviour needs to
+change, change it **upstream** — a fix made in the wrapper is a fix the other
+Python consumers never get.
 
-`lib/containerhub.sh` is a verbatim copy of ContainerHub's
-[`shared/linux/templates/containerhub.sh`](ExternalLib/Kataglyphis-ContainerHub/shared/linux/templates/README.md)
+`run-lint-gates.sh` is the same shape over the hub lint aggregator
+(`linux/scripts/run-lint-gates.sh`): six gates — shell lint, workflow lint plus
+the CI image-ref check, secret scan, `ruff`, the shared-config drift check and
+the consumer pin-forwarding check. `.github/workflows/lint-gates.yml` runs that
+one command, so the CI step and the local command are the same string. The
+consumer root is passed explicitly, because the hub half of that script lives
+inside the submodule and a self-derived root would grade the wrong tree.
+
+`lib/antfrastructure.sh` is a verbatim copy of ANTfrastructure's
+[`shared/linux/templates/antfrastructure.sh`](third_party/ANTfrastructure/shared/linux/templates/README.md)
 — the bash twin of `Resolve-BuildModule.ps1`, and the only other file that
 cannot live upstream because it is what *finds* the submodule. Do not hand-edit
 it; sync from upstream. It owns the not-found guard and the `WORKSPACE_ROOT`
 export that every wrapper used to repeat.
+
+**Both copies are machine-checked, not asserted.** `.antfrastructure-shared.manifest`
+at the repo root declares the two ids this repo takes (`antfrastructure-sh`,
+`resolve-build-module`) from the registry in
+`third_party/ANTfrastructure/shared/config/shared-assets.manifest`; the
+shared-config gate compares them on every lint run:
+
+```bash
+bash third_party/ANTfrastructure/shared/config/sync-shared-config.sh --repo-root . --check
+```
+
+An asset left out of the manifest is never compared — that is how an
+intentional project-owned override is recorded. The word "verbatim" in a header
+is not a check: before 2026-09-15 `Resolve-BuildModule.ps1` had silently fallen
+16 body lines behind canonical while still claiming to be a verbatim copy.
 
 | Wrapper | Upstream driver | Local addition |
 | --- | --- | --- |
@@ -66,11 +89,12 @@ export that every wrapper used to repeat.
 
 Two upstream facts repeated here only because they bite before you reach a doc:
 
-- Every ContainerHub PowerShell module declares `#requires -Version 7.0`, so
+- Every ANTfrastructure PowerShell module declares `#requires -Version 7.0`, so
   `Build-Windows.ps1` does too — launch with `pwsh`, never `powershell`. Under
   5.1 it fails as an opaque `Import-Module` error.
-- Composite actions resolve at `@main`, so a ContainerHub change a workflow
-  depends on must be pushed **before** the consumer change.
+- Composite actions and the reusable workflows resolve at `@main`, so an
+  ANTfrastructure change a workflow depends on must be pushed **before** the
+  consumer change.
 
 **This repo's glue:** `scripts/windows/Resolve-BuildModule.ps1` — the one file
 that cannot live upstream, because it is what *finds* the submodule. Note that
@@ -89,13 +113,13 @@ written out rather than linked.
   If a second binary-wheel project appears, move it up then.
 - **`WORKSPACE_ROOT` is handled for you — do not remove it.** Upstream's
   `detect_workspace` derives it from the sourcing script's location, which for a
-  *delegated* driver resolves inside `ExternalLib/Kataglyphis-ContainerHub/` —
+  *delegated* driver resolves inside `third_party/ANTfrastructure/` —
   so every tool would run against the submodule tree instead of this repo.
-  `containerhub_exec` pins it to the repo root before handing off (it used to be
-  repeated in every wrapper); `detect_workspace` honours a pre-set value and
+  `antfrastructure_exec` pins it to the repo root before handing off (it used to
+  be repeated in every wrapper); `detect_workspace` honours a pre-set value and
   still overrides to `/workspace` in the container, so CI is unaffected. Listed
-  here only because a wrapper that stops going through `containerhub_exec` loses
-  it silently.
+  here only because a wrapper that stops going through `antfrastructure_exec`
+  loses it silently.
 - **Do not re-add a `PACKAGE_NAME` default.** The pre-wrapper `ci_tests.sh`
   defaulted it to `orchestr_ant_ion` — the *sibling* project's name, copy-pasted.
   It only ever worked because CI passed the name explicitly. Upstream derives it
@@ -117,6 +141,8 @@ bash scripts/linux/ci_tests.sh           # pytest + coverage
 bash scripts/linux/ci_static_analysis.sh # lint + type check
 bash scripts/linux/ci_build_docs.sh      # Sphinx
 bash scripts/linux/ci_packaging.sh       # binary wheel + sdist (installs patchelf)
+
+bash scripts/linux/run-lint-gates.sh     # shell + workflow + secret + pin gates
 ```
 
 Windows:
@@ -125,8 +151,11 @@ Windows:
 pwsh -NoProfile -File .\scripts\windows\Build-Windows.ps1
 ```
 
-CI lanes: `.github/workflows/ubuntu-24.04-amd64-arm64.yml` (native x86-64 and
-arm64) and `.github/workflows/windows-2025.yml`.
+CI lanes: `.github/workflows/ubuntu-26.04-amd64-arm64.yml` (native x86-64 and
+arm64), `.github/workflows/windows-2025.yml` — both of them configuration for an
+ANTfrastructure reusable workflow, do not re-inline the steps — and
+`.github/workflows/lint-gates.yml`, which is inline only because there is no
+reusable lint lane upstream yet.
 
 ## 5. Docs owned by this repo
 

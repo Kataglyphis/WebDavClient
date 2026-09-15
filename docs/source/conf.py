@@ -1,4 +1,4 @@
-"""Sphinx configuration for Kataglyphis-WebDavClient documentation."""
+"""Sphinx configuration for WebDavClient documentation."""
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path("../../").resolve()))
 
-project = "Kataglyphis-WebDavClient"
+project = "WebDavClient"
 project_copyright = "2024, Jonas Heinle"
 author = "Jonas Heinle"
 release = "0.0.1"
@@ -50,7 +50,7 @@ exclude_patterns = []
 
 html_theme = "sphinx_book_theme"
 html_theme_options = {
-    "repository_url": "https://github.com/Kataglyphis/Kataglyphis-WebDavClient",
+    "repository_url": "https://github.com/Kataglyphis/WebDavClient",
     "use_repository_button": True,
     "show_navbar_depth": 2,
     "navigation_with_keys": True,
