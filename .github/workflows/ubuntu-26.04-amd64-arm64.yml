@@ -21,6 +21,14 @@ on:
   pull_request:
     branches: ["main"]
 
+# The reusable lane declares exactly this at its own top level, and the
+# GITHUB_TOKEN a called workflow gets is the CALLER's. Registry auth in the
+# lane runs on secrets.GHCR_PAT, not on GITHUB_TOKEN, so read-only contents is
+# the whole requirement; leaving it unset handed the lane the repository
+# default instead, which is write on a default-permissive repository.
+permissions:
+  contents: read
+
 jobs:
   linux:
     uses: Kataglyphis/ANTfrastructure/.github/workflows/python-ci-linux.yml@main
