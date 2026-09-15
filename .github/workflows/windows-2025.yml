@@ -1,10 +1,10 @@
 # .github/workflows/windows-2025.yml
 name: Windows 2025 Workflow
 
-# The lane lives in ContainerHub as a reusable workflow; this file is only its
-# configuration. Do not re-inline the steps: this repo and
-# Kataglyphis-Orchestr-ANT-ion previously carried ~70-line copies that differed
-# on 20 lines, all of it drift rather than intent.
+# The lane lives in ANTfrastructure as a reusable workflow; this file is only
+# its configuration. Do not re-inline the steps: this repo and OrchestrANT
+# previously carried ~70-line copies that differed on 20 lines, all of it
+# drift rather than intent.
 #
 # This repo's behaviour is unchanged by the move - the shared lane took the safer
 # option wherever the two copies disagreed, and in every case that was this one's
@@ -19,7 +19,7 @@ on:
 
 jobs:
   windows:
-    uses: Kataglyphis/Kataglyphis-ContainerHub/.github/workflows/python-ci-windows.yml@main
+    uses: Kataglyphis/ANTfrastructure/.github/workflows/python-ci-windows.yml@main
     with:
       # Full history: this repo's packaging derives its version from git.
       fetch-depth: 0

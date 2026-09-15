@@ -61,7 +61,12 @@ tests = [
     "codespell",
     "bandit",           # find security vulnerabilities
     "vulture",          # find dead code
-    "ruff",             # replacement for flake8
+    # PINNED, and the pin is not cosmetic: an unpinned "ruff" is how a sibling
+    # consumer drifted to 0.15.21 while the hub graded CI with 0.16.4, so the
+    # same tree passed locally and failed in CI. The number follows
+    # ANTfrastructure linux/scripts/01-core/versions.env RUFF_VERSION and is
+    # compared against it by the consumer-pins lint gate.
+    "ruff==0.16.7",     # replacement for flake8
     "ty",               # type checking
     "wsgidav",
     "cheroot",
@@ -80,7 +85,7 @@ docs = [
 
 [project.urls]
 Homepage = "https://webdavclient.jonas.heinle.de"
-Source = "https://github.com/Kataglyphis/Kataglyphis-WebDavClient"
+Source = "https://github.com/Kataglyphis/WebDavClient"
 
 [tool.black]
 line-length = 88
