@@ -17,9 +17,9 @@ name: Build + test + run on Linux natively - x86-64/arm64
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "develop"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "develop"]
 
 # The reusable lane declares exactly this at its own top level, and the
 # GITHUB_TOKEN a called workflow gets is the CALLER's. Registry auth in the
