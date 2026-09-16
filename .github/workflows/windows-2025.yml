@@ -13,9 +13,9 @@ name: Windows 2025 Workflow
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 # Same reasoning as the Linux lane: python-ci-windows.yml declares
 # `contents: read` itself, a called workflow runs on the caller's token, and
