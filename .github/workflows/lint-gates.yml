@@ -1,4 +1,4 @@
-name: Lint gates - shell, workflows, secrets
+name: Lint gates
 
 # THE JOB BELOW RUNS THE SAME COMMAND THE OWNER RUNS LOCALLY, and that identity
 # is the whole point of the file:

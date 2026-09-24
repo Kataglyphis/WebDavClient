@@ -159,10 +159,15 @@ pwsh -NoProfile -File .\scripts\windows\Build-Windows.ps1
 ```
 
 CI lanes: `.github/workflows/ubuntu-26.04-amd64-arm64.yml` (native x86-64 and
-arm64), `.github/workflows/windows-2025.yml` — both of them configuration for an
+arm64), `.github/workflows/windows-x64.yml` — both of them configuration for an
 ANTfrastructure reusable workflow, do not re-inline the steps — and
 `.github/workflows/lint-gates.yml`, which is inline only because there is no
-reusable lint lane upstream yet.
+reusable lint lane upstream yet. File and display names follow the family
+convention (owner decision 2026-09-24): kebab-case, one file per platform +
+arch, display names `<Platform> <Arch> · <what>`, shared lanes named the same
+in every repo (`Lint gates`). `ubuntu-26.04-amd64-arm64.yml` is the one file
+still named the old way; its split into `linux-x64.yml` and `linux-arm64.yml`
+waits for a hub reusable-lane input that is not on hub `main` yet.
 
 ## 5. Docs owned by this repo
 
