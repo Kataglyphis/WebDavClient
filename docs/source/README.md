@@ -16,7 +16,7 @@ QNAPS NAS) and automate your personal storage tasks.  </h4>
 For the official docs follow this [link](https://webdavclient.jonasheinle.de/).
 
 [![Build + test + run on Linux natively - x86-64/arm64](https://github.com/Kataglyphis/WebDavClient/actions/workflows/ubuntu-26.04-amd64-arm64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/ubuntu-26.04-amd64-arm64.yml)
-[![Windows 2025 Workflow](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-2025.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-2025.yml)
+[![Windows x64 · build + test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-x64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-x64.yml)
 [![Lint gates](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml)
 [![Automatic Dependency Submission](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission)
 [![Codecov Coverage](https://codecov.io/gh/Kataglyphis/WebDavClient/branch/main/graph/badge.svg)](https://codecov.io/gh/Kataglyphis/WebDavClient)

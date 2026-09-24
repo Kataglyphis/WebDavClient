@@ -30,6 +30,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runner labels it predates.
 
 ### Changed
+- **2026-09-24: the workflows follow the family naming convention** (owner
+  decision). `windows-2025.yml` is `windows-x64.yml` ("Windows x64 · build +
+  test") and the lint lane's display name is plain `Lint gates`, as in every
+  other repo. Triggers, jobs and job ids are unchanged; the README badges
+  follow the new file. `ubuntu-26.04-amd64-arm64.yml` keeps its name for now:
+  its split into `linux-x64.yml` and `linux-arm64.yml` needs a hub
+  reusable-lane input that is not on hub `main` yet.
 - **The hub pin moved to ANTfrastructure `19286e9f`** (from the published
   `4f6f516a`). The published hub still listed WebDavClient under `unconfirmed`
   in its `.github/consumers.json`, and the workflow-conventions gate refuses a
