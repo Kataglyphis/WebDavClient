@@ -39,6 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   which runs what `scripts/linux/run-lint-gates.sh` runs locally; its header had
   asked for exactly this switch the day that lane existed. The README badges
   follow the new files.
+- **2026-09-25: ANTfrastructure's reusable workflows and composite actions are
+  called at `@develop`**, no longer `@main` as the older entry below says. Since
+  2026-09-16 every lane also runs on pushes and pull requests to `develop`, not
+  only `main`. The hub pin is `539ee280` (2026-09-16), which is on the hub's
+  `main`, as is the `19286e9f` the NOTE below warns about.
 - **2026-09-24: the workflows follow the family naming convention** (owner
   decision). `windows-2025.yml` is `windows-x64.yml` ("Windows x64 · build +
   test") and the lint lane's display name is plain `Lint gates`, as in every
@@ -140,10 +145,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.0] - YYYY-MM-DD
-
-### Added
-- Initial release.
+No version has been released yet: `VERSION.txt` reads `0.0.1`, and the
+repository carries no tags (2026-09-25).
 
 <!-- Add past versions below this line -->
 
@@ -157,5 +160,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <!-- Links for diffs -->
-[Unreleased]: https://your.repo.url/compare/v1.0.0...HEAD
-[1.0.0]: https://your.repo.url/releases/tag/v1.0.0
+[Unreleased]: https://github.com/Kataglyphis/WebDavClient/commits/develop
