@@ -1,0 +1,28 @@
+name: Linux arm64 · build + test
+
+# The arm64 row of the same reusable lane linux-x64.yml runs (one file per
+# platform + arch, the fleet convention). The Python versions MUST match
+# linux-x64.yml's, whose comment says why they are 3.13 and 3.14t: the arm64
+# runner syncs the same lock. No FTP secrets: python-ci-linux.yml deploys the
+# docs from the x64 row only.
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    uses: Kataglyphis/ANTfrastructure/.github/workflows/python-ci-linux.yml@develop
+    with:
+      arches: arm64
+      package-name: kataglyphis_webdavclient
+      test-python-versions: '3.13 3.14t'
+      static-analysis-python-version: '3.13'
+      packaging-python-version: '3.13'
+    secrets:
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}

@@ -30,6 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runner labels it predates.
 
 ### Changed
+- **2026-09-25: one workflow per platform + arch, and every lane a thin caller.**
+  `ubuntu-26.04-amd64-arm64.yml` is split into `linux-x64.yml` ("Linux x64 · build
+  + test") and `linux-arm64.yml` ("Linux arm64 · build + test"), both calling
+  ANTfrastructure's `python-ci-linux.yml` with `arches: x64` / `arches: arm64`. The
+  docs deploy stays on the x64 row, so only that file passes the FTP secrets.
+  `lint-gates.yml` now calls the hub's reusable lint lane with `ratchets: true`,
+  which runs what `scripts/linux/run-lint-gates.sh` runs locally; its header had
+  asked for exactly this switch the day that lane existed. The README badges
+  follow the new files.
 - **2026-09-24: the workflows follow the family naming convention** (owner
   decision). `windows-2025.yml` is `windows-x64.yml` ("Windows x64 · build +
   test") and the lint lane's display name is plain `Lint gates`, as in every
