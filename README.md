@@ -20,7 +20,6 @@ For the official docs follow this [link](https://webdavclient.jonasheinle.de/).
 [![Windows x64 · build + test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-x64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-x64.yml)
 [![Lint gates](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml)
 [![Automatic Dependency Submission](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission)
-[![Codecov Coverage](https://codecov.io/gh/Kataglyphis/WebDavClient/branch/main/graph/badge.svg)](https://codecov.io/gh/Kataglyphis/WebDavClient)
 [![CodeQL](https://github.com/Kataglyphis/WebDavClient/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/github-code-scanning/codeql)
 [![TopLang](https://img.shields.io/github/languages/top/Kataglyphis/WebDavClient)](https://github.com/Kataglyphis/WebDavClient)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/JonasHeinle)
@@ -56,19 +55,20 @@ files from your cloud. This is an easy way to do it
 ### Usage Example:
 
 ```python
-Example usage of the method:
-    from kataglyphis_webdavclient.webdavclient import WebDavClient
-    
-    hostname = "https://yourhost.de/webdav"
-    username = "Schlawiner23"
-    password = "YOUR_PERSONAL_TOKEN"
-    remote_base_path = "MyProjectFolder"
-    local_base_path = "assets"
-    webdevclient = WebDavClient(args.hostname, args.username, args.password)
-    webdevclient.download_all_files_iterative(
-        args.remote_base_path, args.local_base_path
-    )
+from kataglyphis_webdavclient.webdavclient import WebDavClient
+
+hostname = "https://yourhost.de/webdav"
+username = "Schlawiner23"
+password = "YOUR_PERSONAL_TOKEN"
+remote_base_path = "MyProjectFolder"
+local_base_path = "assets"
+webdevclient = WebDavClient(hostname, username, password)
+webdevclient.download_all_files_iterative(remote_base_path, local_base_path)
 ```
+
+Creating a `WebDavClient` also creates `logs/` in the current working directory
+and logs to `logs/downloadMd_s.log` there. `demo/download_markdown_files.py` is
+the same example as a command-line script.
 
 ### Key Features
 
@@ -78,21 +78,19 @@ Example usage of the method:
 | Download all files from remote host |         ✔️         |
 
 ### Dependencies
-I use Python 3.11
+Python ≥ 3.10 (`requires-python` in `pyproject.toml`), managed with
+[uv](https://docs.astral.sh/uv/).
 
-This enumeration also includes submodules.
-
-* Python dependencies are listed in requirements.txt and in the 
-  requirements folder
+* Python dependencies are declared in `pyproject.toml` (the runtime set plus
+  the `tests` and `docs` extras) and locked in `uv.lock`
 
 ```bash
-./scripts/linux/ci_static_analysis.sh > "ci_analysis_$(date +%Y%m%d_%H%M%S).log" 2>&1
+./scripts/linux/ci_static_analysis.sh x64 3.13 > "ci_analysis_$(date +%Y%m%d_%H%M%S).log" 2>&1
 ```
 
 ```bash
-  conda create --name WebDavClient python=3.11
-  conda activate WebDavClient
-  pip install -r requirements.txt
+  # 3.13: the newest interpreter the tests extra's atheris ships wheels for
+  uv sync --all-extras --python 3.13
 ```
 <!-- * [Vulkan 1.3](https://www.vulkan.org/) -->
 
@@ -113,7 +111,9 @@ This enumeration also includes submodules.
    ```
 
 ## Tests
-Run pytest in root directory :smile:
+Run pytest in root directory (`uv run pytest` after the sync above) :smile:
+The WebDAV tests start a local mock server over `tests/remote/`, so no remote
+host is needed. The CI lanes run `tests/unit` only.
 
 <!-- ROADMAP -->
 ## Roadmap
@@ -136,6 +136,8 @@ Contributions are what make the open source community such an amazing place to b
 
 <!-- LICENSE -->
 ## License
+
+MIT — the text is in `LICENSE`.
 
 <!-- CONTACT -->
 ## Contact

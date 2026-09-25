@@ -12,12 +12,12 @@ Hinweis: In diesem Dokument meint „**uv**“ in zwei Kontexten unterschiedlich
 ---
 
 ## Kurze Zusammenfassung / About
-Dieses Repository enthält native Komponenten (C/C++), Rust‑Bibliotheken, und eine Flutter‑UI (Dart). Der Fokus liegt auf Performance, Cross‑Language Interop, deterministischem Verhalten und starker Typisierung.
+Dieses Repository ist ein Python‑Paket, ein WebDAV‑Client (`kataglyphis_webdavclient/`); für das Binär‑Wheel wird es mit Cython kompiliert. C/C++‑Quellen, Rust und Dart/Flutter gibt es hier nicht — die Abschnitte dazu stammen aus der mehrsprachigen Vorlage dieser Datei. Der Fokus liegt auf deterministischem Verhalten und starker Typisierung.
 
 ---
 
 ## Repository‑Scope
-- **Behandeln mit Vorrang:** `src/`, `lib/`, `rust/`, `flutter/`, `native/`, `include/`, `tests/`.
+- **Behandeln mit Vorrang:** `kataglyphis_webdavclient/`, `tests/`.
 - **Ignorieren / nur mit Vorsicht ändern:** `third_party/`, `vendor/`, `build/`, `artifacts/`.
 - **CI/Infra:** Vorschläge für CI (z. B. GitHub Actions) nur wenn klarer Nutzen erkennbar; keine ungeprüften Änderungen an Workflows ohne Review.
 
@@ -92,7 +92,7 @@ Dieses Repository enthält native Komponenten (C/C++), Rust‑Bibliotheken, und 
 - **Formatierung: `ruff format .` häufig ausführen.** Python-Code soll regelmäßig mit `ruff format .` formatiert werden, um konsistenten Code-Stil zu gewährleisten. Copilot soll:
   - Code so schreiben, dass er `ruff format`-konform ist.
   - Bei längeren Änderungen: `ruff format .` nach Abschluss empfehlen.
-- **Typisierung: `ty` (Pyre Type Checker) ist MANDATORY.** Alle Änderungen müssen `uv run ty check` ohne Fehler bestehen. Copilot soll:
+- **Typisierung: `ty` (Astrals Type Checker) ist MANDATORY.** Alle Änderungen müssen `uv run ty check` ohne Fehler bestehen. Copilot soll:
   - Vollständige Typannotationen für **alle öffentlichen Funktionen und Klassen**.
   - `from __future__ import annotations` am Datei-Anfang verwenden.
   - Moderne Python 3.10+ Syntax für Types: `list[T]`, `dict[K,V]`, `tuple[T,...]`, `X | None` (statt `List`, `Dict`, `Tuple`, `Optional`).
@@ -157,7 +157,7 @@ Copilot soll bei „How to validate“ bevorzugt konkrete, reproduzierbare Komma
 ---
 
 ## Lizenz & rechtliche Hinweise
-- Repository‑Lizenz: bitte hier eintragen (z. B. MIT / Apache‑2.0). Copilot soll Lizenz‑Header nur vorschlagen, wenn klar passend.
+- Repository‑Lizenz: MIT (`LICENSE`). Copilot soll Lizenz‑Header nur vorschlagen, wenn klar passend.
 
 ---
 

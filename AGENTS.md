@@ -10,13 +10,15 @@ yes, ANTfrastructure owns it and § 2 links to it. If no, it is written out in �
 ## 1. What this project is
 
 A Python package for talking to a WebDAV host. Python ≥ 3.10, managed with `uv`.
-It builds a **binary** wheel, which is what makes its packaging lane differ from
-the other Python repos here.
+It builds a **binary** wheel: the hub packaging driver exports `CYTHONIZE=True`,
+and `setup.py` then compiles every module with Cython and strips the sources
+from the wheel. OrchestrANT's wheel is built the same way — same driver, same
+`CYTHONIZE` switch in its own `setup.py` — so this does not set the lane apart.
 
 | Path | What lives there |
 | --- | --- |
 | `kataglyphis_webdavclient/` | The package — `webdavclient.py` is the substance |
-| `tests/` | `unit/`, `integration/`, `fuzzy/`, `remote/`, plus `mock_webdav_server.py` |
+| `tests/` | `test_webdav_client.py` and the `mock_webdav_server.py` it starts, plus `unit/`, `integration/`, `fuzzy/` and `remote/` (the mock server's document root) |
 | `bench/`, `demo/` | Benchmarks and a runnable example |
 | `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh` |
 | `scripts/windows/` | `Build-Windows.ps1` + the `Resolve-BuildModule.ps1` bootstrap |
@@ -40,7 +42,6 @@ reorganisation.
 | Running Linux containers on a Windows host | `docs/rancher-desktop-linux-containers.md` |
 | The Windows image, its entrypoint and known traps | `docs/windows-builds.md` |
 | Bind mount vs tar-pipe, Dev Drive filter setup, container reuse | `docs/windows-container-build-performance.md` |
-| Opting a commit into the heavy CI lanes | `docs/ci-build-triggers.md` |
 | Python CI lanes and the uv traps | [`docs/python-ci.md`](third_party/ANTfrastructure/docs/python-ci.md) |
 | The five shell-safety bug classes | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md) § *Shell safety conventions* |
 
@@ -60,10 +61,13 @@ file from the repo root (`comment-size.allow`, `function-size.allow`,
 `code-complexity.allow`; the other five are empty and absent, which means
 nothing frozen). A row in one of those files is a queue entry with a reason, not
 a permanent exemption — shrink the thing and delete the row in the same commit,
-because a stale row fails the gate exactly like a new offender. `.github/workflows/lint-gates.yml` runs that
-one command, so the CI step and the local command are the same string. The
-consumer root is passed explicitly, because the hub half of that script lives
-inside the submodule and a self-derived root would grade the wrong tree.
+because a stale row fails the gate exactly like a new offender.
+`.github/workflows/lint-gates.yml` calls the hub's reusable lint lane with
+`ratchets: true`, which runs the same aggregator over the same root with the
+same `--ratchets` — straight from `third_party/ANTfrastructure`, not through
+this wrapper. The consumer root is passed explicitly on both paths, because the
+hub half of that script lives inside the submodule and a self-derived root
+would grade the wrong tree.
 
 `lib/antfrastructure.sh` is a verbatim copy of ANTfrastructure's
 [`shared/linux/templates/antfrastructure.sh`](third_party/ANTfrastructure/shared/linux/templates/README.md)
@@ -89,16 +93,18 @@ is not a check: before 2026-09-15 `Resolve-BuildModule.ps1` had silently fallen
 
 | Wrapper | Upstream driver | Local addition |
 | --- | --- | --- |
-| `ci_tests.sh` | `python/ci_tests.sh` | none |
-| `ci_static_analysis.sh` | `python/ci_static_analysis.sh` | none |
+| `ci_tests.sh` | `python/ci_tests.sh` | unsets `UV_PYTHON` — redundant at the current pin, whose `uv_run` clears it itself (hub `e9e4b1d2`); the wrapper's comment says to drop it then |
+| `ci_static_analysis.sh` | `python/ci_static_analysis.sh` | unsets `VIRTUAL_ENV` and `UV_PYTHON` and points `UV_PROJECT_ENVIRONMENT` at the venv the driver creates but never activates |
 | `ci_build_docs.sh` | `python/ci_build_docs.sh` | none |
 | `ci_packaging.sh` | `python/ci_packaging.sh` | installs `patchelf` — see § 3 |
 
 Two upstream facts repeated here only because they bite before you reach a doc:
 
-- Every ANTfrastructure PowerShell module declares `#requires -Version 7.0`, so
-  `Build-Windows.ps1` does too — launch with `pwsh`, never `powershell`. Under
-  5.1 it fails as an opaque `Import-Module` error.
+- Every ANTfrastructure PowerShell module declares `#requires -Version 7.0`, and
+  so does `scripts/windows/Resolve-BuildModule.ps1` — launch with `pwsh`, never
+  `powershell`. `Build-Windows.ps1` declares nothing itself, but it dot-sources
+  that bootstrap first; under 5.1 the run stops there with a
+  `ScriptRequiresException` naming 7.0 (measured 2026-09-25).
 - Composite actions and the reusable workflows resolve at `@develop`, so an
   ANTfrastructure change a workflow depends on must be pushed **before** the
   consumer change.
@@ -113,11 +119,12 @@ into must be named in the `Import-BuildModule` list explicitly.
 Everything here is false or meaningless in another repo — that is why it is
 written out rather than linked.
 
-- **`ci_packaging.sh` keeps one local step: `patchelf`.** The binary wheel needs
-  its RPATHs repaired on the runner and upstream's driver does not install it.
-  This stays local deliberately — no second consumer needs it, and the
-  two-consumer rule says one consumer is not enough to justify going upstream.
-  If a second binary-wheel project appears, move it up then.
+- **`ci_packaging.sh` installs `patchelf` before delegating — a duplicate
+  step.** The binary wheel needs it (`auditwheel repair` rewrites the wheel's
+  RPATHs), but upstream's driver has installed it itself since the file's first
+  commit (hub `0972946b`, 2026-06-12), two months before this wrapper delegated
+  to it, and OrchestrANT's wrapper carries no such step. The wrapper's header
+  says upstream does not install it; that is wrong at the current pin.
 - **`WORKSPACE_ROOT` is handled for you — do not remove it.** Upstream's
   `detect_workspace` derives it from the sourcing script's location, which for a
   *delegated* driver resolves inside `third_party/ANTfrastructure/` —
@@ -132,9 +139,17 @@ written out rather than linked.
   It only ever worked because CI passed the name explicitly. Upstream derives it
   from `pyproject.toml`, which is why that class of bug cannot recur; hardcoding
   it again reintroduces the failure mode.
-- **`tests/remote/` talks to a real host.** The offline path is
-  `tests/mock_webdav_server.py`; `tests/remote/data` holds its fixtures. Do not
-  assume a plain `pytest` run exercises the remote lane.
+- **`tests/remote/` is not a remote host — and CI never tests the client.**
+  `tests/remote/` is the document root `tests/mock_webdav_server.py` serves
+  (wsgidav on `127.0.0.1:8081`); `tests/test_webdav_client.py` starts that
+  server from a module-scoped fixture and asserts on the files under
+  `tests/remote/data`, so edit those and the tests change. The paths are
+  relative, so run `pytest` from the repo root. Every CI lane runs
+  `pytest tests/unit` only (the hub's `ci_tests.sh` on Linux,
+  `Build-Windows.ps1` on Windows), so none runs `test_webdav_client.py` or
+  `tests/integration/`, and the coverage they report comes from the `dummy.py`
+  tests alone: a plain `pytest` from the root is the only run that exercises
+  `webdavclient.py`.
 - **There is no Flutter step here.** The pre-wrapper `ci_build_docs.sh` put
   `$WORKSPACE_ROOT/flutter/bin` on `PATH`, copied from a Flutter sibling. It was
   dropped rather than ported — if you see it reappear, it is copy-paste.
@@ -144,12 +159,15 @@ written out rather than linked.
 ```bash
 uv sync
 
-bash scripts/linux/ci_tests.sh           # pytest + coverage
-bash scripts/linux/ci_static_analysis.sh # lint + type check
-bash scripts/linux/ci_build_docs.sh      # Sphinx
-bash scripts/linux/ci_packaging.sh       # binary wheel + sdist (installs patchelf)
+# The arguments linux-x64.yml passes. Bare, the drivers default to 3.14 (tests:
+# "3.13 3.14"), which this project cannot install on x86_64: atheris ships no
+# cp314 wheel (the comment in linux-x64.yml has the measurement).
+bash scripts/linux/ci_tests.sh kataglyphis_webdavclient '3.13 3.14t'  # pytest tests/unit + coverage
+bash scripts/linux/ci_static_analysis.sh x64 3.13  # codespell, bandit, vulture, ruff, ty
+bash scripts/linux/ci_build_docs.sh                # Sphinx (driver default 3.13)
+bash scripts/linux/ci_packaging.sh 3.13            # sdist + binary wheel (installs patchelf)
 
-bash scripts/linux/run-lint-gates.sh     # shell + workflow + secret + pin gates
+bash scripts/linux/run-lint-gates.sh     # the seven lint gates, ratchets included
 ```
 
 Windows:
@@ -167,10 +185,15 @@ for a local run. File and display names follow the family convention (owner
 decision 2026-09-24): kebab-case, one file per platform + arch, display names
 `<Platform> <Arch> · <what>`, shared lanes named the same in every repo (`Lint
 gates`). The two Linux files split `ubuntu-26.04-amd64-arm64.yml` on 2026-09-25.
+Every lane runs on every push and pull request to `main` and `develop`; none is
+opted into by a commit-message token.
 
 ## 5. Docs owned by this repo
 
-- Sphinx sources in `docs/`.
+- Sphinx sources in `docs/`. `docs/source/README.md` and
+  `docs/source/CHANGELOG.md` are copies: the docs driver copies the root
+  `README.md` and `CHANGELOG.md` over them before every build, so edit the root
+  files.
 - `CHANGELOG.md` and `VERSION.txt` — the version is read from `VERSION.txt`, so
   bump it there.
 - Update docs in the same PR as user-facing behaviour changes.
