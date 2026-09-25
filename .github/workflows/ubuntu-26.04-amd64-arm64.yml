@@ -31,7 +31,7 @@ permissions:
 
 jobs:
   linux:
-    uses: Kataglyphis/ANTfrastructure/.github/workflows/python-ci-linux.yml@main
+    uses: Kataglyphis/ANTfrastructure/.github/workflows/python-ci-linux.yml@develop
     with:
       package-name: kataglyphis_webdavclient
       # 3.13 EVERYWHERE A LANE SYNCS THIS PROJECT, and the reason is one
