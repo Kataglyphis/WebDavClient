@@ -85,12 +85,12 @@ Python ≥ 3.10 (`requires-python` in `pyproject.toml`), managed with
   the `tests` and `docs` extras) and locked in `uv.lock`
 
 ```bash
-./scripts/linux/ci_static_analysis.sh x64 3.13 > "ci_analysis_$(date +%Y%m%d_%H%M%S).log" 2>&1
+./scripts/linux/ci_static_analysis.sh x64 3.14 > "ci_analysis_$(date +%Y%m%d_%H%M%S).log" 2>&1
 ```
 
 ```bash
-  # 3.13: the newest interpreter the tests extra's atheris ships wheels for
-  uv sync --all-extras --python 3.13
+  # atheris (tests extra) ships x86_64 Linux wheels for cp312-cp314 only
+  uv sync --all-extras --python 3.14
 ```
 <!-- * [Vulkan 1.3](https://www.vulkan.org/) -->
 
