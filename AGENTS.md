@@ -93,8 +93,8 @@ is not a check: before 2026-09-15 `Resolve-BuildModule.ps1` had silently fallen
 
 | Wrapper | Upstream driver | Local addition |
 | --- | --- | --- |
-| `ci_tests.sh` | `python/ci_tests.sh` | unsets `UV_PYTHON` — redundant at the current pin, whose `uv_run` clears it itself (hub `e9e4b1d2`); the wrapper's comment says to drop it then |
-| `ci_static_analysis.sh` | `python/ci_static_analysis.sh` | unsets `VIRTUAL_ENV` and `UV_PYTHON` and points `UV_PROJECT_ENVIRONMENT` at the venv the driver creates but never activates |
+| `ci_tests.sh` | `python/ci_tests.sh` | none |
+| `ci_static_analysis.sh` | `python/ci_static_analysis.sh` | points `UV_PROJECT_ENVIRONMENT` at the venv the driver creates but never activates |
 | `ci_build_docs.sh` | `python/ci_build_docs.sh` | none |
 | `ci_packaging.sh` | `python/ci_packaging.sh` | installs `patchelf` — see § 3 |
 

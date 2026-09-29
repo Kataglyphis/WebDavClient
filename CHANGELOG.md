@@ -30,6 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runner labels it predates.
 
 ### Changed
+- **The Linux wrappers no longer unset `VIRTUAL_ENV`/`UV_PYTHON`.** The family
+  image stopped exporting both with hub CON18 (`:latest` of 2026-09-29), so
+  `ci_tests.sh` and `ci_static_analysis.sh` dropped the lines described under
+  *Fixed* below; `UV_PROJECT_ENVIRONMENT` in the latter stays, because the
+  driver still never activates the venv it creates.
 - **2026-09-25: one workflow per platform + arch, and every lane a thin caller.**
   `ubuntu-26.04-amd64-arm64.yml` is split into `linux-x64.yml` ("Linux x64 · build
   + test") and `linux-arm64.yml` ("Linux arm64 · build + test"), both calling
