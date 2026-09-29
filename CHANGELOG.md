@@ -30,6 +30,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runner labels it predates.
 
 ### Changed
+- **The Linux lane runs on 3.14 again, and atheris is 3.1.0.** The 3.13 pin of
+  2026-09-15 (below, under *Fixed*) existed because atheris 3.0.0 shipped no
+  cp314 wheel. atheris 3.1.0 ships cp312, cp313 and cp314 wheels, so `uv.lock`
+  moves to it and the lane's tests, static analysis, docs and packaging run on
+  3.14, the image's interpreter; 3.14t stays experimental. The marker gains
+  `python_version >= '3.12'`, because 3.1.0 has no sdist and no cp310/cp311
+  wheel. A source build is still no way out: atheris' `find_libfuzzer.sh` looks
+  for `lib/linux/libclang_rt.fuzzer_no_main-x86_64.a`, which the family image's
+  per-target compiler-rt layout does not provide, and 3.0.0 refuses to import
+  on 3.14 even once built with `LIBFUZZER_LIB` (measured 2026-09-29).
 - **The Linux wrappers no longer unset `VIRTUAL_ENV`/`UV_PYTHON`.** The family
   image stopped exporting both with hub CON18 (`:latest` of 2026-09-29), so
   `ci_tests.sh` and `ci_static_analysis.sh` dropped the lines described under

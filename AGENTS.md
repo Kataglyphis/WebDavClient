@@ -159,13 +159,13 @@ written out rather than linked.
 ```bash
 uv sync
 
-# The arguments linux-x64.yml passes. Bare, the drivers default to 3.14 (tests:
-# "3.13 3.14"), which this project cannot install on x86_64: atheris ships no
-# cp314 wheel (the comment in linux-x64.yml has the measurement).
-bash scripts/linux/ci_tests.sh kataglyphis_webdavclient '3.13 3.14t'  # pytest tests/unit + coverage
-bash scripts/linux/ci_static_analysis.sh x64 3.13  # codespell, bandit, vulture, ruff, ty
-bash scripts/linux/ci_build_docs.sh                # Sphinx (driver default 3.13)
-bash scripts/linux/ci_packaging.sh 3.13            # sdist + binary wheel (installs patchelf)
+# The arguments linux-x64.yml passes: 3.14, the image's own interpreter, and
+# 3.14t as the experimental leg (its sync fails on atheris, which ships no
+# cp314t wheel, and only warns). Run each in its own container, as CI does.
+bash scripts/linux/ci_tests.sh kataglyphis_webdavclient '3.14 3.14t'  # pytest tests/unit + coverage
+bash scripts/linux/ci_static_analysis.sh x64       # codespell, bandit, vulture, ruff, ty (3.14)
+bash scripts/linux/ci_build_docs.sh 3.14           # Sphinx; 3.14 also names the coverage it copies
+bash scripts/linux/ci_packaging.sh                 # sdist + binary wheel (3.14, installs patchelf)
 
 bash scripts/linux/run-lint-gates.sh     # the seven lint gates, ratchets included
 ```
