@@ -4,3 +4,7 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    # Their [build-system] requirements already admit every release; Dependabot's uv updater then fails with "No files have changed!".
+    ignore:
+      - dependency-name: "setuptools"
+      - dependency-name: "cython"
