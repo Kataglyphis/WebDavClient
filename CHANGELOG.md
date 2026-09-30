@@ -30,6 +30,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runner labels it predates.
 
 ### Changed
+- **Comments are one line, only the why (2026-09-30).** The family rule, in
+  [the hub's `AGENTS.md`](third_party/ANTfrastructure/AGENTS.md#comments-one-line-only-the-why)
+  and linked from `AGENTS.md`: 27 files lose their comment blocks, and code is unchanged.
+  ANTfrastructure moves from `539ee280` to `9e9d9828` for the gate that grades every
+  language and the bootstrap templates the two local copies follow. Its `versions.env`
+  pins ruff at 0.16.8, so `pyproject.toml`, `.pre-commit-config.yaml` and `uv.lock`
+  follow (0.16.7 and 0.16.8 report the same findings here).
 - **The Linux lane runs on 3.14 again, and atheris is 3.1.0.** The 3.13 pin of
   2026-09-15 (below, under *Fixed*) existed because atheris 3.0.0 shipped no
   cp314 wheel. atheris 3.1.0 ships cp312, cp313 and cp314 wheels, so `uv.lock`

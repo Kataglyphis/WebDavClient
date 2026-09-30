@@ -1,10 +1,6 @@
 name: Linux arm64 · build + test
 
-# The arm64 row of the same reusable lane linux-x64.yml runs (one file per
-# platform + arch, the fleet convention). The Python versions MUST match
-# linux-x64.yml's, whose comment says why they are 3.14 and 3.14t: the arm64
-# runner syncs the same lock. No FTP secrets: python-ci-linux.yml deploys the
-# docs from the x64 row only.
+# Python versions must match linux-x64.yml's; no FTP secrets, because only the x64 row deploys docs.
 
 on:
   push:

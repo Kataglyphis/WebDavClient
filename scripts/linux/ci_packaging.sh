@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
-# ci_packaging.sh - project wrapper around ANTfrastructure's generic Python package
-# builder (linux/scripts/02-toolchain/python/ci_packaging.sh).
-#
-# Keeps ONE local step: patchelf. The binary wheel build needs it on the runner
-# and upstream's driver does not install it. Left here rather than upstreamed
-# because no second consumer needs it - the two-consumer rule in ANTfrastructure's
-# AGENTS.md.
+# Wrapper around the hub's python/ci_packaging.sh; patchelf stays local because no second consumer needs it.
 set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/antfrastructure.sh"

@@ -1,18 +1,6 @@
 name: Lint gates
 
-# ANTfrastructure's reusable lint lane. It runs the same aggregator the owner runs
-# locally, and that identity is the point:
-#
-#   bash scripts/linux/run-lint-gates.sh      # = run-lint-gates.sh <root> --ratchets
-#
-# linux/scripts/run-lint-gates.sh is the hub lint aggregator (seven gates; the list
-# is in that file's header). It owns their pinned, SHA-verified bootstraps, the
-# git-ls-files scope construction, the empty-scope vacuity guards and the
-# secret-scanner self-test. `ratchets: true` is the wrapper's --ratchets.
-#
-# This job was inline until 2026-09-25, because no reusable lint lane existed
-# upstream; its header asked for a `uses:` the day one did. The wrapper stays for
-# the dev box. Before either, the repo had no shell, workflow or secret linting at all.
+# The same aggregator as `bash scripts/linux/run-lint-gates.sh`; `ratchets: true` is its --ratchets.
 
 on:
   push:

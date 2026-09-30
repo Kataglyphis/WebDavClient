@@ -29,11 +29,7 @@ def test_pipeline(monkeypatch: pytest.MonkeyPatch) -> None:
     def _mock_default_rng(*_args: object, **_kwargs: object) -> _FixedGenerator:
         return _FixedGenerator()
 
-    # SimpleMLPreprocessor calls np.random.default_rng().normal(...), the
-    # Generator API. Patching the LEGACY numpy.random.normal here intercepted
-    # nothing, so the pipeline ran on real random data and the label assertion
-    # below was a coin flip: each row is a sum of three N(5, 2) draws tested
-    # against 15, so [1, 0, 1, 1] came up about one run in sixteen.
+    # Patch the Generator API the pipeline uses; patching legacy numpy.random.normal intercepts nothing.
     monkeypatch.setattr(
         "numpy.random.default_rng",
         _mock_default_rng,

@@ -1,19 +1,6 @@
 name: Linux x64 · build + test
 
-# The whole lane lives in ANTfrastructure as a reusable workflow. This file is
-# the configuration for it, nothing more. Do not re-inline the steps here: this
-# repo and OrchestrANT previously carried 112-line copies that differed on 14
-# lines, all of them parameters.
-#
-# Everything this repo used to leave unset was already the driver default, so it
-# is left unset here too - only the test matrix is a real override.
-#
-# One file per platform + arch (the fleet convention, 2026-09-24): this is the
-# x64 row, linux-arm64.yml the arm64 one, both through the same reusable lane
-# with `arches` picking the row. It was one ubuntu-26.04-amd64-arm64.yml running
-# both rows until 2026-09-25. `runs-on` is deliberately NOT overridden, and no
-# image is named either: the lane pins the runner and resolves the family Linux
-# image through its own fallback, held against versions.env upstream.
+# Configuration for the hub's reusable lane only: do not re-inline its steps, runner or image here.
 
 on:
   push:
@@ -21,11 +8,7 @@ on:
   pull_request:
     branches: ["main", "develop"]
 
-# The reusable lane declares exactly this at its own top level, and the
-# GITHUB_TOKEN a called workflow gets is the CALLER's. Registry auth in the
-# lane runs on secrets.GHCR_PAT, not on GITHUB_TOKEN, so read-only contents is
-# the whole requirement; leaving it unset handed the lane the repository
-# default instead, which is write on a default-permissive repository.
+# A called workflow runs on the caller's token; unset, the lane would get the repository default (write).
 permissions:
   contents: read
 
@@ -35,26 +18,12 @@ jobs:
     with:
       arches: x64
       package-name: kataglyphis_webdavclient
-      # 3.14, the image's own interpreter, for tests, docs, static analysis
-      # and packaging (the last two by driver default). Every lane syncs
-      # --all-extras, so every one installs atheris from `tests`; this lane
-      # was pinned to 3.13 from 2026-09-15 to 2026-09-29 because atheris 3.0.0
-      # shipped no cp314 wheel. uv.lock now holds atheris 3.1.0, whose cp314
-      # wheel installs and fuzzes on 3.14 in the image.
-      #
-      # 3.14t stays: the driver treats it as EXPERIMENTAL, so its sync failure
-      # warns instead of failing the matrix, which is the point of listing it.
-      # atheris ships no cp314t wheel and no sdist, so that sync still fails.
-      #
-      # docs-python-version names 3.14 because it is also the version
-      # ci_build_docs.sh looks for when it copies coverage-<version>.xml; its
-      # default of 3.13 would find no coverage from this matrix.
+      # 3.14t is EXPERIMENTAL (its atheris sync fails and only warns); docs must name a tested version to find coverage.
       test-python-versions: '3.14 3.14t'
       docs-python-version: '3.14'
     secrets:
       GHCR_PAT: ${{ secrets.GHCR_PAT }}
       FTP_SERVER: ${{ secrets.SERVER }}
       FTP_USERNAME: ${{ secrets.USERNAME }}
-      # This repo stores the FTP password as PASSWORD; OrchestrANT calls it PW.
-      # The reusable workflow takes a neutral name so neither has to rename.
+      # This repo stores the FTP password as PASSWORD; the lane takes a neutral name.
       FTP_PASSWORD: ${{ secrets.PASSWORD }}
