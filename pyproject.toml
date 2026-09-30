@@ -41,14 +41,7 @@ dependencies = [
 
 [project.optional-dependencies]
 tests = [
-    # fuzz testing. x86_64 Linux on CPython >= 3.12 ONLY, because that is all
-    # upstream ships: atheris 3.1.0 publishes manylinux x86_64 wheels for
-    # cp312, cp313 and cp314 and no sdist. Everywhere else uv would need a
-    # source build, which needs a Clang whose libFuzzer sits where atheris'
-    # find_libfuzzer.sh looks (lib/linux/libclang_rt.fuzzer_no_main-<arch>.a) -
-    # the family image's per-target layout does not - and died in CI:
-    #   RuntimeError: Failed to find libFuzzer; set either $CLANG_BIN ...
-    # 3.0.0, the previous lock, also refuses to import on 3.14 even when built.
+    # Fuzzing: atheris ships only x86_64 Linux wheels for cp312+, and its source build cannot find the image's libFuzzer.
     "atheris; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
     "pytest",
     "pre-commit",
@@ -63,12 +56,8 @@ tests = [
     "codespell",
     "bandit",           # find security vulnerabilities
     "vulture",          # find dead code
-    # PINNED, and the pin is not cosmetic: an unpinned "ruff" is how a sibling
-    # consumer drifted to 0.15.21 while the hub graded CI with 0.16.4, so the
-    # same tree passed locally and failed in CI. The number follows
-    # ANTfrastructure linux/scripts/01-core/versions.env RUFF_VERSION and is
-    # compared against it by the consumer-pins lint gate.
-    "ruff==0.16.7",     # replacement for flake8
+    # Pinned to versions.env RUFF_VERSION, which the consumer-pins gate checks; unpinned, local ruff drifts from CI's.
+    "ruff==0.16.8",     # replacement for flake8
     "ty",               # type checking
     "wsgidav",
     "cheroot",
@@ -108,9 +97,7 @@ exclude = [
     "^file2\\.py$",  # TOML basic string (double-quotes, backslash and other characters need escaping)
 ]
 
-# ============================================================================
-# RUFF - Linting and Formatting (STRICT MODE)
-# ============================================================================
+# Ruff
 [tool.ruff]
 line-length = 88  # Black-compatible (industry standard)
 target-version = "py313"
@@ -174,9 +161,7 @@ indent-style = "space"
 line-ending = "auto"
 docstring-code-format = true
 
-# ============================================================================
-# TY - Type Checking (STRICT MODE)
-# ============================================================================
+# ty
 [tool.ty.environment]
 python-version = "3.13"
 
@@ -192,6 +177,5 @@ exclude = [
 respect-ignore-files = true
 
 [tool.ty.rules]
-# STRICT: Enable all warnings as errors
-# Only ignore mlflow lazy-loading issue for this specific file
+# Everything else stays an error.
 possibly-missing-attribute = "ignore"  # mlflow uses lazy-loading API

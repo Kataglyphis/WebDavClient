@@ -2,8 +2,7 @@
 
 """Sphinx configuration for WebDavClient documentation."""
 
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+# Project information
 
 import sys
 from pathlib import Path
@@ -17,8 +16,7 @@ author = "Jonas Heinle"
 release = "0.0.1"
 globals()["copyright"] = project_copyright
 
-# -- General configuration ---------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+# General configuration
 
 extensions = [
     "sphinx.ext.autodoc",
@@ -47,8 +45,7 @@ templates_path = ["_templates"]
 exclude_patterns = []
 
 
-# -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+# Options for HTML output
 
 html_theme = "sphinx_book_theme"
 html_theme_options = {

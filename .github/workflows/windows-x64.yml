@@ -1,15 +1,7 @@
 # .github/workflows/windows-x64.yml
 name: Windows x64 · build + test
 
-# The lane lives in ANTfrastructure as a reusable workflow; this file is only
-# its configuration. Do not re-inline the steps: this repo and OrchestrANT
-# previously carried ~70-line copies that differed on 20 lines, all of it
-# drift rather than intent.
-#
-# This repo's behaviour is unchanged by the move - the shared lane took the safer
-# option wherever the two copies disagreed, and in every case that was this one's
-# (upload on always(), if-no-files-found: warn, logs/ + docs/test_results/ in the
-# artifact, upload-artifact v7).
+# Configuration for the hub's reusable lane only: do not re-inline its steps here.
 
 on:
   push:
@@ -17,9 +9,7 @@ on:
   pull_request:
     branches: [main, develop]
 
-# Same reasoning as the Linux lane: python-ci-windows.yml declares
-# `contents: read` itself, a called workflow runs on the caller's token, and
-# the only registry credential in the lane is secrets.GHCR_PAT.
+# A called workflow runs on the caller's token, and the lane's only registry credential is GHCR_PAT.
 permissions:
   contents: read
 

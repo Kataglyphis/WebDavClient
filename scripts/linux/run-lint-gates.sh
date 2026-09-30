@@ -1,48 +1,5 @@
 #!/usr/bin/env bash
-# run-lint-gates.sh - this repo's lint gate: the hub lint aggregator over the
-# tracked tree, every gate running even after one fails, with the verdict
-# raised once at the end.
-#
-# A wrapper around ANTfrastructure's linux/scripts/run-lint-gates.sh, which owns
-# the seven gates (listed in its header), their pinned + SHA-verified bootstraps,
-# the git-ls-files scope construction, the empty-scope vacuity guards and the
-# secret-scanner self-test (an empty tree must scan clean, a planted PAT must be
-# reported at the path that was passed in - otherwise "no findings" cannot be
-# told apart from "the scanner never started").
-#
-# THIS CLOSES A GAP, IT DOES NOT REPLACE ANYTHING. Before this file, the whole
-# repo had no shell, workflow or secret linting at all: grepping the tracked
-# tree outside third_party/ for any of the three tool names found exactly one
-# hit, and it was a disable directive (SC1090) inside lib/antfrastructure.sh - a
-# suppression for a linter that never ran.
-#
-# The roundabout phrasing above is not accidental: a comment line whose FIRST
-# word is the shell linter's own name parses as a DIRECTIVE, and one it cannot
-# parse is itself an SC1073/SC1072 error - a gate that fails on its own wrapper.
-#
-# The consumer root is passed EXPLICITLY. Upstream refuses to infer it, and
-# must: this script's hub half lives inside third_party/ANTfrastructure, so a
-# root derived from its own location would grade ANTfrastructure's tree and
-# report green over the wrong repo.
-#
-# --exclude defaults to third_party upstream, which is what this repo wants:
-# third_party/ANTfrastructure is a submodule graded in its own repository at its
-# own ratchet.
-#
-# --ratchets IS PASSED HERE, NOT LEFT TO THE CALLER. It adds the doc-link gate
-# and the eight measurement gates (comment size, code size, complexity, dead
-# functions, masked declarations, trailing conditionals, stdout-in-substituted-
-# functions, and the shellcheck warning baseline) over this repo's tree, each
-# reading its freeze file from the repo root. Upstream keeps it opt-in because a
-# tree with no freeze files is red on its first run and that first report is what
-# seeds them; this repo's are seeded and committed, so there is nothing left to
-# opt into. Leaving it to the caller would mean the gate the owner runs and the
-# gate CI runs are different gates, which is the one thing this wrapper exists to
-# prevent. The flag is idempotent, so passing it again on the command line is
-# harmless.
-#
-#   scripts/linux/run-lint-gates.sh                     # the whole repo
-#   scripts/linux/run-lint-gates.sh --exclude <dir>     # additional exclusions
+# The hub lint aggregator over this repo; --ratchets is passed here so the owner and CI run the same gate.
 set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/antfrastructure.sh"

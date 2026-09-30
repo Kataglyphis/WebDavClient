@@ -2,7 +2,7 @@ Param(
 	[string[]]$PythonVersions = @("3.13", "3.14", "3.14t"),
 	[string]$PackageName = "kataglyphis_webdavclient",
 	[string]$LogDir = "logs",
-	[switch]$StopOnError,  # Neuer Parameter: bei Fehler stoppen statt fortfahren
+	[switch]$StopOnError,
 	[switch]$EnablePySpy
 )
 
@@ -11,16 +11,10 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 Set-Location $repoRoot
 
-# Modules resolve through the shared bootstrap (a verbatim copy of
-# ANTfrastructure's shared/windows/templates/Resolve-BuildModule.ps1) instead of a
-# hard-coded submodule path: a module that moves upstream is picked up without
-# editing this script, and a missing submodule reports the exact
-# `git submodule update` command rather than a bare path.
+# The shared bootstrap, not a hard-coded path: moved modules are found and a missing submodule names its fix.
 . (Join-Path $PSScriptRoot 'Resolve-BuildModule.ps1')
 
 # Dependency order: Shared, then Build, then what builds on them.
-# (Import-BuildModule pulls WindowsScripts.Shared in regardless — a nested
-# import inside a .psm1 is module-private and never reaches this session.)
 Import-BuildModule @(
 	'WindowsScripts.Shared'
 	'WindowsBuild.Common'
@@ -32,11 +26,6 @@ $script:BuildContext.SuppressConsoleOutput = $true
 $logPath = $script:BuildContext.LogPath
 $script:CreatedUvEnvs = New-Object System.Collections.Generic.List[string]
 
-# Tracking fÃ¼r Erfolg/Fehler
-
-# NOTE: Results.SoftFailed / Results.SoftErrors used to be hand-added here for
-# the local Invoke-Step fork. New-BuildContext already creates AllowedFailures,
-# Errors and Durations, which the upstream Invoke-BuildStep populates instead.
 $script:Results = $script:BuildContext.Results
 
 function Close-Log {
@@ -209,19 +198,8 @@ function Ensure-TestResultsDir {
 	New-Item -ItemType Directory -Force "docs/test_results" | Out-Null
 }
 
-# Neue Funktion: FÃ¼hrt einen Schritt aus und trackt Erfolg/Fehler
-
 function Invoke-Step {
-	# Delegates to ANTfrastructure's Invoke-BuildStep (WindowsBuild.Common), which
-	# this script already imports. The local body replaced here was an older fork
-	# of exactly that function - same parameters, same log format, same
-	# StopOnError-and-Critical rethrow - but it tracked allowed failures in
-	# hand-added Results.SoftFailed/SoftErrors instead of the AllowedFailures and
-	# Errors that New-BuildContext already creates, and it had no timing.
-	#
-	# Delegating gains per-step durations and the machine-readable JSON summary
-	# for free. Kept as a wrapper rather than editing every call site: the -Context
-	# binding is the only thing those call sites would otherwise have to repeat.
+	# A wrapper so call sites need not repeat the -Context binding to Invoke-BuildStep.
 	param(
 		[Parameter(Mandatory)]
 		[string]$StepName,
@@ -235,10 +213,6 @@ function Invoke-Step {
 }
 
 function Write-Summary {
-	# Delegates to ANTfrastructure's Write-BuildSummary. The 39-line local body this
-	# replaced printed the same three sections from the same Results object; the
-	# upstream one additionally reports per-step durations and writes the
-	# machine-readable build-summary JSON to $Context.SummaryPath.
 	Write-BuildSummary -Context $script:BuildContext
 }
 
@@ -291,7 +265,6 @@ try {
 
 					Invoke-External -File "uv" -Args @("run", "python", "bench/demo_cprofile.py")
 					Invoke-External -File "uv" -Args @("run", "python", "bench/demo_line_profiler.py")
-					# Invoke-External -File "uv" -Args @("run", "-m", "memory_profiler", "bench/demo_memory_profiling.py")
 					if ($EnablePySpy) {
 						Invoke-External -File "uv" -Args @("run", "py-spy", "record", "--rate", "200", "--duration", "45", "-o", "profile.svg", "--", "python", "bench/demo_py_spy.py")
 					}
@@ -370,17 +343,14 @@ try {
 		throw
 	}
 } finally {
-	# Cleanup aller Environments
 	foreach ($envPath in $script:CreatedUvEnvs) {
 		Remove-UvEnvironment -EnvPath $envPath
 	}
 
-	# Summary ausgeben
 	Write-Summary
 
 	Close-Log
 
-	# Exit-Code basierend auf Fehlern
 	if ($script:Results.Failed.Count -gt 0) {
 		exit 1
 	}
