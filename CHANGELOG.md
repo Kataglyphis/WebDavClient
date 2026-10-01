@@ -172,7 +172,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - requests 2.32.5 → 2.34.2;
   - idna 3.11 → 3.20;
   - setuptools 82.0.1 → 84.0.0;
-  - pygments 2.19.2 → 2.21.0.
+  - pygments 2.19.2 → 2.21.0;
+  - virtualenv 21.2.0 → 21.14.2, which brings python-discovery 1.1.3 → 1.6.1. GitHub only
+    raised this alert after rescanning the updated lock.
 
   The five Dependabot PRs merged the same day (#22–#26) had already moved pytest past its
   advisory.
