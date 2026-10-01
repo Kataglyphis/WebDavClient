@@ -134,6 +134,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - bcrypt is overridden to >=5. wsgidav caps it below 5, and 4.x has no free-threaded
       wheel; the mock server runs without auth.
   - Windows gates on every leg instead of letting 3.14 and up fail.
+  - py-spy and line_profiler leave the tests extra on Windows arm64
+    (`platform_machine != 'ARM64'`). py-spy has no win_arm64 wheel, and line_profiler has
+    none for 3.14t. No test imports either, so the lock now resolves from wheels alone
+    there, for the arm64 test job that comes next.
 - `tests/integration/test_dummy.py` patched `numpy.random.normal` while
   `SimpleMLPreprocessor` calls `np.random.default_rng().normal(...)`, so the
   fixture was never used and the label assertion was a fair coin on four rows —
