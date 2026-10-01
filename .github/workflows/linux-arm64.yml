@@ -18,6 +18,7 @@ jobs:
       arches: arm64
       package-name: kataglyphis_webdavclient
       test-python-versions: '3.14 3.14t'
+      free-threaded-extras: tests
       docs-python-version: '3.14'
     secrets:
       GHCR_PAT: ${{ secrets.GHCR_PAT }}

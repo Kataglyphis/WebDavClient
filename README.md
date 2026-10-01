@@ -89,7 +89,6 @@ Python ≥ 3.10 (`requires-python` in `pyproject.toml`), managed with
 ```
 
 ```bash
-  # atheris (tests extra) ships x86_64 Linux wheels for cp312-cp314 only
   uv sync --all-extras --python 3.14
 ```
 <!-- * [Vulkan 1.3](https://www.vulkan.org/) -->
@@ -113,7 +112,7 @@ Python ≥ 3.10 (`requires-python` in `pyproject.toml`), managed with
 ## Tests
 Run pytest in root directory (`uv run pytest` after the sync above) :smile:
 The WebDAV tests start a local mock server over `tests/remote/`, so no remote
-host is needed. The CI lanes run `tests/unit` only.
+host is needed. Every CI lane runs the whole suite, on 3.14 and the free-threaded 3.14t.
 
 <!-- ROADMAP -->
 ## Roadmap

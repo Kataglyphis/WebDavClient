@@ -140,17 +140,18 @@ written out rather than linked.
   It only ever worked because CI passed the name explicitly. Upstream derives it
   from `pyproject.toml`, which is why that class of bug cannot recur; hardcoding
   it again reintroduces the failure mode.
-- **`tests/remote/` is not a remote host — and CI never tests the client.**
+- **`tests/remote/` is not a remote host.**
   `tests/remote/` is the document root `tests/mock_webdav_server.py` serves
   (wsgidav on `127.0.0.1:8081`); `tests/test_webdav_client.py` starts that
   server from a module-scoped fixture and asserts on the files under
   `tests/remote/data`, so edit those and the tests change. The paths are
-  relative, so run `pytest` from the repo root. Every CI lane runs
-  `pytest tests/unit` only (the hub's `ci_tests.sh` on Linux,
-  `Build-Windows.ps1` on Windows), so none runs `test_webdav_client.py` or
-  `tests/integration/`, and the coverage they report comes from the `dummy.py`
-  tests alone: a plain `pytest` from the root is the only run that exercises
-  `webdavclient.py`.
+  relative, so run `pytest` from the repo root. Every CI lane runs the whole
+  configured suite, `testpaths = tests`, all 10 tests, since 2026-10-01.
+  - Linux: the hub's `ci_tests.sh` passes pytest no path of its own.
+  - Windows: `Build-Windows.ps1` runs a bare `pytest`.
+  - Until then every lane had run `tests/unit` only. That narrowing came with the arm64
+    and Windows lanes (2025-10-20), so `test_webdav_client.py` and `tests/integration/`
+    ran on no lane, and coverage came from the dummy tests alone.
 - **There is no Flutter step here.** The pre-wrapper `ci_build_docs.sh` put
   `$WORKSPACE_ROOT/flutter/bin` on `PATH`, copied from a Flutter sibling. It was
   dropped rather than ported — if you see it reappear, it is copy-paste.
@@ -160,10 +161,11 @@ written out rather than linked.
 ```bash
 uv sync
 
-# The arguments linux-x64.yml passes: 3.14, the image's own interpreter, and
-# 3.14t as the experimental leg (its sync fails on atheris, which ships no
-# cp314t wheel, and only warns). Run each in its own container, as CI does.
-bash scripts/linux/ci_tests.sh kataglyphis_webdavclient '3.14 3.14t'  # pytest tests/unit + coverage
+# The arguments linux-x64.yml passes: 3.14, the image's own interpreter, and 3.14t, which
+# syncs only the tests extra (free-threaded-extras) and gates like 3.14. Two changes made
+# that leg possible: atheris is gone (no cp314t wheel, nothing used it), and bcrypt is
+# overridden to >=5 (wsgidav caps it below 5, and 4.x has no cp314t wheel).
+FREE_THREADED_SYNC_EXTRAS=tests bash scripts/linux/ci_tests.sh kataglyphis_webdavclient '3.14 3.14t'  # whole suite + coverage
 bash scripts/linux/ci_static_analysis.sh x64       # codespell, bandit, vulture, ruff, ty (3.14)
 bash scripts/linux/ci_build_docs.sh 3.14           # Sphinx; 3.14 also names the coverage it copies
 bash scripts/linux/ci_packaging.sh                 # sdist + binary wheel (3.14, installs patchelf)

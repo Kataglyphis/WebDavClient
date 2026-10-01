@@ -18,8 +18,9 @@ jobs:
     with:
       arches: x64
       package-name: kataglyphis_webdavclient
-      # 3.14t is EXPERIMENTAL (its atheris sync fails and only warns); docs must name a tested version to find coverage.
+      # 3.14t syncs only the tests extra, whose wheels exist free-threaded, and gates; docs name the GIL leg's coverage.
       test-python-versions: '3.14 3.14t'
+      free-threaded-extras: tests
       docs-python-version: '3.14'
     secrets:
       GHCR_PAT: ${{ secrets.GHCR_PAT }}
