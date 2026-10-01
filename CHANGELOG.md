@@ -163,7 +163,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Sphinx setting missing from `conf.py`'s own `_SPHINX_EXPORTS` tuple.
 
 ### Security
-- Placeholder for vulnerabilities patched.
+- **The open Dependabot alerts in `uv.lock` are fixed** (2026-10-01), with
+  `uv lock --upgrade-package` for exactly the affected packages:
+  - wsgidav 4.3.3 → 4.3.5, which adds bcrypt and passlib;
+  - lxml 6.0.2 → 6.1.3;
+  - urllib3 2.6.3 → 2.8.0;
+  - soupsieve 2.8.3 → 2.10;
+  - requests 2.32.5 → 2.34.2;
+  - idna 3.11 → 3.20;
+  - setuptools 82.0.1 → 84.0.0;
+  - pygments 2.19.2 → 2.21.0.
+
+  The five Dependabot PRs merged the same day (#22–#26) had already moved pytest past its
+  advisory.
 
 ---
 
