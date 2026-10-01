@@ -223,33 +223,28 @@ try {
 		Write-Log "=== Pytest matrix (Windows) ==="
 
 		foreach ($version in $PythonVersions) {
-			$versionNumber = $null
-			if ($version -match '^\d+(?:\.\d+)?') {
-				try {
-					$versionNumber = [version]$Matches[0]
-				} catch {
-					$versionNumber = $null
-				}
-			}
-			$allowFailure = $false
-			if ($versionNumber -and $versionNumber -ge [version]"3.14") {
-				$allowFailure = $true
-			}
+			# Every leg gates; a free-threaded one syncs only the tests extra, whose wheels exist for it (as on Linux).
+			$legExtras = if ($version -match 't$') { 'tests' } else { '' }
 
-			Invoke-Step -StepName "Python $version - Tests" -AllowFailure:$allowFailure -Script {
+			Invoke-Step -StepName "Python $version - Tests" -Script {
 				Write-Log "--- Python $version ---"
 				$envPath = New-UvEnvironment -PythonVersion $version -EnvName (".venv-$version")
 
 				try {
 					$useLocked = Test-Path -Path "uv.lock"
-					if ($useLocked) {
-						Sync-ProjectDependencies -NoBuildIsolationPackageWxPython -UseLocked
-					} else {
-						Sync-ProjectDependencies -NoBuildIsolationPackageWxPython
+					$env:UV_SYNC_EXTRAS = $legExtras
+					try {
+						if ($useLocked) {
+							Sync-ProjectDependencies -NoBuildIsolationPackageWxPython -UseLocked
+						} else {
+							Sync-ProjectDependencies -NoBuildIsolationPackageWxPython
+						}
+					} finally {
+						Remove-Item Env:UV_SYNC_EXTRAS -ErrorAction SilentlyContinue
 					}
 
 					Invoke-External -File "uv" -Args @(
-						"run", "pytest", "tests/unit", "-v",
+						"run", "pytest", "-v",
 						"--cov=$PackageName",
 						"--cov-report=term-missing",
 						"--cov-report=html:docs/test_results/coverage-html-$version",

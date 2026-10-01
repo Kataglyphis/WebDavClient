@@ -41,8 +41,6 @@ dependencies = [
 
 [project.optional-dependencies]
 tests = [
-    # Fuzzing: atheris ships only x86_64 Linux wheels for cp312+, and its source build cannot find the image's libFuzzer.
-    "atheris; sys_platform == 'linux' and platform_machine == 'x86_64' and python_version >= '3.12'",
     "pytest",
     "pre-commit",
     "line_profiler",    # line-by-line profiling
@@ -77,6 +75,10 @@ docs = [
 [project.urls]
 Homepage = "https://webdavclient.jonas.heinle.de"
 Source = "https://github.com/Kataglyphis/WebDavClient"
+
+[tool.uv]
+# wsgidav caps bcrypt<5, and bcrypt 4 has no free-threaded or win_arm64 wheel; the mock server runs without auth.
+override-dependencies = ["bcrypt>=5"]
 
 [tool.black]
 line-length = 88

@@ -122,6 +122,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Placeholder for now removed features.
 
 ### Fixed
+- **CI tests the WebDAV client again** (2026-10-01).
+  - Every lane now runs the whole configured suite: all 10 tests, including the 6
+    `test_webdav_client.py` tests against the mock server and the integration test.
+  - Since 2025-10-20 all lanes had run `tests/unit` only (3 dummy tests). Before that, the
+    single Linux x64 lane ran all of `tests/`.
+  - The free-threaded 3.14t leg now really tests: it syncs only the tests extra and gates.
+    Before, it synced nothing and passed on a warning.
+  - Two dependency changes make that possible:
+    - atheris is removed. Nothing used it, and it has no cp314t wheel.
+    - bcrypt is overridden to >=5. wsgidav caps it below 5, and 4.x has no free-threaded
+      wheel; the mock server runs without auth.
+  - Windows gates on every leg instead of letting 3.14 and up fail.
 - `tests/integration/test_dummy.py` patched `numpy.random.normal` while
   `SimpleMLPreprocessor` calls `np.random.default_rng().normal(...)`, so the
   fixture was never used and the label assertion was a fair coin on four rows —
