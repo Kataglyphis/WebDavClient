@@ -43,10 +43,12 @@ dependencies = [
 tests = [
     "pytest",
     "pre-commit",
-    "line_profiler",    # line-by-line profiling
+    # No win_arm64 free-threaded wheel, and that runner builds no sdist; no test imports it.
+    "line_profiler; platform_machine != 'ARM64'",  # line-by-line profiling
     "pytest-benchmark", # benchmark tests
     "memory-profiler",  # memory profiling
-    "py-spy",           # profiling
+    # No win_arm64 wheel at all; no test imports it.
+    "py-spy; platform_machine != 'ARM64'",  # profiling
     "pytest-cov",
     "pytest-md-report",
     "pytest-md",
