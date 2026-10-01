@@ -1,0 +1,25 @@
+name: Windows arm64 · test
+
+# Configuration for the hub's reusable lane only: its runner-native windows-11-arm job, no container and no build.
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+
+# A called workflow runs on the caller's token; unset, the lane would get the repository default (write).
+permissions:
+  contents: read
+
+jobs:
+  windows-arm64:
+    uses: Kataglyphis/ANTfrastructure/.github/workflows/python-ci-windows.yml@develop
+    with:
+      build-python-package: false
+      arm64-tests: true
+      # As on Linux: 3.14t syncs only the tests extra; py-spy and line_profiler stay off ARM64 (pyproject.toml).
+      arm64-python-versions: '3.14 3.14t'
+      free-threaded-extras: tests
+      # Full history: this repo's packaging derives its version from git.
+      fetch-depth: 0

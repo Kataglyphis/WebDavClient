@@ -181,7 +181,10 @@ pwsh -NoProfile -File .\scripts\windows\Build-Windows.ps1
 
 CI lanes: `.github/workflows/linux-x64.yml` and `linux-arm64.yml` (the two rows
 of one hub reusable lane, `arches` picking the row; keep their Python versions
-equal), `.github/workflows/windows-x64.yml` and `.github/workflows/lint-gates.yml`
+equal), `.github/workflows/windows-x64.yml`, `.github/workflows/windows-arm64.yml`
+(the hub's runner-native `windows-11-arm` pytest job: no container, wheels only, so
+a dependency without a `win_arm64` wheel needs `platform_machine != 'ARM64'`) and
+`.github/workflows/lint-gates.yml`
 — every one of them configuration for an ANTfrastructure reusable workflow, do
 not re-inline the steps. `scripts/linux/run-lint-gates.sh` is the same lint lane
 for a local run. File and display names follow the family convention (owner
