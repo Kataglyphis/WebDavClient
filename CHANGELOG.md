@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **A Windows arm64 test lane** (`.github/workflows/windows-arm64.yml`, "Windows arm64 ·
+  test", 2026-10-01). It is the hub's runner-native `windows-11-arm` job (`arm64-tests`,
+  hub 625b3653): no container and no build, just the whole pytest suite on the 3.14 and
+  3.14t legs. It uses arm64 CPython from uv, pinned and SHA-checked by the hub. The lock
+  resolves from `win_arm64` wheels alone since py-spy and line_profiler stay off ARM64.
+  ANTfrastructure moves from 8a45c75a to 625b3653.
 - `scripts/linux/run-lint-gates.sh` and `.github/workflows/lint-gates.yml`: the
   family lint lane. Seven gates over the tracked tree — shell lint, workflow
   lint plus the CI image-ref check, secret scan, `ruff`, the shared-config
