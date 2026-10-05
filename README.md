@@ -103,6 +103,10 @@ Python ≥ 3.10 (`requires-python` in `pyproject.toml`), managed with
 
 ### Prerequisites
 
+Search the tree with [ripgrep](https://github.com/BurntSushi/ripgrep) (`rg`):
+`winget install --id BurntSushi.ripgrep.MSVC -e --scope user` on Windows,
+`apt install ripgrep` on Linux.
+
 ### Installation
 
 1. Clone the repo
