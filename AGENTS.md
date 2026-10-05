@@ -45,6 +45,7 @@ reorganisation.
 | Python CI lanes and the uv traps | [`docs/python-ci.md`](third_party/ANTfrastructure/docs/python-ci.md) |
 | The five shell-safety bug classes | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md) § *Shell safety conventions* |
 | Code comments: one line, only the why; API docs short; gated | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md#comments-one-line-only-the-why) § *Comments: one line, only the why* |
+| Searching the tree: `rg`, not `grep -r` | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md) § *Searching the tree: ripgrep (`rg`)* |
 
 **Every `scripts/linux/*.sh` here is a wrapper, not an implementation.** Each
 sources `scripts/linux/lib/antfrastructure.sh` and calls `antfrastructure_exec`
