@@ -76,6 +76,11 @@ docs = [
   "exhale"
 ]
 
+# The hub's Linux packaging repairs the Cython wheels to manylinux with this; PATH carries no auditwheel.
+packaging = [
+  "auditwheel>=4.0",
+]
+
 [project.urls]
 Homepage = "https://webdavclient.jonas.heinle.de"
 Source = "https://github.com/Kataglyphis/WebDavClient"
