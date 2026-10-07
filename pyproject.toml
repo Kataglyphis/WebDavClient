@@ -57,7 +57,7 @@ tests = [
     "bandit",           # find security vulnerabilities
     "vulture",          # find dead code
     # Pinned to versions.env RUFF_VERSION, which the consumer-pins gate checks; unpinned, local ruff drifts from CI's.
-    "ruff==0.16.8",     # replacement for flake8
+    "ruff==0.16.10",     # replacement for flake8
     "ty",               # type checking
     "wsgidav",
     "cheroot",
