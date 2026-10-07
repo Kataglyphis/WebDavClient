@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **A `packaging` extra with auditwheel (2026-10-07).** The hub's Linux packaging repairs the
+  Cython wheels to manylinux with the packaging venv's auditwheel once the hub pin carries
+  c0ad775a; PATH never had one, so the Linux binaries shipped as `linux_<arch>`.
 - **A proved free-threaded wheel beside the GIL one (2026-10-07).** `pyproject.toml` drops
   `Programming Language :: Python :: 3.14t`, which is no trove classifier (PyPI refuses an
   upload that names it), for the official `Programming Language :: Python :: Free Threading
