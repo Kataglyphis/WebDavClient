@@ -1,0 +1,9 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "WebDavClient's Renovate config. Everything shared lives in the preset at ANTfrastructure's repository root (default.json), so this one line is the whole adoption - the same shape every consumer uses.",
+    "Without it Renovate ran here on its defaults: the git-submodules manager off, so third_party/ANTfrastructure was never watched, and no lockFileMaintenance, so uv.lock sat 41 packages behind on 2026-10-07 while every manager reported nothing.",
+    "The Renovate GitHub App is NOT installed on this repository (family owner decision, 2026-09-09). ANTfrastructure's linux/scripts/renovate-local.sh reads exactly this file; .github/dependabot.yml stays until that hand-over is decided."
+  ],
+  "extends": ["github>Kataglyphis/ANTfrastructure"]
+}
