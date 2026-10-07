@@ -51,6 +51,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runner labels it predates.
 
 ### Changed
+- **`uv.lock` maintenance: every locked package at its newest release (2026-10-07).** The
+  owner's "bleeding edge" rule covers the lock too, and no Renovate manager reported this drift
+  because the hub's shared preset had no `lockFileMaintenance`. `uv lock --upgrade` moved 41
+  packages; the majors are chardet 6, filelock 4, more-itertools 11 and rich 15, all
+  transitive, and pytest-benchmark 5.3 swaps py-cpuinfo for py-cpuinfo2. ty goes 0.0.23 ->
+  0.0.85, numpy 2.4.3 -> 2.5.3 (cp314t wheels on PyPI), cython 3.3.0. ruff stays at the hub's
+  0.16.10. No code change was needed: in `:latest`, `ci_static_analysis.sh` passes its 6 gates
+  (ty 0.0.85 included), `ci_tests.sh` passes 18 tests on 3.14 and on 3.14t (bcrypt 5.0.0 and
+  numpy 2.5.3 from free-threaded wheels), and `run-lint-gates.sh` passes 7/7.
 - **Windows packaging is the hub's `Invoke-CiPackaging.ps1` on 3.14 (2026-10-07).**
   `scripts/windows/Build-Windows.ps1` built in a 3.13 venv with a bare `uv build`, which ignores
   the venv and takes whatever interpreter uv finds, a free-threaded one included. The driver asks
