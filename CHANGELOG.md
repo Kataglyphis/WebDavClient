@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **A proved free-threaded wheel beside the GIL one (2026-10-07).** `pyproject.toml` drops
+  `Programming Language :: Python :: 3.14t`, which is no trove classifier (PyPI refuses an
+  upload that names it), for the official `Programming Language :: Python :: Free Threading
+  :: 2 - Beta`: Beta, because the 3.14t test legs gate. The hub's packaging drivers read that
+  classifier: once the hub pin carries them, they build a second Cython wheel on the image's
+  3.14t (`cp314-cp314t`) and load its compiled modules in a fresh 3.14t venv, failing when the
+  GIL comes back on. `setup.py` therefore sets Cython's `freethreading_compatible=True`
+  (`cython>=3.1`, the first with the directive); without it the proof fails, as a local
+  negative control showed. Proved locally with the hub's new drivers in `:latest` and
+  `:winamd64`: both lanes ship `kataglyphis_webdavclient-0.0.1-cp314-cp314t-{linux_x86_64,win_amd64}.whl`,
+  its 3 compiled modules keep the GIL off, and the 18 tests pass on 3.14t against the installed
+  wheel with `sys._is_gil_enabled()` still False.
 - **A Windows arm64 test lane** (`.github/workflows/windows-arm64.yml`, "Windows arm64 ·
   test", 2026-10-01). It is the hub's runner-native `windows-11-arm` job (`arm64-tests`,
   hub 625b3653): no container and no build, just the whole pytest suite on the 3.14 and
@@ -36,6 +48,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runner labels it predates.
 
 ### Changed
+- **Windows packaging is the hub's `Invoke-CiPackaging.ps1` on 3.14 (2026-10-07).**
+  `scripts/windows/Build-Windows.ps1` built in a 3.13 venv with a bare `uv build`, which ignores
+  the venv and takes whatever interpreter uv finds, a free-threaded one included. The driver asks
+  for `3.14+gil`, as the Linux lane does, and adds the free-threaded wheel above.
 - **Comments are one line, only the why (2026-09-30).** The family rule, in
   [the hub's `AGENTS.md`](third_party/ANTfrastructure/AGENTS.md#comments-one-line-only-the-why)
   and linked from `AGENTS.md`: 27 files lose their comment blocks, and code is unchanged.

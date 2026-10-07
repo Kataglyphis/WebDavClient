@@ -296,36 +296,14 @@ try {
 			}
 		} | Out-Null
 
-		Invoke-Step -StepName "Packaging (source)" -Script {
-			Write-Log "=== Packaging (source) ==="
-			$envPath = New-UvEnvironment -PythonVersion "3.13" -EnvName ".venv-packaging-sources"
-			try {
-				if (Test-Path -Path "uv.lock") {
-					Sync-ProjectDependencies -NoBuildIsolationPackageWxPython -UseLocked
-				} else {
-					Sync-ProjectDependencies -NoBuildIsolationPackageWxPython
-				}
-				Invoke-External -File "uv" -Args @("build")
-			} finally {
-				Remove-UvEnvironment -EnvPath $envPath
+		# The hub's driver pins uv build to 3.14+gil and adds the proved cp314t wheel; a bare uv build picks any interpreter.
+		Invoke-Step -StepName "Packaging (source + Windows binaries)" -Script {
+			Write-Log "=== Packaging (source + Windows binaries) ==="
+			$driver = Join-Path $repoRoot 'third_party/ANTfrastructure/windows/scripts/python/Invoke-CiPackaging.ps1'
+			if (-not (Test-Path $driver)) {
+				throw "Missing $driver - run: git submodule update --init --recursive"
 			}
-		} | Out-Null
-
-		Invoke-Step -StepName "Packaging (Windows binaries)" -Script {
-			Write-Log "=== Packaging (Windows binaries) ==="
-			$env:CYTHONIZE = "True"
-
-			$envPath = New-UvEnvironment -PythonVersion "3.13" -EnvName ".venv-packaging-binaries"
-			try {
-				if (Test-Path -Path "uv.lock") {
-					Invoke-External -File "uv" -Args @("sync", "--locked", "--dev", "--all-extras")
-				} else {
-					Invoke-External -File "uv" -Args @("sync", "--dev", "--all-extras")
-				}
-				Invoke-External -File "uv" -Args @("build")
-			} finally {
-				Remove-UvEnvironment -EnvPath $envPath
-			}
+			Invoke-External -File "pwsh" -Args @("-NoProfile", "-File", $driver, "-RepoRoot", "$repoRoot", "-PythonVersion", "3.14")
 		} | Out-Null
 
 		Write-Log "=== Completed Windows build/test pipeline ==="
