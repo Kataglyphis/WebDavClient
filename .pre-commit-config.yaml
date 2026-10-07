@@ -1,7 +1,7 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Must equal pyproject.toml's ruff pin and versions.env RUFF_VERSION; the consumer-pins gate fails on drift.
-    rev: v0.16.8
+    rev: v0.16.10
     hooks:
       # Run the linter.
       - id: ruff
