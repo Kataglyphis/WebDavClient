@@ -175,6 +175,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Downloads are renamed into place (2026-10-11).** Each file streams into a private
   `.<name>.<uuid>.part` beside it, then replaces the target. Threads that share a destination
   no longer truncate each other's file, and the response is closed on every status.
+  Windows denies a replace while another thread replaces the same target, and the first CI
+  run failed with `PermissionError` on windows-11-arm (run 38142999677). There the replace
+  retries for up to about 4 s; elsewhere the error is final.
 - **Wheels ship only the package (2026-10-11).** `[tool.setuptools.packages.find]` had no
   `include`, so namespace discovery packed `third_party/`, `scripts/` and `images/`, 218
   packages, into every wheel. The pure wheel drops from 363 KB to 12 KB.

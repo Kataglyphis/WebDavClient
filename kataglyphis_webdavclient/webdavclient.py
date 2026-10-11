@@ -2,7 +2,9 @@
 
 """WebDAV client implementation for listing and downloading remote files."""
 
+import sys
 import threading
+import time
 import urllib.parse
 import uuid
 from pathlib import Path, PurePosixPath
@@ -35,13 +37,27 @@ def _join_remote_url(*parts: str) -> str:
     return "/".join(cleaned_parts)
 
 
+def _replace(part: Path, target: Path) -> None:
+    # Windows refuses a replace while another thread replaces the same target (PermissionError); it clears in milliseconds.
+    attempts = 40 if sys.platform == "win32" else 1
+    for attempt in range(attempts):
+        try:
+            part.replace(target)
+        except PermissionError:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(0.005 * (attempt + 1))
+        else:
+            return
+
+
 def _write_atomically(target: Path, response: requests.Response) -> None:
     # A private file renamed into place: two downloads of one file never interleave, and a reader never sees half of it.
     part = target.with_name(f".{target.name}.{uuid.uuid4().hex}.part")
     try:
         with part.open("xb") as f:
             f.writelines(response.iter_content(chunk_size=8192))
-        part.replace(target)
+        _replace(part, target)
     except BaseException:
         part.unlink(missing_ok=True)
         raise

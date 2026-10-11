@@ -154,3 +154,36 @@ def test_clients_built_on_many_threads_share_one_log_sink(
     logger.complete()
     log_text = (tmp_path / "logs" / "downloadMd_s.log").read_text()
     assert log_text.count(marker) == 1
+
+
+@pytest.mark.parametrize(
+    ("platform", "failures", "replaced"), [("win32", 3, True), ("linux", 1, False)]
+)
+def test_replace_retries_a_busy_target_only_on_windows(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    platform: str,
+    failures: int,
+    replaced: bool,  # noqa: FBT001 -- a parametrized expectation
+) -> None:
+    """Windows denies a replace while another thread replaces the same file; elsewhere that error is final."""
+    part, target = tmp_path / "a.part", tmp_path / "a"
+    part.write_bytes(b"new")
+    real_replace = Path.replace
+    calls: list[Path] = []
+
+    def busy_replace(self: Path, other: Path) -> Path:
+        calls.append(self)
+        if len(calls) <= failures:
+            raise PermissionError(13, "Access is denied")
+        return real_replace(self, other)
+
+    monkeypatch.setattr(module.sys, "platform", platform)
+    monkeypatch.setattr(Path, "replace", busy_replace)
+    if replaced:
+        module._replace(part, target)
+        assert target.read_bytes() == b"new"
+    else:
+        with pytest.raises(PermissionError):
+            module._replace(part, target)
+    assert len(calls) == failures + int(replaced)

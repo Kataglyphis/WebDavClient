@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# The whole pytest suite against the installed free-threaded wheel: the 3.14t test leg runs the sources, this runs the Cython build.
-# Usage: test-free-threaded-wheel.sh [free-threaded version, default 3.14t]; run from ci_packaging.sh after the hub driver filled dist/.
+# Usage: test-free-threaded-wheel.sh [3.14t] after the hub driver filled dist/; the 3.14t test leg runs the sources, this the Cython build.
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
