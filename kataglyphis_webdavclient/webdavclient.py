@@ -2,7 +2,9 @@
 
 """WebDAV client implementation for listing and downloading remote files."""
 
+import threading
 import urllib.parse
+import uuid
 from pathlib import Path, PurePosixPath
 
 import requests
@@ -12,11 +14,37 @@ from requests.auth import HTTPBasicAuth
 
 
 REQUEST_TIMEOUT_SECONDS = 30
+LOG_FILE = "logs/downloadMd_s.log"
+
+# One loguru sink per log file: a sink per client wrote every line once per client and rotated the file N times.
+_log_sinks: set[str] = set()
+_log_sinks_lock = threading.Lock()
+
+
+def _add_log_sink(log_file: str) -> None:
+    path = str(Path(log_file).absolute())
+    with _log_sinks_lock:
+        if path in _log_sinks:
+            return
+        logger.add(path, rotation="500 MB")
+        _log_sinks.add(path)
 
 
 def _join_remote_url(*parts: str) -> str:
     cleaned_parts = [part.strip("/") for part in parts if part]
     return "/".join(cleaned_parts)
+
+
+def _write_atomically(target: Path, response: requests.Response) -> None:
+    # A private file renamed into place: two downloads of one file never interleave, and a reader never sees half of it.
+    part = target.with_name(f".{target.name}.{uuid.uuid4().hex}.part")
+    try:
+        with part.open("xb") as f:
+            f.writelines(response.iter_content(chunk_size=8192))
+        part.replace(target)
+    except BaseException:
+        part.unlink(missing_ok=True)
+        raise
 
 
 class WebDavClient:
@@ -32,8 +60,8 @@ class WebDavClient:
             password,
         )
 
-        self.ensure_folder_exists("logs")
-        logger.add("logs/downloadMd_s.log", rotation="500 MB")
+        self.ensure_folder_exists(str(Path(LOG_FILE).parent))
+        _add_log_sink(LOG_FILE)
 
     def list_files(self, url: str) -> list[str]:
         """List the files directly below a WebDAV URL; OSError unless PROPFIND answers 207."""
@@ -214,21 +242,21 @@ class WebDavClient:
             logger.debug(
                 "The current file that is stored has the full path: {}", local_file_path
             )
-            response = requests.get(
+            with requests.get(
                 remote_file_url,
                 auth=self.auth,
                 stream=True,
                 timeout=REQUEST_TIMEOUT_SECONDS,
-            )
-            if response.status_code == 200:
-                folder_path = local_file_path.parent
-                self.ensure_folder_exists(str(folder_path))
-                with local_file_path.open("wb") as f:
-                    f.writelines(response.iter_content(chunk_size=8192))
-            else:
-                logger.debug(
-                    "Failed to download {}: {}", remote_file_url, response.status_code
-                )
+            ) as response:
+                if response.status_code == 200:
+                    self.ensure_folder_exists(str(local_file_path.parent))
+                    _write_atomically(local_file_path, response)
+                else:
+                    logger.debug(
+                        "Failed to download {}: {}",
+                        remote_file_url,
+                        response.status_code,
+                    )
 
     def download_all_files_iterative(
         self,

@@ -3,6 +3,7 @@
 """Tests for the WebDavClient against a local mock WebDAV server."""
 
 import shutil
+import threading
 import time
 from collections.abc import Iterator
 from multiprocessing import Process
@@ -18,12 +19,12 @@ from tests.mock_webdav_server import create_web_dav_server
 
 def cleanup_test_files() -> None:
     """Remove local test directories created during download tests."""
-    try:
-        shutil.rmtree("tests/local_data")
-        shutil.rmtree("tests/local_data2")
-        logger.info("Removed local test directories.")
-    except OSError as error:
-        logger.error("Cleanup error: {}", error.strerror)
+    for folder in ("tests/local_data", "tests/local_data2", "tests/local_data3"):
+        try:
+            shutil.rmtree(folder)
+        except OSError as error:
+            logger.error("Cleanup error: {}", error.strerror)
+    logger.info("Removed local test directories.")
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -106,6 +107,41 @@ def test_download_all_files_iterative(webdav_client: WebDavClient) -> None:
     webdav_client.download_all_files_iterative(remote_base_path, local_base_path)
     assert (Path(local_base_path) / "Readme.md").exists()
     assert (Path(local_base_path) / "subfolder1/text.txt").exists()
+
+
+def test_concurrent_downloads_into_one_tree(webdav_client: WebDavClient) -> None:
+    """Threads sharing one client and one destination each leave complete files and no partial ones."""
+    local_base_path = Path("tests/local_data3")
+    threads_count = 8
+    barrier = threading.Barrier(threads_count)
+    errors: list[BaseException] = []
+
+    def download() -> None:
+        barrier.wait()
+        try:
+            webdav_client.download_all_files_iterative("data", str(local_base_path))
+        except BaseException as error:  # the main thread asserts on it
+            errors.append(error)
+
+    threads = [threading.Thread(target=download) for _ in range(threads_count)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    assert errors == []
+    remote = Path("tests/remote/data")
+    expected = sorted(p.relative_to(remote) for p in remote.rglob("*") if p.is_file())
+    got = sorted(
+        p.relative_to(local_base_path)
+        for p in local_base_path.rglob("*")
+        if p.is_file()
+    )
+    assert got == expected
+    for relative in expected:
+        assert (local_base_path / relative).read_bytes() == (
+            remote / relative
+        ).read_bytes()
 
 
 if __name__ == "__main__":

@@ -2,10 +2,13 @@
 
 """Unit tests for WebDavClient's path helpers and PROPFIND parsing; no server runs."""
 
+import threading
 from collections.abc import Callable
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
+from loguru import logger
 
 from kataglyphis_webdavclient import WebDavClient, webdavclient as module
 
@@ -126,3 +129,28 @@ def test_listing_raises_unless_propfind_answers_207(
         client.list_files("http://host:8080/data")
     with pytest.raises(OSError, match=str(status)):
         client.list_folders("data")
+
+
+def test_clients_built_on_many_threads_share_one_log_sink(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Every client used to add its own sink, so each line reached the log file once per client."""
+    monkeypatch.chdir(tmp_path)
+    threads_count = 8
+    barrier = threading.Barrier(threads_count)
+
+    def build() -> None:
+        barrier.wait()
+        WebDavClient("http://host:8080", "user", "secret")
+
+    threads = [threading.Thread(target=build) for _ in range(threads_count)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    marker = uuid4().hex
+    logger.info(marker)
+    logger.complete()
+    log_text = (tmp_path / "logs" / "downloadMd_s.log").read_text()
+    assert log_text.count(marker) == 1

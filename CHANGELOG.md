@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **The whole suite runs against the installed cp314t wheel on both Linux rows (2026-10-11).**
+  The 3.14t test leg tested the uncompiled sources, and the hub's proof only creates each
+  compiled module without running it. `scripts/linux/ci_packaging.sh` now runs
+  `scripts/linux/test-free-threaded-wheel.sh` after the hub driver. It installs the locked
+  `tests` extra and the `cp314t` wheel into a fresh 3.14t venv, and runs pytest from a copy of
+  `tests/` that has no package directory beside it. `tests/unit/test_free_threading.py` fails
+  when importing the package re-enables the GIL, and, under `KATAGLYPHIS_EXPECT_COMPILED=1`,
+  when a module is not the compiled one. `tests/test_webdav_client.py` adds eight threads that
+  share one client and one destination. Locally in `:latest`: 22 passed on the wheel. Both
+  negative controls fail: a wheel built without `freethreading_compatible` gives
+  `assert True is False` and the hub's proof exits 1, and a run from the checkout imports the sources.
 - **A `packaging` extra with auditwheel (2026-10-07).** The hub's Linux packaging repairs the
   Cython wheels to manylinux with the packaging venv's auditwheel once the hub pin carries
   c0ad775a; PATH never had one, so the Linux binaries shipped as `linux_<arch>`.
@@ -156,6 +167,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Placeholder for now removed features.
 
 ### Fixed
+- **One loguru file sink per log file, not one per client (2026-10-11).** Every
+  `WebDavClient()` called `logger.add("logs/downloadMd_s.log")`. Eight clients built on eight
+  threads wrote each line eight times and rotated the file eight times (measured on 3.14t).
+  The sinks are now a lock-guarded module set keyed by absolute path. That is the only mutable
+  module state the thread-safety audit found, and `freethreading_compatible=True` rests on it.
+- **Downloads are renamed into place (2026-10-11).** Each file streams into a private
+  `.<name>.<uuid>.part` beside it, then replaces the target. Threads that share a destination
+  no longer truncate each other's file, and the response is closed on every status.
+- **Wheels ship only the package (2026-10-11).** `[tool.setuptools.packages.find]` had no
+  `include`, so namespace discovery packed `third_party/`, `scripts/` and `images/`, 218
+  packages, into every wheel. The pure wheel drops from 363 KB to 12 KB.
+- **`cythonize(force=True)` (2026-10-11).** An in-tree `.c` left by an earlier build was reused
+  as is, so a changed compiler directive did not reach the next wheel.
 - **CI tests the WebDAV client again** (2026-10-01).
   - Every lane now runs the whole configured suite: all 10 tests, including the 6
     `test_webdav_client.py` tests against the mock server and the integration test.

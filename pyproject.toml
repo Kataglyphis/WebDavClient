@@ -5,6 +5,8 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
+# Namespace discovery otherwise ships third_party/, scripts/ and images/ as top-level packages in every wheel.
+include = ["kataglyphis_webdavclient*"]
 exclude = ["test*", "data*", "docs*", "demo*", "bench*"]
 
 [tool.setuptools.dynamic]

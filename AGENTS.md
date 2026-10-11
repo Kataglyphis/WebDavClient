@@ -20,7 +20,7 @@ from the wheel. OrchestrANT's wheel is built the same way — same driver, same
 | `kataglyphis_webdavclient/` | The package — `webdavclient.py` is the substance |
 | `tests/` | `test_webdav_client.py` and the `mock_webdav_server.py` it starts, plus `unit/`, `integration/`, `fuzzy/` and `remote/` (the mock server's document root) |
 | `bench/`, `demo/` | Benchmarks and a runnable example |
-| `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh` |
+| `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh`; and `test-free-threaded-wheel.sh`, this repo's own (§ 3) |
 | `scripts/windows/` | `Build-Windows.ps1` + the `Resolve-BuildModule.ps1` bootstrap |
 | `third_party/ANTfrastructure` | The submodule owning every reusable script, module and doc |
 
@@ -98,7 +98,7 @@ is not a check: before 2026-09-15 `Resolve-BuildModule.ps1` had silently fallen
 | `ci_tests.sh` | `python/ci_tests.sh` | none |
 | `ci_static_analysis.sh` | `python/ci_static_analysis.sh` | points `UV_PROJECT_ENVIRONMENT` at the venv the driver creates but never activates |
 | `ci_build_docs.sh` | `python/ci_build_docs.sh` | none |
-| `ci_packaging.sh` | `python/ci_packaging.sh` | installs `patchelf` — see § 3 |
+| `ci_packaging.sh` | `python/ci_packaging.sh` | installs `patchelf` — see § 3; then runs `test-free-threaded-wheel.sh` |
 
 Two upstream facts repeated here only because they bite before you reach a doc:
 
@@ -161,6 +161,29 @@ written out rather than linked.
   - Until then every lane had run `tests/unit` only. That narrowing came with the arm64
     and Windows lanes (2025-10-20), so `test_webdav_client.py` and `tests/integration/`
     ran on no lane, and coverage came from the dummy tests alone.
+- **The 3.14t test leg tests the sources, not the Cython build.** The hub's
+  `ci_tests.sh` syncs the project uncompiled, and the hub's packaging proof only
+  *creates* each compiled module (`free-threaded-wheel.py prove`), never runs it.
+  So `ci_packaging.sh` runs the hub driver as a child, then
+  `scripts/linux/test-free-threaded-wheel.sh`: the locked `tests` extra and the
+  `cp314t` wheel from `dist/` go into a fresh 3.14t venv, and the whole suite runs
+  from a copy of `tests/` that has no package directory beside it.
+  `KATAGLYPHIS_EXPECT_COMPILED=1` makes `tests/unit/test_free_threading.py` fail
+  when a module is not the compiled one, and on any free-threaded leg it fails
+  when importing the package turns the GIL back on. Both Linux rows run it; the
+  Windows lanes do not yet. It belongs upstream once a second consumer wants it.
+- **Module state is shared between threads, so it is locked.** The modules hold
+  one piece of mutable state, the set of loguru file sinks in `webdavclient.py`.
+  Before 2026-10-11 every `WebDavClient()` added another sink on the same file.
+  Each line was then written once per client, and the file rotated once per client.
+  Downloads write a private `.part` file and rename it into place, so threads that
+  share a destination never interleave. `freethreading_compatible=True` in
+  `setup.py` rests on that audit. A new module-level cache, global or lazily built
+  object needs a lock as well, and a test in `tests/` that drives it from threads.
+- **`packages.find` must keep its `include`.** Setuptools' default namespace
+  discovery took `third_party/`, `scripts/` and `images/` as top-level packages, 218 in all, and
+  every wheel shipped the hub's scripts into `site-packages/third_party/` until
+  2026-10-11.
 - **There is no Flutter step here.** The pre-wrapper `ci_build_docs.sh` put
   `$WORKSPACE_ROOT/flutter/bin` on `PATH`, copied from a Flutter sibling. It was
   dropped rather than ported — if you see it reappear, it is copy-paste.
@@ -177,7 +200,7 @@ uv sync
 FREE_THREADED_SYNC_EXTRAS=tests bash scripts/linux/ci_tests.sh kataglyphis_webdavclient '3.14 3.14t'  # whole suite + coverage
 bash scripts/linux/ci_static_analysis.sh x64       # codespell, bandit, vulture, ruff, ty (3.14)
 bash scripts/linux/ci_build_docs.sh 3.14           # Sphinx; 3.14 also names the coverage it copies
-bash scripts/linux/ci_packaging.sh                 # sdist + binary wheel (3.14, installs patchelf)
+bash scripts/linux/ci_packaging.sh                 # sdist + cp314 and proved cp314t wheels, then the suite on the cp314t one
 
 bash scripts/linux/run-lint-gates.sh     # the seven lint gates, ratchets included
 ```

@@ -11,4 +11,10 @@ if ! command -v patchelf >/dev/null 2>&1; then
   $SUDO apt-get update -y && $SUDO apt-get install -y patchelf
 fi
 
-antfrastructure_exec "linux/scripts/02-toolchain/python/ci_packaging.sh" "$@"
+driver="$(antfrastructure_path "linux/scripts/02-toolchain/python/ci_packaging.sh")"
+export WORKSPACE_ROOT="${WORKSPACE_ROOT:-$KATAGLYPHIS_REPO_ROOT}"
+bash "${driver}" "$@"
+
+# The hub proves the cp314t wheel only by loading its modules; this runs the suite on them.
+python_version="${1:-3.14}"
+bash "$(dirname "${BASH_SOURCE[0]}")/test-free-threaded-wheel.sh" "$(printf '%s' "${python_version%t}" | cut -d. -f1,2)t"

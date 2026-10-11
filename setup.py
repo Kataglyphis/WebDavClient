@@ -227,6 +227,8 @@ if CYTHONIZE:
         {
             "ext_modules": cythonize(
                 extensions,
+                # A stale in-tree .c from an earlier build hid a changed directive; three modules regenerate in seconds.
+                force=True,
                 compiler_directives={
                     "language_level": "3",
                     "emit_code_comments": False,
