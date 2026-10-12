@@ -167,6 +167,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Placeholder for now removed features.
 
 ### Fixed
+- **Every compiled module builds with clang-cl on Windows; the first one used MSVC's `cl` until now
+  (2026-10-12).** `ClangBuildExt` set the compiler's `cc` to `clang-cl` before the first `compile()`,
+  which then ran `initialize()` and put `cl.exe` back, so `kataglyphis_webdavclient/dummy.c` compiled
+  and linked with MSVC's tools in every Windows build (run 38214955666). `build_extension` now
+  initializes the compiler first. The `spawn` hook meant to catch this is gone: setuptools 84 never
+  calls it.
 - **One loguru file sink per log file, not one per client (2026-10-11).** Every
   `WebDavClient()` called `logger.add("logs/downloadMd_s.log")`. Eight clients built on eight
   threads wrote each line eight times and rotated the file eight times (measured on 3.14t).

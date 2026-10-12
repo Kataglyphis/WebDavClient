@@ -10,7 +10,6 @@ import shutil
 import sys
 import tempfile
 import zipfile
-from collections.abc import Sequence
 from pathlib import Path
 
 from setuptools import Extension, setup
@@ -159,23 +158,9 @@ class ClangBuildExt(build_ext):
     def build_extension(self, ext: Extension) -> None:
         """Build one extension and map MSVC toolchain calls to LLVM binaries."""
         if self.compiler.compiler_type == "msvc":
-            original_spawn = self.compiler.spawn
-
-            def clang_spawn(cmd: Sequence[str]) -> object:
-                if not cmd:
-                    return original_spawn(cmd)
-
-                exe = cmd[0].strip('"')  # remove surrounding quotes if any
-                name = Path(exe).name.lower()
-
-                if name in {"cl.exe", "cl"}:
-                    cmd[0] = "clang-cl"
-                elif name in {"link.exe", "link"}:
-                    cmd[0] = "lld-link.exe"
-
-                return original_spawn(cmd)
-
-            self.compiler.spawn = clang_spawn
+            # The first compile() would initialize() and reset cc to cl.exe, so the first extension built with MSVC cl.
+            if not getattr(self.compiler, "initialized", True):
+                self.compiler.initialize(self.plat_name)
 
             if hasattr(self.compiler, "cc"):
                 self.compiler.cc = "clang-cl"
