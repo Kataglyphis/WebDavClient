@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **The suite on the installed cp314t wheel runs through the hub's step (2026-10-12).**
+  `scripts/linux/ci_packaging.sh` calls the hub's `test-free-threaded-wheel.sh` (hub 9ade0dd1, CON66) with
+  `--extra tests --copy tests --copy pytest.ini --env KATAGLYPHIS_EXPECT_COMPILED=1`, in place of the local
+  `scripts/linux/test-free-threaded-wheel.sh`, which is gone. The lock's set now comes from `uv export --locked`
+  rather than `--frozen`. A local run of the wrapper in `:latest` proved 3 compiled modules and passed all 24 tests.
+
 ### Added
 - **The whole suite runs against the installed cp314t wheel on both Linux rows (2026-10-11).**
   The 3.14t test leg tested the uncompiled sources, and the hub's proof only creates each
