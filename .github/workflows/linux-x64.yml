@@ -18,8 +18,7 @@ jobs:
     with:
       arches: x64
       package-name: kataglyphis_webdavclient
-      # No version named: the hub runs the image's pinned X.Y and its X.Yt twin (pyproject declares free-threading).
-      # The free-threaded leg syncs only the tests extra, whose wheels exist free-threaded, and gates.
+      # No version named: the hub runs the pinned X.Y and its X.Yt twin, which syncs only the tests extra and gates.
       free-threaded-extras: tests
     secrets:
       GHCR_PAT: ${{ secrets.GHCR_PAT }}

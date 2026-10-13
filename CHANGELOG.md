@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **ruff 0.17.0, ANTfrastructure 99aafa33 -> 3ee5955f and the lock's maintenance (2026-10-13).** The hub's tool
+  batch moves `RUFF_VERSION` to 0.17.0, so `pyproject.toml`, `.pre-commit-config.yaml` and `uv.lock` follow it in
+  the same commit, as the consumer-pins gate requires. `uv lock --upgrade` with uv 0.13.0, the hub's pin, writes lock
+  revision 5 and moves ten packages, ty 0.0.86, numpy 2.5.4 and pre-commit 4.7.0 among them. `linux-x64.yml`'s
+  two-line comment is one line again; the comment-size ratchet had failed the lint lane on it since 2026-10-12.
+  In `:latest`: the seven lint gates and the six static-analysis gates pass, and so do 22 tests (2 skipped) on
+  CPython 3.15.0 and 3.14.4, and 23 (1 skipped) on 3.14t.
 - **The suite on the installed cp314t wheel runs through the hub's step (2026-10-12).**
   `scripts/linux/ci_packaging.sh` calls the hub's `test-free-threaded-wheel.sh` (hub 9ade0dd1, CON66) with
   `--extra tests --copy tests --copy pytest.ini --env KATAGLYPHIS_EXPECT_COMPILED=1`, in place of the local
