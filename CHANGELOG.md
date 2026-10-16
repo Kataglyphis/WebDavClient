@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-16
+
 ### Changed
 - **Every push to `main` releases `v<version>`, and only when all four lanes are green** (2026-10-16,
   `release.yml`, the family's rule in [ANTfrastructure's `branch-and-release-strategy.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md)).
