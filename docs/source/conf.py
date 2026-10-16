@@ -13,7 +13,11 @@ sys.path.insert(0, str(Path("../../").resolve()))
 project = "WebDavClient"
 project_copyright = "2024, Jonas Heinle"
 author = "Jonas Heinle"
-release = (Path(__file__).resolve().parents[2] / "VERSION.txt").read_text(encoding="utf-8").strip()
+release = (
+    (Path(__file__).resolve().parents[2] / "VERSION.txt")
+    .read_text(encoding="utf-8")
+    .strip()
+)
 globals()["copyright"] = project_copyright
 
 # General configuration
