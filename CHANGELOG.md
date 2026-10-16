@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **A push runs Linux x64 and the lint gates; Linux arm64, Windows x64 and Windows arm64 run on request**
+  (2026-10-16), the family's CI rule ([ANTfrastructure's `branch-and-release-strategy.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md)).
+  `on-request.yml` starts the lanes a pushed commit message asks for with the ci token (`windows`,
+  `arm64`, `all`), every lane keeps its Run workflow button, and each lane's concurrency group names
+  the lane and its caller.
 - **ruff 0.17.0, ANTfrastructure 99aafa33 -> 3ee5955f and the lock's maintenance (2026-10-13).** The hub's tool
   batch moves `RUFF_VERSION` to 0.17.0, so `pyproject.toml`, `.pre-commit-config.yaml` and `uv.lock` follow it in
   the same commit, as the consumer-pins gate requires. `uv lock --upgrade` with uv 0.13.0, the hub's pin, writes lock

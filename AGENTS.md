@@ -224,8 +224,13 @@ for a local run. File and display names follow the family convention (owner
 decision 2026-09-24): kebab-case, one file per platform + arch, display names
 `<Platform> <Arch> · <what>`, shared lanes named the same in every repo (`Lint
 gates`). The two Linux files split `ubuntu-26.04-amd64-arm64.yml` on 2026-09-25.
-Every lane runs on every push and pull request to `main` and `develop`; none is
-opted into by a commit-message token.
+**A push or PR runs Linux x64 and the lint gates; Linux arm64, Windows x64 and Windows arm64
+run on request** (owner rule 2026-10-15 for the whole family, ANTfrastructure's
+[`branch-and-release-strategy.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md); here since 2026-10-16). `on-request.yml`
+reads `[ci <lane>]` in the pushed commit messages (`[ci windows]`, `[ci arm64]`, `[ci all]`),
+and each lane keeps its Run workflow button. Each lane's concurrency group is
+`<lane>-${{ github.ref }}-${{ github.workflow }}`, one per lane and caller. A token in a commit
+message starts lanes, so never quote one in prose.
 
 ## 5. Docs owned by this repo
 
