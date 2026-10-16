@@ -109,6 +109,18 @@ Search the tree with [ripgrep](https://github.com/BurntSushi/ripgrep) (`rg`):
 
 ### Installation
 
+**From a release** (since v0.10.0): every [release](https://github.com/Kataglyphis/WebDavClient/releases/latest)
+carries wheels for Linux x64/arm64 and Windows x64 (CPython 3.14, with and without the GIL), a
+pure-Python wheel that installs anywhere, the sdist and a `SHA256SUMS`. Download the wheel for your
+platform and `SHA256SUMS`, then:
+
+```sh
+sha256sum --check --ignore-missing SHA256SUMS
+pip install ./kataglyphis_webdavclient-*.whl
+```
+
+**From source:**
+
 1. Clone the repo
    ```sh
    git clone --recurse-submodules git@github.com:Kataglyphis/WebDavClient.git
