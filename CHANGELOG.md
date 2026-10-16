@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Every push to `main` releases `v<version>`, and only when all four lanes are green** (2026-10-16,
+  `release.yml`, the family's rule in [ANTfrastructure's `branch-and-release-strategy.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md)).
+  The version is `VERSION.txt`'s; the release carries the binary wheels of Linux x64, Linux arm64 and
+  Windows x64 (cp314 and cp314t each), the pure wheel and the sdist, which every lane builds and Linux
+  x64's copy ships (`scripts/linux/collect-release-assets.sh`; its suite runs with Linux x64 on every
+  push). The hub moves to 5499dc91, which carries the release script.
 - **A push runs Linux x64 and the lint gates; Linux arm64, Windows x64 and Windows arm64 run on request**
   (2026-10-16), the family's CI rule ([ANTfrastructure's `branch-and-release-strategy.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md)).
   `on-request.yml` starts the lanes a pushed commit message asks for with the ci token (`windows`,

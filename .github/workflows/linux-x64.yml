@@ -1,15 +1,16 @@
 name: Linux x64 · build + test
 
-# The one build lane every push runs (https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md).
+# The one build lane every push to develop runs; release.yml calls it on main (https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md).
 
 # Configuration for the hub's reusable lane only: do not re-inline its steps, runner or image here.
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: ["develop"]
   pull_request:
     branches: ["main", "develop"]
   workflow_dispatch:
+  workflow_call:
 
 # A called workflow runs on the caller's token; unset, the lane would get the repository default (write).
 permissions:
@@ -21,6 +22,20 @@ concurrency:
   cancel-in-progress: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
 
 jobs:
+  # Seconds on the bare runner: the collector release.yml runs on main, against uploads shaped like the lanes'.
+  release-collector:
+    name: Release collector suite
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: collect-release-assets.sh against synthetic uploads
+        run: bash scripts/linux/tests/test-collect-release-assets.sh
+
   linux:
     uses: Kataglyphis/ANTfrastructure/.github/workflows/python-ci-linux.yml@develop
     with:

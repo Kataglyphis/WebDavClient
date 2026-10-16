@@ -230,7 +230,11 @@ run on request** (owner rule 2026-10-15 for the whole family, ANTfrastructure's
 reads `[ci <lane>]` in the pushed commit messages (`[ci windows]`, `[ci arm64]`, `[ci all]`),
 and each lane keeps its Run workflow button. Each lane's concurrency group is
 `<lane>-${{ github.ref }}-${{ github.workflow }}`, one per lane and caller. A token in a commit
-message starts lanes, so never quote one in prose.
+message starts lanes, so never quote one in prose. **Every push to `main` is a release**
+(`release.yml`): a version check, all four lanes once more, then `v<VERSION.txt's version>` with
+the six binary wheels, the pure wheel and the sdist (`scripts/linux/collect-release-assets.sh`, whose
+suite is a job of `linux-x64.yml`), only when every lane is green. `gh workflow run release.yml --ref
+develop -f dry-run=true` proves it on `develop` without publishing.
 
 ## 5. Docs owned by this repo
 
@@ -239,5 +243,6 @@ message starts lanes, so never quote one in prose.
   `README.md` and `CHANGELOG.md` over them before every build, so edit the root
   files.
 - `CHANGELOG.md` and `VERSION.txt` — the version is read from `VERSION.txt`, so
-  bump it there.
+  bump it there, and turn `## [Unreleased]` into its `## [<version>]` section before a merge into
+  `main`: the release takes its notes from it and refuses a version without one.
 - Update docs in the same PR as user-facing behaviour changes.
