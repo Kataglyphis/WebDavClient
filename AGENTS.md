@@ -132,7 +132,7 @@ written out rather than linked.
 - **`ci_packaging.sh` installs `patchelf` before delegating — a duplicate
   step.** The binary wheel needs it (`auditwheel repair` rewrites the wheel's
   RPATHs), but upstream's driver has installed it itself since the file's first
-  commit (hub `0972946b`, 2026-06-12), two months before this wrapper delegated
+  commit (hub `fc4df858`, 2026-06-12), two months before this wrapper delegated
   to it, and OrchestrANT's wrapper carries no such step. The wrapper's header
   says upstream does not install it; that is wrong at the current pin.
 - **`WORKSPACE_ROOT` is handled for you — do not remove it.** Upstream's

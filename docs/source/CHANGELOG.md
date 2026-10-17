@@ -57,8 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **2026-09-25: ANTfrastructure's reusable workflows and composite actions are
   called at `@develop`**, no longer `@main` as the older entry below says. Since
   2026-09-16 every lane also runs on pushes and pull requests to `develop`, not
-  only `main`. The hub pin is `539ee280` (2026-09-16), which is on the hub's
-  `main`, as is the `19286e9f` the NOTE below warns about.
+  only `main`. The hub pin is `f65ccae9` (2026-09-16), which is on the hub's
+  `main`, as is the `3c83a5e3` the NOTE below warns about.
 - **2026-09-24: the workflows follow the family naming convention** (owner
   decision). `windows-2025.yml` is `windows-x64.yml` ("Windows x64 · build +
   test") and the lint lane's display name is plain `Lint gates`, as in every
@@ -66,14 +66,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   follow the new file. `ubuntu-26.04-amd64-arm64.yml` keeps its name for now:
   its split into `linux-x64.yml` and `linux-arm64.yml` needs a hub
   reusable-lane input that is not on hub `main` yet.
-- **The hub pin moved to ANTfrastructure `19286e9f`** (from the published
-  `4f6f516a`). The published hub still listed WebDavClient under `unconfirmed`
+- **The hub pin moved to ANTfrastructure `3c83a5e3`** (from the published
+  `72730743`). The published hub still listed WebDavClient under `unconfirmed`
   in its `.github/consumers.json`, and the workflow-conventions gate refuses a
   tree it cannot key its allow rows to, so that gate could not pass at the old
-  pin at all. NOTE: `19286e9f` is NOT PUSHED anywhere yet — do not push this
+  pin at all. NOTE: `3c83a5e3` is NOT PUSHED anywhere yet — do not push this
   repo before ANTfrastructure is, or the gitlink resolves to nothing.
 - `scripts/linux/lib/antfrastructure.sh` re-synced against the new pin (hub
-  commit `e03bbe42` rewrote the template). `ANTFRASTRUCTURE_DIR` now resolves
+  commit `08137b27` rewrote the template). `ANTFRASTRUCTURE_DIR` now resolves
   in a documented order — explicit env, then the submodule, then an
   `antfrastructure-tools` sibling clone — and the not-found error picks its
   hint from whether `.gitmodules` actually declares the submodule.
@@ -148,7 +148,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the one interpreter the image happens to ship. The two wrappers now clear
   those variables (and static analysis names `UV_PROJECT_ENVIRONMENT`, doing
   what the `uv_venv_activate` `ci_build_docs.sh` already carries would do).
-  Invisible until the pin reached `604294e2`: upstream ran those six behind
+  Invisible until the pin reached `d339cd52`: upstream ran those six behind
   `|| true` until 2026-09-08.
 - The two findings that surfaced once the analysers ran for real, fixed rather
   than ignored: `ruff` CPY001 over twelve files (the MIT `LICENSE`'s notice now

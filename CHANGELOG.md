@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   clang-cl, and installs each alone into a fresh venv where every compiled module must load (the
   `cp314t` one with the GIL off). The release collector picks them up beside the `win_amd64` pair,
   and its suite expects ten files now. Until now a release carried no Windows arm64 wheel, because
-  the hub's arm64 container cross-builds no GIL Cython wheel. ANTfrastructure moves to 9fa9b23c
+  the hub's arm64 container cross-builds no GIL Cython wheel. ANTfrastructure moves to f24e7530
   (`python-ci-windows.yml`'s `arm64-wheels`). Owner rule of the same day: every release ships Windows
   arm64 next to x64.
 
@@ -31,13 +31,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The version is `VERSION.txt`'s; the release carries the binary wheels of Linux x64, Linux arm64 and
   Windows x64 (cp314 and cp314t each), the pure wheel and the sdist, which every lane builds and Linux
   x64's copy ships (`scripts/linux/collect-release-assets.sh`; its suite runs with Linux x64 on every
-  push). The hub moves to 5499dc91, which carries the release script.
+  push). The hub moves to 15bc7d6c, which carries the release script.
 - **A push runs Linux x64 and the lint gates; Linux arm64, Windows x64 and Windows arm64 run on request**
   (2026-10-16), the family's CI rule ([ANTfrastructure's `branch-and-release-strategy.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md)).
   `on-request.yml` starts the lanes a pushed commit message asks for with the ci token (`windows`,
   `arm64`, `all`), every lane keeps its Run workflow button, and each lane's concurrency group names
   the lane and its caller.
-- **ruff 0.17.0, ANTfrastructure 99aafa33 -> 3ee5955f and the lock's maintenance (2026-10-13).** The hub's tool
+- **ruff 0.17.0, ANTfrastructure 3a0ab1c3 -> 0768e5e0 and the lock's maintenance (2026-10-13).** The hub's tool
   batch moves `RUFF_VERSION` to 0.17.0, so `pyproject.toml`, `.pre-commit-config.yaml` and `uv.lock` follow it in
   the same commit, as the consumer-pins gate requires. `uv lock --upgrade` with uv 0.13.0, the hub's pin, writes lock
   revision 5 and moves ten packages, ty 0.0.86, numpy 2.5.4 and pre-commit 4.7.0 among them. `linux-x64.yml`'s
@@ -45,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   In `:latest`: the seven lint gates and the six static-analysis gates pass, and so do 22 tests (2 skipped) on
   CPython 3.15.0 and 3.14.4, and 23 (1 skipped) on 3.14t.
 - **The suite on the installed cp314t wheel runs through the hub's step (2026-10-12).**
-  `scripts/linux/ci_packaging.sh` calls the hub's `test-free-threaded-wheel.sh` (hub 9ade0dd1, CON66) with
+  `scripts/linux/ci_packaging.sh` calls the hub's `test-free-threaded-wheel.sh` (hub ff91d46d, CON66) with
   `--extra tests --copy tests --copy pytest.ini --env KATAGLYPHIS_EXPECT_COMPILED=1`, in place of the local
   `scripts/linux/test-free-threaded-wheel.sh`, which is gone. The lock's set now comes from `uv export --locked`
   rather than `--frozen`. A local run of the wrapper in `:latest` proved 3 compiled modules and passed all 24 tests.
@@ -64,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `assert True is False` and the hub's proof exits 1, and a run from the checkout imports the sources.
 - **A `packaging` extra with auditwheel (2026-10-07).** The hub's Linux packaging repairs the
   Cython wheels to manylinux with the packaging venv's auditwheel once the hub pin carries
-  c0ad775a; PATH never had one, so the Linux binaries shipped as `linux_<arch>`.
+  0fb3bd95; PATH never had one, so the Linux binaries shipped as `linux_<arch>`.
 - **A proved free-threaded wheel beside the GIL one (2026-10-07).** `pyproject.toml` drops
   `Programming Language :: Python :: 3.14t`, which is no trove classifier (PyPI refuses an
   upload that names it), for the official `Programming Language :: Python :: Free Threading
@@ -79,10 +79,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   wheel with `sys._is_gil_enabled()` still False.
 - **A Windows arm64 test lane** (`.github/workflows/windows-arm64.yml`, "Windows arm64 ·
   test", 2026-10-01). It is the hub's runner-native `windows-11-arm` job (`arm64-tests`,
-  hub 625b3653): no container and no build, just the whole pytest suite on the 3.14 and
+  hub 0ef3f68d): no container and no build, just the whole pytest suite on the 3.14 and
   3.14t legs. It uses arm64 CPython from uv, pinned and SHA-checked by the hub. The lock
   resolves from `win_arm64` wheels alone since py-spy and line_profiler stay off ARM64.
-  ANTfrastructure moves from 8a45c75a to 625b3653.
+  ANTfrastructure moves from 65d61617 to 0ef3f68d.
 - `scripts/linux/run-lint-gates.sh` and `.github/workflows/lint-gates.yml`: the
   family lint lane. Seven gates over the tracked tree — shell lint, workflow
   lint plus the CI image-ref check, secret scan, `ruff`, the shared-config
@@ -121,7 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Comments are one line, only the why (2026-09-30).** The family rule, in
   [the hub's `AGENTS.md`](third_party/ANTfrastructure/AGENTS.md#comments-one-line-only-the-why)
   and linked from `AGENTS.md`: 27 files lose their comment blocks, and code is unchanged.
-  ANTfrastructure moves from `539ee280` to `9e9d9828` for the gate that grades every
+  ANTfrastructure moves from `f65ccae9` to `497ba711` for the gate that grades every
   language and the bootstrap templates the two local copies follow. Its `versions.env`
   pins ruff at 0.16.8, so `pyproject.toml`, `.pre-commit-config.yaml` and `uv.lock`
   follow (0.16.7 and 0.16.8 report the same findings here).
@@ -152,8 +152,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **2026-09-25: ANTfrastructure's reusable workflows and composite actions are
   called at `@develop`**, no longer `@main` as the older entry below says. Since
   2026-09-16 every lane also runs on pushes and pull requests to `develop`, not
-  only `main`. The hub pin is `539ee280` (2026-09-16), which is on the hub's
-  `main`, as is the `19286e9f` the NOTE below warns about.
+  only `main`. The hub pin is `f65ccae9` (2026-09-16), which is on the hub's
+  `main`, as is the `3c83a5e3` the NOTE below warns about.
 - **2026-09-24: the workflows follow the family naming convention** (owner
   decision). `windows-2025.yml` is `windows-x64.yml` ("Windows x64 · build +
   test") and the lint lane's display name is plain `Lint gates`, as in every
@@ -161,14 +161,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   follow the new file. `ubuntu-26.04-amd64-arm64.yml` keeps its name for now:
   its split into `linux-x64.yml` and `linux-arm64.yml` needs a hub
   reusable-lane input that is not on hub `main` yet.
-- **The hub pin moved to ANTfrastructure `19286e9f`** (from the published
-  `4f6f516a`). The published hub still listed WebDavClient under `unconfirmed`
+- **The hub pin moved to ANTfrastructure `3c83a5e3`** (from the published
+  `72730743`). The published hub still listed WebDavClient under `unconfirmed`
   in its `.github/consumers.json`, and the workflow-conventions gate refuses a
   tree it cannot key its allow rows to, so that gate could not pass at the old
-  pin at all. NOTE: `19286e9f` is NOT PUSHED anywhere yet — do not push this
+  pin at all. NOTE: `3c83a5e3` is NOT PUSHED anywhere yet — do not push this
   repo before ANTfrastructure is, or the gitlink resolves to nothing.
 - `scripts/linux/lib/antfrastructure.sh` re-synced against the new pin (hub
-  commit `e03bbe42` rewrote the template). `ANTFRASTRUCTURE_DIR` now resolves
+  commit `08137b27` rewrote the template). `ANTFRASTRUCTURE_DIR` now resolves
   in a documented order — explicit env, then the submodule, then an
   `antfrastructure-tools` sibling clone — and the not-found error picks its
   hint from whether `.gitmodules` actually declares the submodule.
@@ -281,7 +281,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the one interpreter the image happens to ship. The two wrappers now clear
   those variables (and static analysis names `UV_PROJECT_ENVIRONMENT`, doing
   what the `uv_venv_activate` `ci_build_docs.sh` already carries would do).
-  Invisible until the pin reached `604294e2`: upstream ran those six behind
+  Invisible until the pin reached `d339cd52`: upstream ran those six behind
   `|| true` until 2026-09-08.
 - The two findings that surfaced once the analysers ran for real, fixed rather
   than ignored: `ruff` CPY001 over twelve files (the MIT `LICENSE`'s notice now
