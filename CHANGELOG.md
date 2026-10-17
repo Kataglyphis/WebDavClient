@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-10-17
+
 ### Added
 - **Windows arm64 wheels** (2026-10-17): the Windows arm64 lane builds `cp314-cp314-win_arm64` and
   `cp314-cp314t-win_arm64` natively on `windows-11-arm`, after its tests, with Visual Studio's own
@@ -316,4 +318,5 @@ repository carries no tags (2026-09-25).
 ---
 
 <!-- Links for diffs -->
-[Unreleased]: https://github.com/Kataglyphis/WebDavClient/commits/develop
+[Unreleased]: https://github.com/Kataglyphis/WebDavClient/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/Kataglyphis/WebDavClient/compare/v0.10.0...v0.10.1
