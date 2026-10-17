@@ -28,12 +28,15 @@ printf 'win' > "${w}/dist/${p}-py3-none-any.whl"
 printf 'win' > "${w}/dist/${p}.tar.gz"
 printf 'cov' > "${w}/docs/test_results/coverage-3.14.xml"
 printf 'log' > "${w}/logs/build-windows.log"
+wa="${a}/packages-windows-arm64-wheels"
+mkdir -p "${wa}"
+for abi in cp314-cp314 cp314-cp314t; do printf 'arm' > "${wa}/${p}-${abi}-win_arm64.whl"; done
 
 out="${work}/release"
 check "it collects, though all three lanes carry the pure wheel and the sdist" bash "${collect}" "${a}" "${out}"
-check "the six binary wheels" test "$(find "${out}" -name '*-cp314-*.whl' | wc -l)" = 6
+check "the eight binary wheels, Windows arm64's two among them" test "$(find "${out}" -name '*-cp314-*.whl' | wc -l)" = 8
 check "one pure wheel and one sdist, Linux x64's" test "$(cat "${out}/${p}-py3-none-any.whl")$(cat "${out}/${p}.tar.gz")" = x64x64
-check "eight files and nothing else: no report, coverage or log" test "$(find "${out}" -type f | wc -l)" = 8
+check "ten files and nothing else: no report, coverage or log" test "$(find "${out}" -type f | wc -l)" = 10
 check "relative paths, as release.yml passes them" bash -c "cd '${work}' && bash '${collect}' artifacts release-relative >/dev/null && test -e release-relative/${p}-cp314-cp314t-win_amd64.whl"
 
 mkdir -p "${a}/packages-linux-x64-copy"

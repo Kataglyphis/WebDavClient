@@ -18,7 +18,7 @@ For the official docs follow this [link](https://webdavclient.jonasheinle.de/).
 [![Linux x64 · build + test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/linux-x64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/linux-x64.yml)
 [![Linux arm64 · build + test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/linux-arm64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/linux-arm64.yml)
 [![Windows x64 · build + test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-x64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-x64.yml)
-[![Windows arm64 · test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-arm64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-arm64.yml)
+[![Windows arm64 · test + wheels](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-arm64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-arm64.yml)
 [![Lint gates](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml)
 [![Automatic Dependency Submission](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission)
 [![CodeQL](https://github.com/Kataglyphis/WebDavClient/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/github-code-scanning/codeql)
@@ -110,7 +110,8 @@ Search the tree with [ripgrep](https://github.com/BurntSushi/ripgrep) (`rg`):
 ### Installation
 
 **From a release** (since v0.10.0): every [release](https://github.com/Kataglyphis/WebDavClient/releases/latest)
-carries wheels for Linux x64/arm64 and Windows x64 (CPython 3.14, with and without the GIL), a
+carries wheels for Linux x64/arm64 and Windows x64/arm64 (CPython 3.14, with and without the GIL; Windows
+arm64 since v0.10.1), a
 pure-Python wheel that installs anywhere, the sdist and a `SHA256SUMS`. Download the wheel for your
 platform and `SHA256SUMS`, then:
 

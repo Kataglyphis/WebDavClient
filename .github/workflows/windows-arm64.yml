@@ -1,6 +1,6 @@
-name: Windows arm64 · test
+name: Windows arm64 · test + wheels
 
-# Configuration for the hub's reusable lane only: its runner-native windows-11-arm job, no container and no build.
+# Configuration for the hub's reusable lane only: its runner-native windows-11-arm job, tests then the win_arm64 wheels.
 
 # On request only (https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md): on-request.yml or by hand.
 on:
@@ -21,6 +21,8 @@ jobs:
     with:
       build-python-package: false
       arm64-tests: true
+      # Built and loaded on the runner itself: the hub's arm64 container cross-builds no GIL Cython wheel.
+      arm64-wheels: true
       # As on Linux: 3.14t syncs only the tests extra; py-spy and line_profiler stay off ARM64 (pyproject.toml).
       arm64-python-versions: '3.14 3.14t'
       free-threaded-extras: tests

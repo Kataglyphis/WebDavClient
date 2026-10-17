@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Windows arm64 wheels** (2026-10-17): the Windows arm64 lane builds `cp314-cp314-win_arm64` and
+  `cp314-cp314t-win_arm64` natively on `windows-11-arm`, after its tests, with Visual Studio's own
+  clang-cl, and installs each alone into a fresh venv where every compiled module must load (the
+  `cp314t` one with the GIL off). The release collector picks them up beside the `win_amd64` pair,
+  and its suite expects ten files now. Until now a release carried no Windows arm64 wheel, because
+  the hub's arm64 container cross-builds no GIL Cython wheel. ANTfrastructure moves to 9fa9b23c
+  (`python-ci-windows.yml`'s `arm64-wheels`). Owner rule of the same day: every release ships Windows
+  arm64 next to x64.
+
 ## [0.10.0] - 2026-10-16
 
 ### Changed
