@@ -32,9 +32,18 @@ Download files and folders from a WebDAV host.
    webdavclient
    CHANGELOG
 
+Tests and coverage
+==================
+
+Published with the docs by the Linux x64 lane, from the image's pinned CPython; the
+free-threaded report is its X.Yt twin.
+
+* `Coverage report (HTML) <_static/coverage/index.html>`_ and `(XML) <_static/coverage.xml>`_
+* `Test report <_static/test_results/pytest-report.html>`_
+* `Free-threaded test report <_static/test_results/pytest-report-free-threaded.html>`_
+
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

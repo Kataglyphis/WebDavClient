@@ -75,8 +75,6 @@ docs = [
   "myst-parser",
   "pyyaml",
   "cmake-format",
-  "breathe",
-  "exhale"
 ]
 
 # The hub's Linux packaging repairs the Cython wheels to manylinux with this; PATH carries no auditwheel.

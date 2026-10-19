@@ -17,6 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the commented-out Vulkan literature and the unused Best-README-Template link definitions are
   gone. The clone URL is `https://`, as for every family repository, and the logo has an absolute
   URL, so it also shows on the docs site and in the package's long description.
+- **`.github/copilot-instructions.md` points at `AGENTS.md`** and names five of its rules, in
+  English. It was a 213-line German template with C++, Rust and Dart sections for code this
+  repository does not have.
+
+### Removed
+- **`exhale_args` in `docs/source/conf.py`, and `breathe` and `exhale` in the `docs` extra**:
+  Doxygen tooling for C++ that no page loaded. The docs build without them gives zero warnings,
+  as before.
 
 ### Fixed
 - **`AGENTS.md` names what a release carries instead of "six binary wheels"**: a cp314 and a
@@ -25,6 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`docs/source/CHANGELOG.md` matches `CHANGELOG.md` again**; it lacked the 0.10.0 and 0.10.1
   sections, and `docs/Makefile` builds from the tracked copy. 0.10.0's link to the hub's
   `AGENTS.md` is absolute, so it resolves from the copy too.
+- **The dead links a live-site audit found (2026-10-19) are gone.** The docs index linked
+  `py-modindex.html`, which Sphinx did not write, and the API page's `:no-index:` left the eight
+  links back from the highlighted source without a target; the page now indexes `WebDavClient`
+  and its methods. The README's *Automatic Dependency Submission* badge named a workflow this
+  repository does not have. The coverage report and both test reports, published with every docs
+  build, are linked from the docs index.
 
 ## [0.10.1] - 2026-10-17
 

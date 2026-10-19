@@ -13,7 +13,6 @@
 [![Windows x64 · build + test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-x64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-x64.yml)
 [![Windows arm64 · test + wheels](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-arm64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-arm64.yml)
 [![Lint gates](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml)
-[![Automatic Dependency Submission](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission)
 [![CodeQL](https://github.com/Kataglyphis/WebDavClient/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/github-code-scanning/codeql)
 [![TopLang](https://img.shields.io/github/languages/top/Kataglyphis/WebDavClient)](https://github.com/Kataglyphis/WebDavClient)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/JonasHeinle)

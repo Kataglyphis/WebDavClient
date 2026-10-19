@@ -37,14 +37,6 @@ myst_enable_extensions = [
     "deflist",  # Enables definition lists
 ]
 
-exhale_args = {
-    "containmentFolder": "./api",
-    "rootFileName": "library_root.rst",
-    "rootFileTitle": "Library API",
-    "doxygenStripFromPath": "../..",
-    "createTreeView": True,
-}
-
 templates_path = ["_templates"]
 exclude_patterns = []
 
@@ -77,7 +69,6 @@ _SPHINX_EXPORTS = (
     author,
     release,
     myst_enable_extensions,
-    exhale_args,
     templates_path,
     exclude_patterns,
     html_theme,
