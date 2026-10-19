@@ -5,7 +5,7 @@
 
 # WebDavClient
 
-  <h4>Download files via webdav easily.</h4>
+  <h4>Download files and folders from WebDAV storage.</h4>
 </div>
 
 [![Linux x64 · build + test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/linux-x64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/linux-x64.yml)
