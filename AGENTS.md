@@ -232,8 +232,10 @@ and each lane keeps its Run workflow button. Each lane's concurrency group is
 `<lane>-${{ github.ref }}-${{ github.workflow }}`, one per lane and caller. A token in a commit
 message starts lanes, so never quote one in prose. **Every push to `main` is a release**
 (`release.yml`): a version check, all four lanes once more, then `v<VERSION.txt's version>` with
-the six binary wheels, the pure wheel and the sdist (`scripts/linux/collect-release-assets.sh`, whose
-suite is a job of `linux-x64.yml`), only when every lane is green. `gh workflow run release.yml --ref
+a cp314 and a cp314t binary wheel from each lane (Linux x86_64 and aarch64, Windows amd64 and
+arm64), Linux x64's pure wheel and sdist, and the hub publisher's `SHA256SUMS`
+(`scripts/linux/collect-release-assets.sh`, whose suite is a job of `linux-x64.yml`), only when
+every lane is green. `gh workflow run release.yml --ref
 develop -f dry-run=true` proves it on `develop` without publishing.
 
 ## 5. Docs owned by this repo
@@ -244,7 +246,9 @@ how to run it and what breaks; no filler, no marketing, no repetition.
 - Sphinx sources in `docs/`. `docs/source/README.md` and
   `docs/source/CHANGELOG.md` are copies: the docs driver copies the root
   `README.md` and `CHANGELOG.md` over them before every build, so edit the root
-  files. A new page goes into `docs/source/index.rst`'s toctree.
+  files. They stay tracked because `docs/Makefile` and `make.bat` build without
+  that copy; re-sync them in the commit that changes the root file. A new page
+  goes into `docs/source/index.rst`'s toctree.
 - `README.md` is the short overview the family's README rule asks for
   ([`repository-family.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/repository-family.md#the-readme-rule));
   installation, usage, tests and static analysis are

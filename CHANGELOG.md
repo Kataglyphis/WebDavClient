@@ -18,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   gone. The clone URL is `https://`, as for every family repository, and the logo has an absolute
   URL, so it also shows on the docs site and in the package's long description.
 
+### Fixed
+- **`AGENTS.md` names what a release carries instead of "six binary wheels"**: a cp314 and a
+  cp314t wheel from each of Linux x86_64 and aarch64 and Windows amd64 and arm64 (eight, as
+  v0.10.1 has), Linux x64's pure wheel and sdist, and `SHA256SUMS`.
+- **`docs/source/CHANGELOG.md` matches `CHANGELOG.md` again**; it lacked the 0.10.0 and 0.10.1
+  sections, and `docs/Makefile` builds from the tracked copy. 0.10.0's link to the hub's
+  `AGENTS.md` is absolute, so it resolves from the copy too.
+
 ## [0.10.1] - 2026-10-17
 
 ### Added
@@ -126,7 +134,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the venv and takes whatever interpreter uv finds, a free-threaded one included. The driver asks
   for `3.14+gil`, as the Linux lane does, and adds the free-threaded wheel above.
 - **Comments are one line, only the why (2026-09-30).** The family rule, in
-  [the hub's `AGENTS.md`](third_party/ANTfrastructure/AGENTS.md#comments-one-line-only-the-why)
+  [the hub's `AGENTS.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/AGENTS.md#comments-one-line-only-the-why)
   and linked from `AGENTS.md`: 27 files lose their comment blocks, and code is unchanged.
   ANTfrastructure moves from `f65ccae9` to `497ba711` for the gate that grades every
   language and the bootstrap templates the two local copies follow. Its `versions.env`
