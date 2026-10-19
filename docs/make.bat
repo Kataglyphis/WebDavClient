@@ -25,6 +25,13 @@ if errorlevel 9009 (
 
 if "%1" == "" goto help
 
+REM The family theme, editable into the active venv, as docs/Makefile installs it.
+uv pip install --quiet --no-deps -e ..\third_party\ANTfrastructure\third_party\DocumANTation\sphinx-kataglyphis-theme
+if errorlevel 1 (
+	popd
+	exit /b 1
+)
+
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 goto end
 

@@ -1,80 +1,26 @@
 # Copyright (c) 2024 Jonas Heinle
 
-"""Sphinx configuration for WebDavClient documentation."""
+"""Sphinx configuration: the family theme's setup_theme(), as the hub's docs/conf.py calls it."""
 
-# Project information
-
-import sys
 from pathlib import Path
 
-
-sys.path.insert(0, str(Path("../../").resolve()))
-
-project = "WebDavClient"
-project_copyright = "2024, Jonas Heinle"
-author = "Jonas Heinle"
-release = (
-    (Path(__file__).resolve().parents[2] / "VERSION.txt")
-    .read_text(encoding="utf-8")
-    .strip()
-)
-globals()["copyright"] = project_copyright
-
-# General configuration
-
-extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",  # For Google and NumPy style docstrings
-    "sphinx.ext.viewcode",  # To include links to the source code
-    "myst_parser",  # adding .md files
-    "sphinx_design",  # UI components
-]
-
-myst_enable_extensions = [
-    "dollarmath",  # Enables dollar-based math syntax
-    "amsmath",  # Supports extended LaTeX math environments
-    "colon_fence",  # Allows ::: for directives
-    "deflist",  # Enables definition lists
-]
-
-templates_path = ["_templates"]
-exclude_patterns = []
+# docs/Makefile and make.bat install it from the theme package the hub vendors, before every build.
+from sphinx_kataglyphis import setup_theme
 
 
-# Options for HTML output
+PROJECT = "WebDavClient"
+VERSION_FILE = Path(__file__).resolve().parents[2] / "VERSION.txt"
 
-html_theme = "sphinx_book_theme"
-html_theme_options = {
-    "repository_url": "https://github.com/Kataglyphis/WebDavClient",
-    "use_repository_button": True,
-    "show_navbar_depth": 2,
-    "navigation_with_keys": True,
-}
-html_static_path = ["_static"]
-
-myst_heading_anchors = 3
-
-# Enable the processing of Markdown files
-source_suffix = {
-    ".rst": "restructuredtext",
-    ".md": "markdown",
-}
-
-# Here we assume that the file is at _static/css/custom.css
-html_css_files = ["css/custom.css"]
-
-_SPHINX_EXPORTS = (
-    project,
-    project_copyright,
-    author,
-    release,
-    myst_enable_extensions,
-    templates_path,
-    exclude_patterns,
-    html_theme,
-    html_theme_options,
-    html_static_path,
-    myst_heading_anchors,
-    source_suffix,
-    html_css_files,
+setup_theme(
+    globals(),
+    repository_url=f"https://github.com/Kataglyphis/{PROJECT}",
+    project_name=PROJECT,
+    copyright_="2024, Jonas Heinle",
+    release=VERSION_FILE.read_text(encoding="utf-8").strip(),
+    extensions_extra=[
+        "sphinx.ext.autodoc",
+        "sphinx.ext.napoleon",
+        "sphinx.ext.viewcode",
+    ],
+    myst_enable_extensions=["dollarmath", "amsmath", "colon_fence", "deflist"],
 )

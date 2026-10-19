@@ -25,11 +25,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   module-private PowerShell imports, `git-sync-branches.sh`, the workflow naming and the
   CI-round and release rule point at the hub's pages; this repo's lanes, release files and
   exceptions stay. `doc-dupes-hub.allow` turns on the hub's `doc-dupes --against-hub` gate.
+- **The docs site wears the family theme** (2026-10-19): `docs/source/conf.py` calls
+  `sphinx_kataglyphis.setup_theme()`, so the site gets the current brand CSS, the family logo and
+  favicon, the Kataglyphis code palette, `<page> — WebDavClient` titles and GitHub heading anchors
+  on every level (`myst_heading_anchors` 6, was 3). `docs/Makefile` and `make.bat` install the
+  theme editable from the hub's vendored DocumANTation before every build; a uv path source would
+  fail every `uv sync --locked` of a checkout without submodules. The `sys.path` entry the old
+  `conf.py` added resolved against the working directory to the repository's parent; autodoc
+  imports the package the docs venv installs.
 
 ### Removed
 - **`exhale_args` in `docs/source/conf.py`, and `breathe` and `exhale` in the `docs` extra**:
   Doxygen tooling for C++ that no page loaded. The docs build without them gives zero warnings,
   as before.
+- **`docs/source/_static/css/custom.css`**, an 81-line fork of the brand sheet that still painted
+  links the pre-cyan green; the theme ships the generated one.
 
 ### Fixed
 - **`AGENTS.md` names what a release carries instead of "six binary wheels"**: a cp314 and a

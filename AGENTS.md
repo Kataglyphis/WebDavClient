@@ -205,6 +205,10 @@ how to run it and what breaks; no filler, no marketing, no repetition.
   files. They stay tracked because `docs/Makefile` and `make.bat` build without
   that copy; re-sync them in the commit that changes the root file. A new page
   goes into `docs/source/index.rst`'s toctree.
+- `conf.py` calls the family theme's `setup_theme()`, which `docs/Makefile` and `make.bat`
+  install editable from the hub's vendored DocumANTation before every build. It is not a uv
+  path source: a checkout without that submodule would then fail every `uv sync --locked`.
+  The brand CSS comes with the theme; do not add a copy under `docs/source/_static/`.
 - `README.md` is the short overview the family's README rule asks for
   ([`repository-family.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/repository-family.md#the-readme-rule));
   installation, usage, tests and static analysis are
