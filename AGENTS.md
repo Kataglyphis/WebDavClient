@@ -155,10 +155,10 @@ written out rather than linked.
 ```bash
 uv sync
 
-# The arguments linux-x64.yml passes: 3.14, the image's own interpreter, and 3.14t, which
-# syncs only the tests extra (free-threaded-extras) and gates like 3.14. Two changes made
-# that leg possible: atheris is gone (no cp314t wheel, nothing used it), and bcrypt is
-# overridden to >=5 (wsgidav caps it below 5, and 4.x has no cp314t wheel).
+# linux-x64.yml names no version: the hub runs the image's own X.Y and X.Yt, 3.14 and 3.14t in
+# :latest on 2026-10-19. 3.14t syncs only the tests extra (free-threaded-extras) and gates like
+# 3.14. Two changes made that leg possible: atheris is gone (no cp314t wheel, nothing used it),
+# and bcrypt is overridden to >=5 (wsgidav caps it below 5, and 4.x has no cp314t wheel).
 FREE_THREADED_SYNC_EXTRAS=tests bash scripts/linux/ci_tests.sh kataglyphis_webdavclient '3.14 3.14t'  # whole suite + coverage
 bash scripts/linux/ci_static_analysis.sh x64       # codespell, bandit, vulture, ruff, ty (3.14)
 bash scripts/linux/ci_build_docs.sh 3.14           # Sphinx; 3.14 also names the coverage it copies

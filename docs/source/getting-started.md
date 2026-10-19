@@ -48,7 +48,13 @@ uv run python demo/download_markdown_files.py <hostname> <username> <password> <
 
 Run pytest in the root directory (`uv run pytest` after the sync above).
 The WebDAV tests start a local mock server over `tests/remote/`, so no remote
-host is needed. Every CI lane runs the whole suite, on 3.14 and the free-threaded 3.14t.
+host is needed. Every CI lane runs the whole suite:
+
+| Lane | Python | Set by |
+| --- | --- | --- |
+| Linux x64, arm64 | 3.14 and the free-threaded 3.14t | the image's own X.Y and X.Yt (`:latest`, 2026-10-19); the hub's 3.15.0 pin moves them when `:latest` is rebuilt |
+| Windows x64 | 3.13, 3.14, 3.14t | `scripts/windows/python-ci.psd1` |
+| Windows arm64 | 3.14, 3.14t | `arm64-python-versions` in `.github/workflows/windows-arm64.yml` |
 
 ## Static analysis
 
