@@ -21,7 +21,7 @@ this does not set the lane apart.
 | `tests/` | `test_webdav_client.py` and the `mock_webdav_server.py` it starts, plus `unit/`, `integration/`, `fuzzy/` and `remote/` (the mock server's document root) |
 | `bench/`, `demo/` | Benchmarks and a runnable example |
 | `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh` |
-| `scripts/windows/` | `Build-Windows.ps1`, the `Resolve-BuildModule.ps1` bootstrap, and `setup-dependencies.ps1`, a winget/scoop host-toolchain installer no lane calls |
+| `scripts/windows/` | `python-ci.psd1` (the hub's Windows build driver reads it, § 2), the `Resolve-BuildModule.ps1` bootstrap, and `setup-dependencies.ps1`, a winget/scoop host-toolchain installer no lane calls |
 | `third_party/ANTfrastructure` | The submodule owning every reusable script, module and doc |
 
 Distribution name and module name agree here (`kataglyphis_webdavclient`), so
@@ -74,17 +74,18 @@ the submodule. `.antfrastructure-shared.manifest` declares them (`antfrastructur
 on every lint run: re-copy them from the templates, never edit them here
 ([the hub's `shared/config/README.md`](third_party/ANTfrastructure/shared/config/README.md#the-template-trees-are-owners-too)).
 
-`Build-Windows.ps1` names every hub module it calls into (`WindowsScripts.Shared`,
-`WindowsBuild.Common`, `WindowsUv.Common`), since a module's own imports are private to it
-([`adopting-in-a-new-project.md` § 8](third_party/ANTfrastructure/docs/adopting-in-a-new-project.md#reach-for-these-before-writing-a-helper)).
+**The Windows x64 build is the hub's** (2026-10-19): `python-ci-windows.yml` runs
+`windows/scripts/python/Invoke-PythonCiBuild.ps1`, which takes this repo's values from
+`scripts/windows/python-ci.psd1`: the legs 3.13, 3.14 and 3.14t (the last with only the `tests`
+extra) and 3.14 for packaging
+([`python-ci.md` § *The Windows build driver*](third_party/ANTfrastructure/docs/python-ci.md#the-windows-build-driver)).
+Its static analysis is the hub's `Invoke-CiStaticAnalysis.ps1` on the pinned Python, and it gates.
 
 Two upstream facts repeated here only because they bite before you reach a doc:
 
-- Every ANTfrastructure PowerShell module declares `#requires -Version 7.0`, and
-  so does `scripts/windows/Resolve-BuildModule.ps1` — launch with `pwsh`, never
-  `powershell`. `Build-Windows.ps1` declares nothing itself, but it dot-sources
-  that bootstrap first; under 5.1 the run stops there with a
-  `ScriptRequiresException` naming 7.0 (measured 2026-09-25).
+- Every ANTfrastructure PowerShell module and the hub's build driver declare
+  `#requires -Version 7.0`, and so does `scripts/windows/Resolve-BuildModule.ps1` —
+  launch with `pwsh`, never `powershell`.
 - Composite actions and the reusable workflows resolve at `@develop`, so an
   ANTfrastructure change a workflow depends on must be pushed **before** the
   consumer change.
@@ -120,7 +121,7 @@ written out rather than linked.
   relative, so run `pytest` from the repo root. Every CI lane runs the whole configured
   suite, `testpaths = tests`, all 10 tests, since 2026-10-01.
   - Linux: the hub's `ci_tests.sh` passes pytest no path of its own.
-  - Windows: `Build-Windows.ps1` runs a bare `pytest`.
+  - Windows: the hub's driver runs a bare `pytest`, since `python-ci.psd1` sets no `TestPaths`.
   - Until then every lane had run `tests/unit` only. That narrowing came with the arm64
     and Windows lanes (2025-10-20), so `test_webdav_client.py` and `tests/integration/`
     ran on no lane, and coverage came from the dummy tests alone.
@@ -169,7 +170,8 @@ bash scripts/linux/run-lint-gates.sh     # the eight lint gates, ratchets includ
 Windows:
 
 ```powershell
-pwsh -NoProfile -File .\scripts\windows\Build-Windows.ps1
+# Inside :winamd64, from the repo root: the hub's driver, as windows-x64.yml runs it.
+pwsh -NoProfile -File .\third_party\ANTfrastructure\windows\scripts\python\Invoke-PythonCiBuild.ps1
 ```
 
 | CI lane | What it runs |

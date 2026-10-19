@@ -40,6 +40,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `linux-x64.yml`'s `release-collector` job are gone; the hub's suite runs these options over this
   repo's uploads. Over v0.10.1's real uploads (run 39048087762) the old and the hub collector pick
   the same 10 files, the release's assets but `SHA256SUMS`. ANTfrastructure moves to c3fc7585.
+- **The Windows x64 build is the hub's** (2026-10-19): `scripts/windows/Build-Windows.ps1` is gone,
+  and `python-ci-windows.yml` runs ANTfrastructure's `Invoke-PythonCiBuild.ps1` instead, which reads
+  `scripts/windows/python-ci.psd1`. The legs (3.13, 3.14, and 3.14t with only the `tests` extra)
+  and the packaging on 3.14 are unchanged; ANTfrastructure moves to 1a174d9c. Three things differ:
+  - Static analysis gates: a finding fails the lane, where each tool used to log and carry on. It
+    is the hub's `Invoke-CiStaticAnalysis.ps1` on the pinned Python (3.15 at this pin, was 3.13):
+    codespell, bandit (the package, the hub's excludes), vulture, `ruff check`,
+    `ruff format --check` and ty.
+  - mypy no longer runs; the Linux lane never ran it.
+  - A failing `bench/` demo logs `skipped` instead of failing its leg, as on Linux.
 
 ### Removed
 - **`exhale_args` in `docs/source/conf.py`, and `breathe` and `exhale` in the `docs` extra**:
