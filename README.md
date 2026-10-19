@@ -40,7 +40,7 @@ not fit my needs and/or were not actively maintained.
 ```bash
 git clone --recurse-submodules --branch develop https://github.com/Kataglyphis/WebDavClient.git
 cd WebDavClient
-uv sync --all-extras --python 3.14
+uv sync --all-extras --python 3.15   # the pinned CPython; 3.15t for the free-threaded build
 ```
 
 ```python

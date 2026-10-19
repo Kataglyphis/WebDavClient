@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   until that image is rebuilt. Measured in `:winamd64` with the hub's driver: legs 3.15 (22 passed,
   2 skipped) and 3.15t (23 passed, 1 skipped), both from the image's interpreters, no download;
   wheels `cp315-cp315` and `cp315-cp315t` `win_amd64`, the second proved with the GIL off.
+- **The quick start syncs on the pinned 3.15** (`uv sync --all-extras --python 3.15`, 3.15t for
+  the free-threaded build) where it named 3.14. Nothing in the repo selects the pin (no
+  `.python-version`; `requires-python` is `>=3.10`), so the flag stays; getting-started says where
+  the pin lives.
 - **bcrypt is overridden only below 3.15**: 5.0.0 has no cp315t wheel, and its PyO3 0.26 refuses
   to build for 3.15, which failed the 3.15t leg's sync. wsgidav lists it, but the tests' mock
   server runs without auth and nothing imports it.

@@ -23,13 +23,15 @@ pip install ./kataglyphis_webdavclient-*.whl
 ```sh
 git clone --recurse-submodules https://github.com/Kataglyphis/WebDavClient.git
 cd WebDavClient
-uv sync --all-extras --python 3.14
+uv sync --all-extras --python 3.15   # the pinned CPython; 3.15t for the free-threaded build
 ```
 
 ## Dependencies
 
 Python ≥ 3.10 (`requires-python` in `pyproject.toml`), managed with
-[uv](https://docs.astral.sh/uv/). The dependencies are declared in `pyproject.toml` (the
+[uv](https://docs.astral.sh/uv/). Develop on the pinned CPython, `PYTHON_VERSION` in
+`third_party/ANTfrastructure/linux/scripts/01-core/versions.env`: nothing in the repo picks it,
+so `uv sync` takes `--python`. The dependencies are declared in `pyproject.toml` (the
 runtime set plus the `tests` and `docs` extras) and locked in `uv.lock`.
 
 ## Usage
