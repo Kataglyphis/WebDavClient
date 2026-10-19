@@ -76,8 +76,8 @@ on every lint run: re-copy them from the templates, never edit them here
 
 **The Windows x64 build is the hub's** (2026-10-19): `python-ci-windows.yml` runs
 `windows/scripts/python/Invoke-PythonCiBuild.ps1`, which takes this repo's values from
-`scripts/windows/python-ci.psd1`: the legs 3.13, 3.14 and 3.14t (the last with only the `tests`
-extra) and 3.14 for packaging
+`scripts/windows/python-ci.psd1`: the pinned X.Y and X.Yt (`pinned pinnedt`; X.Yt with only the
+`tests` extra), and packaging on the pinned X.Y
 ([`python-ci.md` § *The Windows build driver*](third_party/ANTfrastructure/docs/python-ci.md#the-windows-build-driver)).
 Its static analysis is the hub's `Invoke-CiStaticAnalysis.ps1` on the pinned Python, and it gates.
 
@@ -155,14 +155,14 @@ written out rather than linked.
 ```bash
 uv sync
 
-# linux-x64.yml names no version: the hub runs the image's own X.Y and X.Yt, 3.14 and 3.14t in
-# :latest on 2026-10-19. 3.14t syncs only the tests extra (free-threaded-extras) and gates like
-# 3.14. Two changes made that leg possible: atheris is gone (no cp314t wheel, nothing used it),
-# and bcrypt is overridden to >=5 (wsgidav caps it below 5, and 4.x has no cp314t wheel).
-FREE_THREADED_SYNC_EXTRAS=tests bash scripts/linux/ci_tests.sh kataglyphis_webdavclient '3.14 3.14t'  # whole suite + coverage
-bash scripts/linux/ci_static_analysis.sh x64       # codespell, bandit, vulture, ruff, ty (3.14)
-bash scripts/linux/ci_build_docs.sh 3.14           # Sphinx; 3.14 also names the coverage it copies
-bash scripts/linux/ci_packaging.sh                 # sdist + cp314 and proved cp314t wheels, then the suite on the cp314t one
+# Every lane runs the pinned X.Y and X.Yt; Linux follows :latest's X.Y (3.14 and 3.14t on
+# 2026-10-19). X.Yt syncs only the tests extra (free-threaded-extras) and gates like X.Y. Two changes
+# made that leg possible: atheris is gone (no cp314t wheel, nothing used it), and bcrypt is
+# overridden to >=5 (wsgidav caps it below 5, and 4.x has no cp314t wheel).
+FREE_THREADED_SYNC_EXTRAS=tests bash scripts/linux/ci_tests.sh kataglyphis_webdavclient  # X.Y and X.Yt: whole suite + coverage
+bash scripts/linux/ci_static_analysis.sh x64       # codespell, bandit, vulture, ruff, ty (X.Y)
+bash scripts/linux/ci_build_docs.sh                # Sphinx, with X.Y's coverage
+bash scripts/linux/ci_packaging.sh                 # sdist + cpXY and proved cpXYt wheels, then the suite on the cpXYt one
 
 bash scripts/linux/run-lint-gates.sh     # the eight lint gates, ratchets included
 ```

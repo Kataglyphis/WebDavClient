@@ -9,7 +9,7 @@ resolution-markers = [
 ]
 
 [manifest]
-overrides = [{ name = "bcrypt", specifier = ">=5" }]
+overrides = [{ name = "bcrypt", marker = "python_full_version < '3.15'", specifier = ">=5" }]
 
 [[package]]
 name = "accessible-pygments"
@@ -2409,7 +2409,7 @@ name = "wsgidav"
 version = "4.3.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "bcrypt" },
+    { name = "bcrypt", marker = "python_full_version < '3.15'" },
     { name = "defusedxml" },
     { name = "jinja2" },
     { name = "json5" },

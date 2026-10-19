@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Every lane tests and packages only the pinned CPython, once with the GIL and once
+  free-threaded** (owner, 2026-10-20). Windows x64 ran 3.13, 3.14 and 3.14t and packaged on 3.14,
+  so `uv python install` downloaded 3.13 and 3.14 into `:winamd64`, which carries 3.15.0 (dry run
+  39309927573). `scripts/windows/python-ci.psd1` names `pinned pinnedt` and no packaging version;
+  Windows arm64's `arm64-python-versions` is `pinned pinnedt`. The Windows wheels follow the pin:
+  cp315 and cp315t where v0.10.1 shipped cp314 and cp314t; Linux keeps `:latest`'s 3.14 and 3.14t
+  until that image is rebuilt. Measured in `:winamd64` with the hub's driver: legs 3.15 (22 passed,
+  2 skipped) and 3.15t (23 passed, 1 skipped), both from the image's interpreters, no download;
+  wheels `cp315-cp315` and `cp315-cp315t` `win_amd64`, the second proved with the GIL off.
+- **bcrypt is overridden only below 3.15**: 5.0.0 has no cp315t wheel, and its PyO3 0.26 refuses
+  to build for 3.15, which failed the 3.15t leg's sync. wsgidav lists it, but the tests' mock
+  server runs without auth and nothing imports it.
 - **The README logo is the family's ant** (2026-10-17, owner: one icon in every repository),
   drawn from OmniAccelerANT's `assets/icons/kataglyphis_app_icon.svg`.
 - **The README is a short overview** (owner, 2026-10-19: every README links into its docs, and

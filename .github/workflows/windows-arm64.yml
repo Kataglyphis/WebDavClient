@@ -23,8 +23,8 @@ jobs:
       arm64-tests: true
       # Built and loaded on the runner itself: the hub's arm64 container cross-builds no GIL Cython wheel.
       arm64-wheels: true
-      # As on Linux: 3.14t syncs only the tests extra; py-spy and line_profiler stay off ARM64 (pyproject.toml).
-      arm64-python-versions: '3.14 3.14t'
+      # The pinned X.Y and X.Yt, as on Linux: X.Yt syncs only the tests extra; py-spy and line_profiler stay off ARM64 (pyproject.toml).
+      arm64-python-versions: 'pinned pinnedt'
       free-threaded-extras: tests
       # Full history: this repo's packaging derives its version from git.
       fetch-depth: 0

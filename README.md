@@ -29,7 +29,7 @@ not fit my needs and/or were not actively maintained.
 ## Highlights
 
 - **Downloads a whole remote folder**, subfolders included, keeping its structure (`download_all_files_iterative`).
-- **Binary wheels** for Linux x64/arm64 and Windows x64/arm64, CPython 3.14 with and without the GIL.
+- **Binary wheels** for Linux x64/arm64 and Windows x64/arm64, the pinned CPython with and without the GIL (cp314 and cp314t in v0.10.1).
 - **A pure-Python wheel** that installs anywhere, and a `SHA256SUMS` with every release.
 - **Every module compiled with Cython**, the sources stripped from the binary wheels.
 - **Safe across threads**: each download writes a private `.part` file and renames it into place.

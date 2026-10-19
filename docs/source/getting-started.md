@@ -8,8 +8,8 @@ contribute to any of the family's repositories is ANTfrastructure's
 ## Installation
 
 **From a release** (since v0.10.0): every [release](https://github.com/Kataglyphis/WebDavClient/releases/latest)
-carries wheels for Linux x64/arm64 and Windows x64/arm64 (CPython 3.14, with and without the GIL; Windows
-arm64 since v0.10.1), a
+carries wheels for Linux x64/arm64 and Windows x64/arm64 (the pinned CPython, with and without the
+GIL: cp314 and cp314t in v0.10.1; Windows arm64 since v0.10.1), a
 pure-Python wheel that installs anywhere, the sdist and a `SHA256SUMS`. Download the wheel for your
 platform and `SHA256SUMS`, then:
 
@@ -48,21 +48,22 @@ uv run python demo/download_markdown_files.py <hostname> <username> <password> <
 
 Run pytest in the root directory (`uv run pytest` after the sync above).
 The WebDAV tests start a local mock server over `tests/remote/`, so no remote
-host is needed. Every CI lane runs the whole suite:
+host is needed. Every CI lane runs the whole suite on the pinned CPython (ANTfrastructure's
+`PYTHON_VERSION`), once with the GIL and once free-threaded, and packages that X.Y's wheels:
 
 | Lane | Python | Set by |
 | --- | --- | --- |
-| Linux x64, arm64 | 3.14 and the free-threaded 3.14t | the image's own X.Y and X.Yt (`:latest`, 2026-10-19); the hub's 3.15.0 pin moves them when `:latest` is rebuilt |
-| Windows x64 | 3.13, 3.14, 3.14t | `scripts/windows/python-ci.psd1` |
-| Windows arm64 | 3.14, 3.14t | `arm64-python-versions` in `.github/workflows/windows-arm64.yml` |
+| Linux x64, arm64 | the image's X.Y and X.Yt: 3.14 and 3.14t in `:latest` (2026-10-19), 3.15 after its rebuild | the hub's default, no version named |
+| Windows x64 | 3.15 and 3.15t, the `:winamd64` image's | `PythonVersions = 'pinned pinnedt'` in `scripts/windows/python-ci.psd1` |
+| Windows arm64 | 3.15 and 3.15t, installed by uv on the runner | `arm64-python-versions: 'pinned pinnedt'` in `.github/workflows/windows-arm64.yml` |
 
 ## Static analysis
 
 ```bash
-./scripts/linux/ci_static_analysis.sh x64 3.14 > "ci_analysis_$(date +%Y%m%d_%H%M%S).log" 2>&1
+./scripts/linux/ci_static_analysis.sh x64 > "ci_analysis_$(date +%Y%m%d_%H%M%S).log" 2>&1
 ```
 
-The arguments are the architecture and the Python version. It is the CI gate and exits
+The argument is the architecture; it runs on the pinned X.Y. It is the CI gate and exits
 non-zero on a finding, which the redirect hides
 ([ANTfrastructure `python-ci.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/python-ci.md#working-on-a-python-consumer-locally): the hook, the gate, binary-only wheels, the tools). The
 other CI scripts are in [`AGENTS.md` § 4](https://github.com/Kataglyphis/WebDavClient/blob/develop/AGENTS.md#4-build-run-test).
