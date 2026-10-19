@@ -59,9 +59,9 @@ host is needed. Every CI lane runs the whole suite, on 3.14 and the free-threade
 ./scripts/linux/ci_static_analysis.sh x64 3.14 > "ci_analysis_$(date +%Y%m%d_%H%M%S).log" 2>&1
 ```
 
-The arguments are the architecture and the Python version. It is the gate CI runs
-(codespell, bandit, vulture, ruff, ty) and exits non-zero on a finding, which the
-redirect into the log hides from the terminal: check `$?`, or drop the redirect. The
+The arguments are the architecture and the Python version. It is the CI gate and exits
+non-zero on a finding, which the redirect hides
+([ANTfrastructure `python-ci.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/python-ci.md#working-on-a-python-consumer-locally): the hook, the gate, binary-only wheels, the tools). The
 other CI scripts are in [`AGENTS.md` § 4](https://github.com/Kataglyphis/WebDavClient/blob/develop/AGENTS.md#4-build-run-test).
 
 ## Literature

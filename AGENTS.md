@@ -238,6 +238,9 @@ develop -f dry-run=true` proves it on `develop` without publishing.
 
 ## 5. Docs owned by this repo
 
+**Write docs like a developer: short and precise** (owner, 2026-10-19). Say what a thing does,
+how to run it and what breaks; no filler, no marketing, no repetition.
+
 - Sphinx sources in `docs/`. `docs/source/README.md` and
   `docs/source/CHANGELOG.md` are copies: the docs driver copies the root
   `README.md` and `CHANGELOG.md` over them before every build, so edit the root
