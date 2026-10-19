@@ -21,7 +21,7 @@ this does not set the lane apart.
 | `tests/` | `test_webdav_client.py` and the `mock_webdav_server.py` it starts, plus `unit/`, `integration/`, `fuzzy/` and `remote/` (the mock server's document root) |
 | `bench/`, `demo/` | Benchmarks and a runnable example |
 | `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh`; and the release collector `collect-release-assets.sh` (§ 4) |
-| `scripts/windows/` | `Build-Windows.ps1` + the `Resolve-BuildModule.ps1` bootstrap |
+| `scripts/windows/` | `Build-Windows.ps1`, the `Resolve-BuildModule.ps1` bootstrap, and `setup-dependencies.ps1`, a winget/scoop host-toolchain installer no lane calls |
 | `third_party/ANTfrastructure` | The submodule owning every reusable script, module and doc |
 
 Distribution name and module name agree here (`kataglyphis_webdavclient`), so
@@ -60,47 +60,24 @@ made in the wrapper is a fix the other Python consumers never get.
 | `ci_build_docs.sh` | `python/ci_build_docs.sh` | none |
 | `ci_packaging.sh` | `python/ci_packaging.sh` | installs `patchelf` — see § 3; then runs the hub's `python/test-free-threaded-wheel.sh` |
 
-**`run-lint-gates.sh` runs the hub lint aggregator** (`linux/scripts/run-lint-gates.sh`),
-seven gates: shell lint, workflow lint plus the CI image-ref check, secret scan, `ruff`, the
-shared-config drift check, the consumer pin-forwarding check, and the ratchets.
+**`run-lint-gates.sh` runs the hub lint aggregator with `--ratchets`**, the same call
+`.github/workflows/lint-gates.yml` makes with `ratchets: true`. What each of its eight gates
+checks and how a freeze file works:
+[`code-quality-tooling.md`](third_party/ANTfrastructure/docs/code-quality-tooling.md#the-scan-root-contract).
+This repo freezes rows in `comment-size.allow`, `function-size.allow` and
+`code-complexity.allow`, and budgets the passages it shares with a hub page in
+`doc-dupes-hub.allow`; a gate with no file here has nothing frozen.
 
-- The wrapper passes `--ratchets` itself, so the seventh is not optional here: it runs the
-  doc-link gate and the eight measurement gates over this tree, each reading its freeze
-  file from the repo root (`comment-size.allow`, `function-size.allow`,
-  `code-complexity.allow`; the other five are empty and absent, which means nothing
-  frozen).
-- A row in one of those files is a queue entry with a reason, not a permanent exemption:
-  shrink the thing and delete the row in the same commit, because a stale row fails the
-  gate exactly like a new offender.
-- `.github/workflows/lint-gates.yml` calls the hub's reusable lint lane with
-  `ratchets: true`, which runs the same aggregator over the same root with the same
-  `--ratchets`, straight from `third_party/ANTfrastructure`, not through this wrapper. The
-  consumer root is passed explicitly on both paths, because the hub half of that script
-  lives inside the submodule and a self-derived root would grade the wrong tree.
+**The two bootstrap copies**, `scripts/windows/Resolve-BuildModule.ps1` and its bash twin
+`scripts/linux/lib/antfrastructure.sh`, cannot live upstream, because they are what *find*
+the submodule. `.antfrastructure-shared.manifest` declares them (`antfrastructure-sh`,
+`resolve-build-module`), and the shared-config gate compares them with the hub's templates
+on every lint run: re-copy them from the templates, never edit them here
+([the hub's `shared/config/README.md`](third_party/ANTfrastructure/shared/config/README.md#the-template-trees-are-owners-too)).
 
-**The two bootstrap copies are machine-checked, not asserted.**
-`scripts/windows/Resolve-BuildModule.ps1` and its bash twin `scripts/linux/lib/antfrastructure.sh`
-are the only files that cannot live upstream, because they are what *find* the submodule.
-The bash one is a copy of ANTfrastructure's
-[`shared/linux/templates/antfrastructure.sh`](third_party/ANTfrastructure/shared/linux/templates/README.md)
-and owns the not-found guard and the `WORKSPACE_ROOT` export that every wrapper used to
-repeat. Do not hand-edit either; sync from upstream. `.antfrastructure-shared.manifest` at
-the repo root declares the two ids this repo takes (`antfrastructure-sh`,
-`resolve-build-module`) from the registry in
-`third_party/ANTfrastructure/shared/config/shared-assets.manifest`, and the shared-config
-gate compares them on every lint run:
-
-```bash
-bash third_party/ANTfrastructure/shared/config/sync-shared-config.sh --repo-root . --check
-```
-
-An asset left out of the manifest is never compared; that is how an intentional
-project-owned override is recorded. The word "verbatim" in a header is not a check: before
-2026-09-15 `Resolve-BuildModule.ps1` had silently fallen 16 body lines behind canonical
-while still claiming to be a verbatim copy.
-
-Nested imports inside a `.psm1` are **module-private**, so every module you call into must
-be named in the `Import-BuildModule` list explicitly.
+`Build-Windows.ps1` names every hub module it calls into (`WindowsScripts.Shared`,
+`WindowsBuild.Common`, `WindowsUv.Common`), since a module's own imports are private to it
+([`adopting-in-a-new-project.md` § 8](third_party/ANTfrastructure/docs/adopting-in-a-new-project.md#reach-for-these-before-writing-a-helper)).
 
 Two upstream facts repeated here only because they bite before you reach a doc:
 
@@ -115,11 +92,7 @@ Two upstream facts repeated here only because they bite before you reach a doc:
 
 For local work on the newest code, run
 `bash third_party/ANTfrastructure/linux/scripts/git-sync-branches.sh` (`--dry-run`
-first): this repo and every submodule, third-party ones included, go to the tip
-of their `branch =`, fast-forward only; `--owned-only` leaves the third-party ones
-pinned. It commits no gitlink, so what it moved shows as `+` until the gitlinks are
-committed, innermost repo first, and the next `git submodule update` puts it back.
-Details: [`adopting-in-a-new-project.md` § *Putting every checkout on its branch*](third_party/ANTfrastructure/docs/adopting-in-a-new-project.md#putting-every-checkout-on-its-branch).
+first): [`adopting-in-a-new-project.md` § *Putting every checkout on its branch*](third_party/ANTfrastructure/docs/adopting-in-a-new-project.md#putting-every-checkout-on-its-branch).
 
 ## 3. Pitfalls specific to this project
 
@@ -132,14 +105,11 @@ written out rather than linked.
   months before this wrapper delegated to it, and OrchestrANT's wrapper carries no such
   step. The wrapper's header keeps it local "because no second consumer needs it"; at the
   current pin upstream installs it anyway.
-- **`WORKSPACE_ROOT` is handled for you; do not remove it.** Upstream's
-  `detect_workspace` derives it from the sourcing script's location, which for a
-  *delegated* driver resolves inside `third_party/ANTfrastructure/`, so every tool would
-  run against the submodule tree instead of this repo. `antfrastructure_exec` pins it to
-  the repo root before handing off (it used to be repeated in every wrapper);
-  `detect_workspace` honours a pre-set value and still overrides to `/workspace` in the
-  container, so CI is unaffected. Listed here only because a wrapper that stops going
-  through `antfrastructure_exec` loses it silently.
+- **`ci_packaging.sh` exports `WORKSPACE_ROOT` itself; do not remove it.** It runs the
+  hub driver with `bash`, not through `antfrastructure_exec`, so that the free-threaded wheel
+  suite can follow it, and so misses the export `antfrastructure_exec` makes. Without it
+  every tool runs against the submodule tree
+  ([the hub's templates README](third_party/ANTfrastructure/shared/linux/templates/README.md#the-three-entry-points)).
 - **Do not re-add a `PACKAGE_NAME` default.** The pre-wrapper `ci_tests.sh` defaulted it to
   `orchestr_ant_ion`, the *sibling* project's name, copy-pasted. It only ever worked
   because CI passed the name explicitly. Upstream derives it from `pyproject.toml`, which
@@ -194,7 +164,7 @@ bash scripts/linux/ci_static_analysis.sh x64       # codespell, bandit, vulture,
 bash scripts/linux/ci_build_docs.sh 3.14           # Sphinx; 3.14 also names the coverage it copies
 bash scripts/linux/ci_packaging.sh                 # sdist + cp314 and proved cp314t wheels, then the suite on the cp314t one
 
-bash scripts/linux/run-lint-gates.sh     # the seven lint gates, ratchets included
+bash scripts/linux/run-lint-gates.sh     # the eight lint gates, ratchets included
 ```
 
 Windows:
@@ -211,26 +181,18 @@ pwsh -NoProfile -File .\scripts\windows\Build-Windows.ps1
 | `.github/workflows/lint-gates.yml` | the lint gates; `scripts/linux/run-lint-gates.sh` is the same lint lane for a local run |
 
 Every one of them is configuration for an ANTfrastructure reusable workflow; do not
-re-inline the steps. File and display names follow the family convention (owner decision
-2026-09-24): kebab-case, one file per platform + arch, display names
-`<Platform> <Arch> · <what>`, shared lanes named the same in every repo (`Lint gates`). The
-two Linux files split `ubuntu-26.04-amd64-arm64.yml` on 2026-09-25.
+re-inline the steps. Names follow the fleet convention
+([`adopting-in-a-new-project.md` § *Workflow file names and display names*](third_party/ANTfrastructure/docs/adopting-in-a-new-project.md#workflow-file-names-and-display-names));
+the two Linux files split `ubuntu-26.04-amd64-arm64.yml` on 2026-09-25.
 
-**A push or PR runs Linux x64 and the lint gates; Linux arm64, Windows x64 and Windows arm64
-run on request** (owner rule 2026-10-15 for the whole family, ANTfrastructure's
-[`branch-and-release-strategy.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md); here since 2026-10-16).
-`on-request.yml` reads `[ci <lane>]` in the pushed commit messages (`[ci windows]`,
-`[ci arm64]`, `[ci all]`), and each lane keeps its Run workflow button. Each lane's
-concurrency group is `<lane>-${{ github.ref }}-${{ github.workflow }}`, one per lane and
-caller. A token in a commit message starts lanes, so never quote one in prose.
-
-**Every push to `main` is a release** (`release.yml`): a version check, all four lanes once
-more, then `v<VERSION.txt's version>` with a cp314 and a cp314t binary wheel from each lane
-(Linux x86_64 and aarch64, Windows amd64 and arm64), Linux x64's pure wheel and sdist, and
-the hub publisher's `SHA256SUMS` (`scripts/linux/collect-release-assets.sh`, whose suite is
-a job of `linux-x64.yml`), only when every lane is green.
-`gh workflow run release.yml --ref develop -f dry-run=true` proves it on `develop` without
-publishing.
+**CI rounds and releases follow the family rule**, ANTfrastructure's
+[`branch-and-release-strategy.md`](third_party/ANTfrastructure/docs/branch-and-release-strategy.md)
+(here since 2026-10-16). A push or PR runs Linux x64 and the lint gates; Linux arm64,
+Windows x64 and Windows arm64 run on request (`[ci arm64]`, `[ci windows]`, `[ci all]`). A
+push to `main` releases the `VERSION.txt` version with a cp314 and a cp314t binary wheel from
+each lane (Linux x86_64 and aarch64, Windows amd64 and arm64), Linux x64's pure wheel and
+sdist, collected by `scripts/linux/collect-release-assets.sh`, whose suite is a job of
+`linux-x64.yml`, and the hub publisher's `SHA256SUMS`.
 
 ## 5. Docs owned by this repo
 

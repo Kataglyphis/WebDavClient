@@ -20,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`.github/copilot-instructions.md` points at `AGENTS.md`** and names five of its rules, in
   English. It was a 213-line German template with C++, Rust and Dart sections for code this
   repository does not have.
+- **`AGENTS.md` links ANTfrastructure instead of restating it** (2026-10-19): the lint gates and
+  the freeze-file contract, the bootstrap copies' body mode and their drift history, the
+  module-private PowerShell imports, `git-sync-branches.sh`, the workflow naming and the
+  CI-round and release rule point at the hub's pages; this repo's lanes, release files and
+  exceptions stay. `doc-dupes-hub.allow` turns on the hub's `doc-dupes --against-hub` gate.
 
 ### Removed
 - **`exhale_args` in `docs/source/conf.py`, and `breathe` and `exhale` in the `docs` extra**:
@@ -39,6 +44,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and its methods. The README's *Automatic Dependency Submission* badge named a workflow this
   repository does not have. The coverage report and both test reports, published with every docs
   build, are linked from the docs index.
+- **`AGENTS.md` matches the code again**: the lint aggregator runs eight gates, not seven; the
+  `WORKSPACE_ROOT` pitfall names `ci_packaging.sh`, the one wrapper that runs its driver without
+  `antfrastructure_exec` and so exports the variable itself; and `scripts/windows/` also holds
+  `setup-dependencies.ps1`.
 
 ## [0.10.1] - 2026-10-17
 
