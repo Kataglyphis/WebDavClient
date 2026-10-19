@@ -33,6 +33,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fail every `uv sync --locked` of a checkout without submodules. The `sys.path` entry the old
   `conf.py` added resolved against the working directory to the repository's parent; autodoc
   imports the package the docs venv installs.
+- **`release.yml` calls the hub's `release-publish.yml`** (2026-10-19) for its version check and
+  its release job, which collects with this repo's `collect` options (the wheels and the sdist,
+  the pure wheel and the sdist from Linux x64 only, reports and logs left out), tags
+  `v<version>` and publishes. `scripts/linux/collect-release-assets.sh`, its suite and
+  `linux-x64.yml`'s `release-collector` job are gone; the hub's suite runs these options over this
+  repo's uploads. Over v0.10.1's real uploads (run 39048087762) the old and the hub collector pick
+  the same 10 files, the release's assets but `SHA256SUMS`. ANTfrastructure moves to c3fc7585.
 
 ### Removed
 - **`exhale_args` in `docs/source/conf.py`, and `breathe` and `exhale` in the `docs` extra**:

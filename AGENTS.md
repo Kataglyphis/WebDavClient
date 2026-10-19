@@ -20,7 +20,7 @@ this does not set the lane apart.
 | `kataglyphis_webdavclient/` | The package — `webdavclient.py` is the substance |
 | `tests/` | `test_webdav_client.py` and the `mock_webdav_server.py` it starts, plus `unit/`, `integration/`, `fuzzy/` and `remote/` (the mock server's document root) |
 | `bench/`, `demo/` | Benchmarks and a runnable example |
-| `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh`; and the release collector `collect-release-assets.sh` (§ 4) |
+| `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh` |
 | `scripts/windows/` | `Build-Windows.ps1`, the `Resolve-BuildModule.ps1` bootstrap, and `setup-dependencies.ps1`, a winget/scoop host-toolchain installer no lane calls |
 | `third_party/ANTfrastructure` | The submodule owning every reusable script, module and doc |
 
@@ -47,10 +47,9 @@ reorganisation.
 | Code comments: one line, only the why; API docs short; gated | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md#comments-one-line-only-the-why) § *Comments: one line, only the why* |
 | Searching the tree: `rg`, not `grep -r` | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md) § *Searching the tree: ripgrep (`rg`)* |
 
-**Every `scripts/linux/*.sh` here but `collect-release-assets.sh` is a wrapper, not an
-implementation.** Each sources `scripts/linux/lib/antfrastructure.sh` and calls
-`antfrastructure_exec` (or `antfrastructure_source`, or runs the path
-`antfrastructure_path` resolves) into the submodule. Change behaviour **upstream**: a fix
+**Every `scripts/linux/*.sh` here is a wrapper, not an implementation.** Each sources
+`scripts/linux/lib/antfrastructure.sh` and calls `antfrastructure_exec` (or
+`antfrastructure_source`, or runs the path `antfrastructure_path` resolves) into the submodule. Change behaviour **upstream**: a fix
 made in the wrapper is a fix the other Python consumers never get.
 
 | Wrapper | Upstream driver | Local addition |
@@ -191,8 +190,9 @@ the two Linux files split `ubuntu-26.04-amd64-arm64.yml` on 2026-09-25.
 Windows x64 and Windows arm64 run on request (`[ci arm64]`, `[ci windows]`, `[ci all]`). A
 push to `main` releases the `VERSION.txt` version with a cp314 and a cp314t binary wheel from
 each lane (Linux x86_64 and aarch64, Windows amd64 and arm64), Linux x64's pure wheel and
-sdist, collected by `scripts/linux/collect-release-assets.sh`, whose suite is a job of
-`linux-x64.yml`, and the hub publisher's `SHA256SUMS`.
+sdist, and the hub publisher's `SHA256SUMS`: `release.yml` calls the hub's `release-publish.yml`,
+which collects them with its `collect` options (since 2026-10-19). A dry run collects and lists
+them and tags nothing: `gh workflow run release.yml --ref develop -f dry-run=true`.
 
 ## 5. Docs owned by this repo
 
