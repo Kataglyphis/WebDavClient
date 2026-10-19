@@ -1,23 +1,17 @@
-# WebDavClient
-
 <div align="center">
   <a href="https://jonasheinle.de">
-    <img src="images/logo.png" alt="logo" width="200" />
+    <img src="https://raw.githubusercontent.com/Kataglyphis/WebDavClient/develop/images/logo.png" alt="logo" width="200" />
   </a>
 
-  <h1>WebDavClient 🚀</h1>
+# WebDavClient
 
-  <h4>Download files via webdav easily. Use it to communicate to cloud storage provider (e.g. Nextcloud, ownCloud, Magenta, Synology NAS,
-QNAPS NAS) and automate your personal storage tasks.  </h4>
+  <h4>Download files via webdav easily.</h4>
 </div>
-
-**__Other solutions (on pyPI) did not fit my needs and/or were not actively maintained__**
-
-For the official docs follow this [link](https://webdavclient.jonasheinle.de/).
 
 [![Linux x64 · build + test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/linux-x64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/linux-x64.yml)
 [![Linux arm64 · build + test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/linux-arm64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/linux-arm64.yml)
 [![Windows x64 · build + test](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-x64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-x64.yml)
+[![Windows arm64 · test + wheels](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-arm64.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/windows-arm64.yml)
 [![Lint gates](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/lint-gates.yml)
 [![Automatic Dependency Submission](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/dependency-graph/auto-submission)
 [![CodeQL](https://github.com/Kataglyphis/WebDavClient/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Kataglyphis/WebDavClient/actions/workflows/github-code-scanning/codeql)
@@ -26,33 +20,29 @@ For the official docs follow this [link](https://webdavclient.jonasheinle.de/).
 [![Twitter](https://img.shields.io/twitter/follow/Cataglyphis_?style=social)](https://twitter.com/Cataglyphis_)
 [![YouTube](https://img.shields.io/youtube/channel/subscribers/UC3LZiH4sZzzaVBCUV8knYeg?style=social)](https://www.youtube.com/channel/UC3LZiH4sZzzaVBCUV8knYeg)
 
-<!-- TABLE OF CONTENTS -->
-## Table of Contents
+[**Docs site**](https://webdavclient.jonasheinle.de/)
 
-- [About The Project](#about-the-project)
-  - [Key Features](#key-features)
-  - [Dependencies](#dependencies)
-  - [Useful tools](#useful-tools)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Tests](#tests)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
-- [Acknowledgements](#acknowledgements)
-- [Literature](#literature)
+WebDavClient is a Python package that downloads files and folders from a WebDAV host. Use it to
+communicate to a cloud storage provider (e.g. Nextcloud, ownCloud, Magenta, Synology NAS, QNAP
+NAS) and automate your personal storage tasks, in CI for example. Other solutions on PyPI did
+not fit my needs and/or were not actively maintained.
 
+## Highlights
 
-## About The Project
+- **Downloads a whole remote folder**, subfolders included, keeping its structure (`download_all_files_iterative`).
+- **Binary wheels** for Linux x64/arm64 and Windows x64/arm64, CPython 3.14 with and without the GIL.
+- **A pure-Python wheel** that installs anywhere, and a `SHA256SUMS` with every release.
+- **Every module compiled with Cython**, the sources stripped from the binary wheels.
+- **Safe across threads**: each download writes a private `.part` file and renames it into place.
+- **Tested against a local mock WebDAV server**, so no remote host is needed.
 
-This module provides an easy interface for communication via WebDav protocol
-to a remote host (f.e. you can automate downloads from your cloud).
-For certain use cases one might want to be able to automatically download
-files from your cloud. This is an easy way to do it
+## Quick start
 
-### Usage Example:
+```bash
+git clone --recurse-submodules --branch develop https://github.com/Kataglyphis/WebDavClient.git
+cd WebDavClient
+uv sync --all-extras --python 3.14
+```
 
 ```python
 from kataglyphis_webdavclient.webdavclient import WebDavClient
@@ -66,134 +56,19 @@ webdevclient = WebDavClient(hostname, username, password)
 webdevclient.download_all_files_iterative(remote_base_path, local_base_path)
 ```
 
-Creating a `WebDavClient` also creates `logs/` in the current working directory
-and logs to `logs/downloadMd_s.log` there. `demo/download_markdown_files.py` is
-the same example as a command-line script.
+Release wheels, logging, the demo script and the tests:
+[docs/source/getting-started.md](https://github.com/Kataglyphis/WebDavClient/blob/develop/docs/source/getting-started.md).
 
-### Key Features
+## Documentation
 
-<!-- ❌  -->
-|          Feature                    |   Implement Status |
-| ------------------------------------| :----------------: |
-| Download all files from remote host |         ✔️         |
+| Topic | Read |
+| --- | --- |
+| Getting started: installation, usage, tests, static analysis | [docs/source/getting-started.md](https://github.com/Kataglyphis/WebDavClient/blob/develop/docs/source/getting-started.md) |
+| The API | [docs/source/webdavclient.rst](https://github.com/Kataglyphis/WebDavClient/blob/develop/docs/source/webdavclient.rst), rendered on the [docs site](https://webdavclient.jonasheinle.de/) |
+| Rules for agents and contributors | [AGENTS.md](https://github.com/Kataglyphis/WebDavClient/blob/develop/AGENTS.md) |
+| Changes | [CHANGELOG.md](https://github.com/Kataglyphis/WebDavClient/blob/develop/CHANGELOG.md) |
 
-### Dependencies
-Python ≥ 3.10 (`requires-python` in `pyproject.toml`), managed with
-[uv](https://docs.astral.sh/uv/).
+## Contributing and contact
 
-* Python dependencies are declared in `pyproject.toml` (the runtime set plus
-  the `tests` and `docs` extras) and locked in `uv.lock`
-
-```bash
-./scripts/linux/ci_static_analysis.sh x64 3.14 > "ci_analysis_$(date +%Y%m%d_%H%M%S).log" 2>&1
-```
-
-```bash
-  # atheris (tests extra) ships x86_64 Linux wheels for cp312-cp314 only
-  uv sync --all-extras --python 3.14
-```
-<!-- * [Vulkan 1.3](https://www.vulkan.org/) -->
-
-### Useful tools
-
-<!-- * [cppcheck](https://cppcheck.sourceforge.io/) -->
-
-<!-- GETTING STARTED -->
-## Getting Started
-
-### Prerequisites
-
-### Installation
-
-1. Clone the repo
-   ```sh
-   git clone --recurse-submodules git@github.com:Kataglyphis/WebDavClient.git
-   ```
-
-## Tests
-Run pytest in root directory (`uv run pytest` after the sync above) :smile:
-The WebDAV tests start a local mock server over `tests/remote/`, so no remote
-host is needed. The CI lanes run `tests/unit` only.
-
-<!-- ROADMAP -->
-## Roadmap
-Upcoming :)
-<!-- See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a list of proposed features (and known issues). -->
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-
-<!-- LICENSE -->
-## License
-
-MIT — the text is in `LICENSE`.
-
-<!-- CONTACT -->
-## Contact
-
-Jonas Heinle - [@Cataglyphis_](https://twitter.com/Cataglyphis_) - jonasheinle@googlemail.com
-
-Project Link: [https://github.com/Kataglyphis/WebDavClient](https://github.com/Kataglyphis/WebDavClient)
-
-
-<!-- ACKNOWLEDGEMENTS -->
-## Acknowledgements
-
-<!-- Thanks for free 3D Models: 
-* [Morgan McGuire, Computer Graphics Archive, July 2017 (https://casual-effects.com/data)](http://casual-effects.com/data/)
-* [Viking room](https://sketchfab.com/3d-models/viking-room-a49f1b8e4f5c4ecf9e1fe7d81915ad38) -->
-
-## Literature 
-
-Some very helpful literature, tutorials, etc. 
-
-  * https://de.wikipedia.org/wiki/WebDAV
-
-<!-- CMake/C++
-* [Cpp best practices](https://github.com/cpp-best-practices/cppbestpractices)
-
-Vulkan
-* [Udemy course by Ben Cook](https://www.udemy.com/share/102M903@JMHgpMsdMW336k2s5Ftz9FMx769wYAEQ7p6GMAPBsFuVUbWRgq7k2uY6qBCG6UWNPQ==/)
-* [Vulkan Tutorial](https://vulkan-tutorial.com/)
-* [Vulkan Raytracing Tutorial](https://developer.nvidia.com/rtx/raytracing/vkray)
-* [Vulkan Tutorial; especially chapter about integrating imgui](https://frguthmann.github.io/posts/vulkan_imgui/)
-* [NVidia Raytracing tutorial with Vulkan](https://nvpro-samples.github.io/vk_raytracing_tutorial_KHR/)
-* [Blog from Sascha Willems](https://www.saschawillems.de/)
-
-Physically Based Shading
-* [Advanced Global Illumination by Dutre, Bala, Bekaert](https://www.oreilly.com/library/view/advanced-global-illumination/9781439864951/)
-* [The Bible: PBR book](https://pbr-book.org/3ed-2018/Reflection_Models/Microfacet_Models)
-* [Real shading in Unreal engine 4](https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf)
-* [Physically Based Shading at Disney](https://blog.selfshadow.com/publications/s2012-shading-course/burley/s2012_pbs_disney_brdf_notes_v3.pdf)
-* [RealTimeRendering](https://www.realtimerendering.com/)
-* [Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs](https://hal.inria.fr/hal-01024289/)
-* [Sampling the GGX Distribution of Visible Normals](https://pdfs.semanticscholar.org/63bc/928467d760605cdbf77a25bb7c3ad957e40e.pdf)
-
-Path tracing
-* [NVIDIA Path tracing Tutorial](https://github.com/nvpro-samples/vk_mini_path_tracer/blob/main/vk_mini_path_tracer/main.cpp) -->
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
-[contributors-url]: https://github.com/othneildrew/Best-README-Template/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
-[forks-url]: https://github.com/othneildrew/Best-README-Template/network/members
-[stars-shield]: https://img.shields.io/github/stars/othneildrew/Best-README-Template.svg?style=for-the-badge
-[stars-url]: https://github.com/othneildrew/Best-README-Template/stargazers
-[issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=for-the-badge
-[issues-url]: https://github.com/othneildrew/Best-README-Template/issues
-[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
-[license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://www.linkedin.com/in/jonas-heinle-0b2a301a0/
+WebDavClient is one of the [Kataglyphis repositories](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/repository-family.md),
+which share one way to contribute and one contact. Licence: MIT, see [LICENSE](https://github.com/Kataglyphis/WebDavClient/blob/develop/LICENSE).

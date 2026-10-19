@@ -241,7 +241,13 @@ develop -f dry-run=true` proves it on `develop` without publishing.
 - Sphinx sources in `docs/`. `docs/source/README.md` and
   `docs/source/CHANGELOG.md` are copies: the docs driver copies the root
   `README.md` and `CHANGELOG.md` over them before every build, so edit the root
-  files.
+  files. A new page goes into `docs/source/index.rst`'s toctree.
+- `README.md` is the short overview the family's README rule asks for
+  ([`repository-family.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/repository-family.md#the-readme-rule));
+  installation, usage, tests and static analysis are
+  [`docs/source/getting-started.md`](docs/source/getting-started.md). `pyproject.toml`'s
+  `readme` makes the README the package's long description, so it links with absolute
+  GitHub URLs.
 - `CHANGELOG.md` and `VERSION.txt` — the version is read from `VERSION.txt`, so
   bump it there, and turn `## [Unreleased]` into its `## [<version>]` section before a merge into
   `main`: the release takes its notes from it and refuses a version without one.

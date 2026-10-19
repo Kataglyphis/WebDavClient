@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **The README logo is the family's ant** (2026-10-17, owner: one icon in every repository),
   drawn from OmniAccelerANT's `assets/icons/kataglyphis_app_icon.svg`.
+- **The README is a short overview** (owner, 2026-10-19: every README links into its docs, and
+  ANTfrastructure's `repository-family.md` holds contributing, licence and contact for the family).
+  Installation, usage, tests and static analysis moved to the new `docs/source/getting-started.md`,
+  which is in the Sphinx toctree. The empty Roadmap, Useful tools and Acknowledgements sections,
+  the commented-out Vulkan literature and the unused Best-README-Template link definitions are
+  gone. The clone URL is `https://`, as for every family repository, and the logo has an absolute
+  URL, so it also shows on the docs site and in the package's long description.
 
 ## [0.10.1] - 2026-10-17
 

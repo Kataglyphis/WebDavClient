@@ -35,6 +35,7 @@ This package contains modules to easily communicate to a host via WebDav.
    :caption: Contents:
 
    README
+   getting-started
    webdavclient
    CHANGELOG
 
