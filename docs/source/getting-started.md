@@ -1,9 +1,8 @@
 # Getting started
 
-This module provides an easy interface for communication via the WebDAV protocol
-to a remote host: you can, for example, automate downloads from your cloud. The
-API itself is [webdavclient.rst](webdavclient.rst); how to contribute to any of the
-family's repositories is ANTfrastructure's
+The package talks to a remote host over the WebDAV protocol, for example to automate
+downloads from your cloud. The API is [webdavclient.rst](webdavclient.rst); how to
+contribute to any of the family's repositories is ANTfrastructure's
 [`repository-family.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/repository-family.md).
 
 ## Installation
@@ -30,10 +29,8 @@ uv sync --all-extras --python 3.14
 ## Dependencies
 
 Python ≥ 3.10 (`requires-python` in `pyproject.toml`), managed with
-[uv](https://docs.astral.sh/uv/).
-
-* Python dependencies are declared in `pyproject.toml` (the runtime set plus
-  the `tests` and `docs` extras) and locked in `uv.lock`
+[uv](https://docs.astral.sh/uv/). The dependencies are declared in `pyproject.toml` (the
+runtime set plus the `tests` and `docs` extras) and locked in `uv.lock`.
 
 ## Usage
 
@@ -65,7 +62,5 @@ non-zero on a finding, which the redirect hides
 other CI scripts are in [`AGENTS.md` § 4](https://github.com/Kataglyphis/WebDavClient/blob/develop/AGENTS.md#4-build-run-test).
 
 ## Literature
-
-Some very helpful literature, tutorials, etc.
 
 * <https://de.wikipedia.org/wiki/WebDAV>

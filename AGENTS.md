@@ -9,18 +9,18 @@ yes, ANTfrastructure owns it and § 2 links to it. If no, it is written out in �
 
 ## 1. What this project is
 
-A Python package for talking to a WebDAV host. Python ≥ 3.10, managed with `uv`.
-It builds a **binary** wheel: the hub packaging driver exports `CYTHONIZE=True`,
-and `setup.py` then compiles every module with Cython and strips the sources
-from the wheel. OrchestrANT's wheel is built the same way — same driver, same
-`CYTHONIZE` switch in its own `setup.py` — so this does not set the lane apart.
+A Python package for talking to a WebDAV host. Python ≥ 3.10, managed with `uv`. It builds
+a **binary** wheel: the hub packaging driver exports `CYTHONIZE=True`, and `setup.py` then
+compiles every module with Cython and strips the sources from the wheel. OrchestrANT builds
+its wheel the same way (same driver, same `CYTHONIZE` switch in its own `setup.py`), so
+this does not set the lane apart.
 
 | Path | What lives there |
 | --- | --- |
 | `kataglyphis_webdavclient/` | The package — `webdavclient.py` is the substance |
 | `tests/` | `test_webdav_client.py` and the `mock_webdav_server.py` it starts, plus `unit/`, `integration/`, `fuzzy/` and `remote/` (the mock server's document root) |
 | `bench/`, `demo/` | Benchmarks and a runnable example |
-| `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh` |
+| `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh`; and the release collector `collect-release-assets.sh` (§ 4) |
 | `scripts/windows/` | `Build-Windows.ps1` + the `Resolve-BuildModule.ps1` bootstrap |
 | `third_party/ANTfrastructure` | The submodule owning every reusable script, module and doc |
 
@@ -47,51 +47,11 @@ reorganisation.
 | Code comments: one line, only the why; API docs short; gated | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md#comments-one-line-only-the-why) § *Comments: one line, only the why* |
 | Searching the tree: `rg`, not `grep -r` | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md) § *Searching the tree: ripgrep (`rg`)* |
 
-**Every `scripts/linux/*.sh` here is a wrapper, not an implementation.** Each
-sources `scripts/linux/lib/antfrastructure.sh` and calls `antfrastructure_exec`
-(or `antfrastructure_source`) into the submodule. When behaviour needs to
-change, change it **upstream** — a fix made in the wrapper is a fix the other
-Python consumers never get.
-
-`run-lint-gates.sh` is the same shape over the hub lint aggregator
-(`linux/scripts/run-lint-gates.sh`): seven gates — shell lint, workflow lint
-plus the CI image-ref check, secret scan, `ruff`, the shared-config drift check,
-the consumer pin-forwarding check, and the ratchets. The wrapper passes
-`--ratchets` itself, so the seventh is not optional here: it runs the doc-link
-gate and the eight measurement gates over this tree, each reading its freeze
-file from the repo root (`comment-size.allow`, `function-size.allow`,
-`code-complexity.allow`; the other five are empty and absent, which means
-nothing frozen). A row in one of those files is a queue entry with a reason, not
-a permanent exemption — shrink the thing and delete the row in the same commit,
-because a stale row fails the gate exactly like a new offender.
-`.github/workflows/lint-gates.yml` calls the hub's reusable lint lane with
-`ratchets: true`, which runs the same aggregator over the same root with the
-same `--ratchets` — straight from `third_party/ANTfrastructure`, not through
-this wrapper. The consumer root is passed explicitly on both paths, because the
-hub half of that script lives inside the submodule and a self-derived root
-would grade the wrong tree.
-
-`lib/antfrastructure.sh` is a verbatim copy of ANTfrastructure's
-[`shared/linux/templates/antfrastructure.sh`](third_party/ANTfrastructure/shared/linux/templates/README.md)
-— the bash twin of `Resolve-BuildModule.ps1`, and the only other file that
-cannot live upstream because it is what *finds* the submodule. Do not hand-edit
-it; sync from upstream. It owns the not-found guard and the `WORKSPACE_ROOT`
-export that every wrapper used to repeat.
-
-**Both copies are machine-checked, not asserted.** `.antfrastructure-shared.manifest`
-at the repo root declares the two ids this repo takes (`antfrastructure-sh`,
-`resolve-build-module`) from the registry in
-`third_party/ANTfrastructure/shared/config/shared-assets.manifest`; the
-shared-config gate compares them on every lint run:
-
-```bash
-bash third_party/ANTfrastructure/shared/config/sync-shared-config.sh --repo-root . --check
-```
-
-An asset left out of the manifest is never compared — that is how an
-intentional project-owned override is recorded. The word "verbatim" in a header
-is not a check: before 2026-09-15 `Resolve-BuildModule.ps1` had silently fallen
-16 body lines behind canonical while still claiming to be a verbatim copy.
+**Every `scripts/linux/*.sh` here but `collect-release-assets.sh` is a wrapper, not an
+implementation.** Each sources `scripts/linux/lib/antfrastructure.sh` and calls
+`antfrastructure_exec` (or `antfrastructure_source`, or runs the path
+`antfrastructure_path` resolves) into the submodule. Change behaviour **upstream**: a fix
+made in the wrapper is a fix the other Python consumers never get.
 
 | Wrapper | Upstream driver | Local addition |
 | --- | --- | --- |
@@ -99,6 +59,48 @@ is not a check: before 2026-09-15 `Resolve-BuildModule.ps1` had silently fallen
 | `ci_static_analysis.sh` | `python/ci_static_analysis.sh` | points `UV_PROJECT_ENVIRONMENT` at the venv the driver creates but never activates |
 | `ci_build_docs.sh` | `python/ci_build_docs.sh` | none |
 | `ci_packaging.sh` | `python/ci_packaging.sh` | installs `patchelf` — see § 3; then runs the hub's `python/test-free-threaded-wheel.sh` |
+
+**`run-lint-gates.sh` runs the hub lint aggregator** (`linux/scripts/run-lint-gates.sh`),
+seven gates: shell lint, workflow lint plus the CI image-ref check, secret scan, `ruff`, the
+shared-config drift check, the consumer pin-forwarding check, and the ratchets.
+
+- The wrapper passes `--ratchets` itself, so the seventh is not optional here: it runs the
+  doc-link gate and the eight measurement gates over this tree, each reading its freeze
+  file from the repo root (`comment-size.allow`, `function-size.allow`,
+  `code-complexity.allow`; the other five are empty and absent, which means nothing
+  frozen).
+- A row in one of those files is a queue entry with a reason, not a permanent exemption:
+  shrink the thing and delete the row in the same commit, because a stale row fails the
+  gate exactly like a new offender.
+- `.github/workflows/lint-gates.yml` calls the hub's reusable lint lane with
+  `ratchets: true`, which runs the same aggregator over the same root with the same
+  `--ratchets`, straight from `third_party/ANTfrastructure`, not through this wrapper. The
+  consumer root is passed explicitly on both paths, because the hub half of that script
+  lives inside the submodule and a self-derived root would grade the wrong tree.
+
+**The two bootstrap copies are machine-checked, not asserted.**
+`scripts/windows/Resolve-BuildModule.ps1` and its bash twin `scripts/linux/lib/antfrastructure.sh`
+are the only files that cannot live upstream, because they are what *find* the submodule.
+The bash one is a copy of ANTfrastructure's
+[`shared/linux/templates/antfrastructure.sh`](third_party/ANTfrastructure/shared/linux/templates/README.md)
+and owns the not-found guard and the `WORKSPACE_ROOT` export that every wrapper used to
+repeat. Do not hand-edit either; sync from upstream. `.antfrastructure-shared.manifest` at
+the repo root declares the two ids this repo takes (`antfrastructure-sh`,
+`resolve-build-module`) from the registry in
+`third_party/ANTfrastructure/shared/config/shared-assets.manifest`, and the shared-config
+gate compares them on every lint run:
+
+```bash
+bash third_party/ANTfrastructure/shared/config/sync-shared-config.sh --repo-root . --check
+```
+
+An asset left out of the manifest is never compared; that is how an intentional
+project-owned override is recorded. The word "verbatim" in a header is not a check: before
+2026-09-15 `Resolve-BuildModule.ps1` had silently fallen 16 body lines behind canonical
+while still claiming to be a verbatim copy.
+
+Nested imports inside a `.psm1` are **module-private**, so every module you call into must
+be named in the `Import-BuildModule` list explicitly.
 
 Two upstream facts repeated here only because they bite before you reach a doc:
 
@@ -110,11 +112,6 @@ Two upstream facts repeated here only because they bite before you reach a doc:
 - Composite actions and the reusable workflows resolve at `@develop`, so an
   ANTfrastructure change a workflow depends on must be pushed **before** the
   consumer change.
-
-**This repo's glue:** `scripts/windows/Resolve-BuildModule.ps1` — the one file
-that cannot live upstream, because it is what *finds* the submodule. Note that
-nested imports inside a `.psm1` are **module-private**, so every module you call
-into must be named in the `Import-BuildModule` list explicitly.
 
 For local work on the newest code, run
 `bash third_party/ANTfrastructure/linux/scripts/git-sync-branches.sh` (`--dry-run`
@@ -129,65 +126,59 @@ Details: [`adopting-in-a-new-project.md` § *Putting every checkout on its branc
 Everything here is false or meaningless in another repo — that is why it is
 written out rather than linked.
 
-- **`ci_packaging.sh` installs `patchelf` before delegating — a duplicate
-  step.** The binary wheel needs it (`auditwheel repair` rewrites the wheel's
-  RPATHs), but upstream's driver has installed it itself since the file's first
-  commit (hub `fc4df858`, 2026-06-12), two months before this wrapper delegated
-  to it, and OrchestrANT's wrapper carries no such step. The wrapper's header
-  says upstream does not install it; that is wrong at the current pin.
-- **`WORKSPACE_ROOT` is handled for you — do not remove it.** Upstream's
+- **`ci_packaging.sh` installs `patchelf` before delegating, a duplicate step.** The binary
+  wheel needs it (`auditwheel repair` rewrites the wheel's RPATHs), but upstream's driver
+  has installed it itself since the file's first commit (hub `fc4df858`, 2026-06-12), two
+  months before this wrapper delegated to it, and OrchestrANT's wrapper carries no such
+  step. The wrapper's header keeps it local "because no second consumer needs it"; at the
+  current pin upstream installs it anyway.
+- **`WORKSPACE_ROOT` is handled for you; do not remove it.** Upstream's
   `detect_workspace` derives it from the sourcing script's location, which for a
-  *delegated* driver resolves inside `third_party/ANTfrastructure/` —
-  so every tool would run against the submodule tree instead of this repo.
-  `antfrastructure_exec` pins it to the repo root before handing off (it used to
-  be repeated in every wrapper); `detect_workspace` honours a pre-set value and
-  still overrides to `/workspace` in the container, so CI is unaffected. Listed
-  here only because a wrapper that stops going through `antfrastructure_exec`
-  loses it silently.
-- **Do not re-add a `PACKAGE_NAME` default.** The pre-wrapper `ci_tests.sh`
-  defaulted it to `orchestr_ant_ion` — the *sibling* project's name, copy-pasted.
-  It only ever worked because CI passed the name explicitly. Upstream derives it
-  from `pyproject.toml`, which is why that class of bug cannot recur; hardcoding
-  it again reintroduces the failure mode.
-- **`tests/remote/` is not a remote host.**
-  `tests/remote/` is the document root `tests/mock_webdav_server.py` serves
-  (wsgidav on `127.0.0.1:8081`); `tests/test_webdav_client.py` starts that
-  server from a module-scoped fixture and asserts on the files under
-  `tests/remote/data`, so edit those and the tests change. The paths are
-  relative, so run `pytest` from the repo root. Every CI lane runs the whole
-  configured suite, `testpaths = tests`, all 10 tests, since 2026-10-01.
+  *delegated* driver resolves inside `third_party/ANTfrastructure/`, so every tool would
+  run against the submodule tree instead of this repo. `antfrastructure_exec` pins it to
+  the repo root before handing off (it used to be repeated in every wrapper);
+  `detect_workspace` honours a pre-set value and still overrides to `/workspace` in the
+  container, so CI is unaffected. Listed here only because a wrapper that stops going
+  through `antfrastructure_exec` loses it silently.
+- **Do not re-add a `PACKAGE_NAME` default.** The pre-wrapper `ci_tests.sh` defaulted it to
+  `orchestr_ant_ion`, the *sibling* project's name, copy-pasted. It only ever worked
+  because CI passed the name explicitly. Upstream derives it from `pyproject.toml`, which
+  is why that class of bug cannot recur; hardcoding it again reintroduces the failure mode.
+- **`tests/remote/` is not a remote host.** It is the document root
+  `tests/mock_webdav_server.py` serves (wsgidav on `127.0.0.1:8081`);
+  `tests/test_webdav_client.py` starts that server from a module-scoped fixture and asserts
+  on the files under `tests/remote/data`, so edit those and the tests change. The paths are
+  relative, so run `pytest` from the repo root. Every CI lane runs the whole configured
+  suite, `testpaths = tests`, all 10 tests, since 2026-10-01.
   - Linux: the hub's `ci_tests.sh` passes pytest no path of its own.
   - Windows: `Build-Windows.ps1` runs a bare `pytest`.
   - Until then every lane had run `tests/unit` only. That narrowing came with the arm64
     and Windows lanes (2025-10-20), so `test_webdav_client.py` and `tests/integration/`
     ran on no lane, and coverage came from the dummy tests alone.
-- **The 3.14t test leg tests the sources, not the Cython build.** The hub's
-  `ci_tests.sh` syncs the project uncompiled, and the hub's packaging proof only
-  *creates* each compiled module (`free-threaded-wheel.py prove`), never runs it.
-  So `ci_packaging.sh` runs the hub driver as a child, then the hub's
-  `test-free-threaded-wheel.sh` (a local script until 2026-10-12): the locked `tests`
-  extra and the `cp314t` wheel from `dist/` go into a fresh 3.14t venv, and the whole
-  suite runs from a copy of `tests/` and `pytest.ini` that has no package directory
-  beside it.
-  `KATAGLYPHIS_EXPECT_COMPILED=1` makes `tests/unit/test_free_threading.py` fail
-  when a module is not the compiled one, and on any free-threaded leg it fails
-  when importing the package turns the GIL back on. Both Linux rows run it; the
-  Windows lanes do not yet.
-- **Module state is shared between threads, so it is locked.** The modules hold
-  one piece of mutable state, the set of loguru file sinks in `webdavclient.py`.
-  Before 2026-10-11 every `WebDavClient()` added another sink on the same file.
-  Each line was then written once per client, and the file rotated once per client.
-  Downloads write a private `.part` file and rename it into place, so threads that
-  share a destination never interleave. `freethreading_compatible=True` in
-  `setup.py` rests on that audit. A new module-level cache, global or lazily built
-  object needs a lock as well, and a test in `tests/` that drives it from threads.
-- **`packages.find` must keep its `include`.** Setuptools' default namespace
-  discovery took `third_party/`, `scripts/` and `images/` as top-level packages, 218 in all, and
-  every wheel shipped the hub's scripts into `site-packages/third_party/` until
-  2026-10-11.
+- **The 3.14t test leg tests the sources, not the Cython build.** The hub's `ci_tests.sh`
+  syncs the project uncompiled, and the hub's packaging proof only *creates* each compiled
+  module (`free-threaded-wheel.py prove`), never runs it. So `ci_packaging.sh` runs the hub
+  driver as a child, then the hub's `test-free-threaded-wheel.sh` (a local script until
+  2026-10-12): the locked `tests` extra and the `cp314t` wheel from `dist/` go into a fresh
+  3.14t venv, and the whole suite runs from a copy of `tests/` and `pytest.ini` that has no
+  package directory beside it. `KATAGLYPHIS_EXPECT_COMPILED=1` makes
+  `tests/unit/test_free_threading.py` fail when a module is not the compiled one, and on
+  any free-threaded leg it fails when importing the package turns the GIL back on. Both
+  Linux rows run it; the Windows lanes do not yet.
+- **Module state is shared between threads, so it is locked.** The modules hold one piece
+  of mutable state, the set of loguru file sinks in `webdavclient.py`. Before 2026-10-11
+  every `WebDavClient()` added another sink on the same file, so each line was written
+  once per client and the file rotated once per client. Downloads write a private `.part`
+  file and rename it into place, so threads that share a destination never interleave.
+  `freethreading_compatible=True` in `setup.py` rests on that audit. A new module-level
+  cache, global or lazily built object needs a lock as well, and a test in `tests/` that
+  drives it from threads.
+- **`packages.find` must keep its `include`.** Setuptools' default namespace discovery took
+  `third_party/`, `scripts/` and `images/` as top-level packages, 218 in all, and every
+  wheel shipped the hub's scripts into `site-packages/third_party/` until 2026-10-11.
 - **There is no Flutter step here.** The pre-wrapper `ci_build_docs.sh` put
-  `$WORKSPACE_ROOT/flutter/bin` on `PATH`, copied from a Flutter sibling. It was
-  dropped rather than ported — if you see it reappear, it is copy-paste.
+  `$WORKSPACE_ROOT/flutter/bin` on `PATH`, copied from a Flutter sibling. It was dropped
+  rather than ported; if it reappears, it is copy-paste.
 
 ## 4. Build, run, test
 
@@ -212,31 +203,34 @@ Windows:
 pwsh -NoProfile -File .\scripts\windows\Build-Windows.ps1
 ```
 
-CI lanes: `.github/workflows/linux-x64.yml` and `linux-arm64.yml` (the two rows
-of one hub reusable lane, `arches` picking the row; keep their Python versions
-equal), `.github/workflows/windows-x64.yml`, `.github/workflows/windows-arm64.yml`
-(the hub's runner-native `windows-11-arm` pytest job: no container, wheels only, so
-a dependency without a `win_arm64` wheel needs `platform_machine != 'ARM64'`) and
-`.github/workflows/lint-gates.yml`
-— every one of them configuration for an ANTfrastructure reusable workflow, do
-not re-inline the steps. `scripts/linux/run-lint-gates.sh` is the same lint lane
-for a local run. File and display names follow the family convention (owner
-decision 2026-09-24): kebab-case, one file per platform + arch, display names
-`<Platform> <Arch> · <what>`, shared lanes named the same in every repo (`Lint
-gates`). The two Linux files split `ubuntu-26.04-amd64-arm64.yml` on 2026-09-25.
+| CI lane | What it runs |
+| --- | --- |
+| `.github/workflows/linux-x64.yml`, `linux-arm64.yml` | the two rows of one hub reusable lane, `arches` picking the row; keep their Python versions equal |
+| `.github/workflows/windows-x64.yml` | Windows x64 · build + test |
+| `.github/workflows/windows-arm64.yml` | the hub's runner-native `windows-11-arm` pytest job: no container, wheels only, so a dependency without a `win_arm64` wheel needs `platform_machine != 'ARM64'` |
+| `.github/workflows/lint-gates.yml` | the lint gates; `scripts/linux/run-lint-gates.sh` is the same lint lane for a local run |
+
+Every one of them is configuration for an ANTfrastructure reusable workflow; do not
+re-inline the steps. File and display names follow the family convention (owner decision
+2026-09-24): kebab-case, one file per platform + arch, display names
+`<Platform> <Arch> · <what>`, shared lanes named the same in every repo (`Lint gates`). The
+two Linux files split `ubuntu-26.04-amd64-arm64.yml` on 2026-09-25.
+
 **A push or PR runs Linux x64 and the lint gates; Linux arm64, Windows x64 and Windows arm64
 run on request** (owner rule 2026-10-15 for the whole family, ANTfrastructure's
-[`branch-and-release-strategy.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md); here since 2026-10-16). `on-request.yml`
-reads `[ci <lane>]` in the pushed commit messages (`[ci windows]`, `[ci arm64]`, `[ci all]`),
-and each lane keeps its Run workflow button. Each lane's concurrency group is
-`<lane>-${{ github.ref }}-${{ github.workflow }}`, one per lane and caller. A token in a commit
-message starts lanes, so never quote one in prose. **Every push to `main` is a release**
-(`release.yml`): a version check, all four lanes once more, then `v<VERSION.txt's version>` with
-a cp314 and a cp314t binary wheel from each lane (Linux x86_64 and aarch64, Windows amd64 and
-arm64), Linux x64's pure wheel and sdist, and the hub publisher's `SHA256SUMS`
-(`scripts/linux/collect-release-assets.sh`, whose suite is a job of `linux-x64.yml`), only when
-every lane is green. `gh workflow run release.yml --ref
-develop -f dry-run=true` proves it on `develop` without publishing.
+[`branch-and-release-strategy.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md); here since 2026-10-16).
+`on-request.yml` reads `[ci <lane>]` in the pushed commit messages (`[ci windows]`,
+`[ci arm64]`, `[ci all]`), and each lane keeps its Run workflow button. Each lane's
+concurrency group is `<lane>-${{ github.ref }}-${{ github.workflow }}`, one per lane and
+caller. A token in a commit message starts lanes, so never quote one in prose.
+
+**Every push to `main` is a release** (`release.yml`): a version check, all four lanes once
+more, then `v<VERSION.txt's version>` with a cp314 and a cp314t binary wheel from each lane
+(Linux x86_64 and aarch64, Windows amd64 and arm64), Linux x64's pure wheel and sdist, and
+the hub publisher's `SHA256SUMS` (`scripts/linux/collect-release-assets.sh`, whose suite is
+a job of `linux-x64.yml`), only when every lane is green.
+`gh workflow run release.yml --ref develop -f dry-run=true` proves it on `develop` without
+publishing.
 
 ## 5. Docs owned by this repo
 
