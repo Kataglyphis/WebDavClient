@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Windows runs the suite on the installed cp3XYt wheel too** (hub CON122). The subset moved from
+  `scripts/linux/ci_packaging.sh`'s flags into `pyproject.toml`'s
+  `[tool.antfrastructure.free-threaded-wheel-tests]`, unchanged; the Linux twin, the hub's Windows
+  x64 build and the `windows-11-arm` stage all read it, and the hub's runner fails a run that left
+  the GIL enabled. The third_party/ANTfrastructure gitlink moves to the hub commit that adds it.
 - **`docs/source/README.md` and `docs/source/CHANGELOG.md` are no longer tracked** (hub CON117).
   Both were hand-synced copies of the root files and had drifted (the CHANGELOG copy lacked
   5dad56c's and 970353a's entries). `docs/Makefile` and `make.bat` now copy the root files in

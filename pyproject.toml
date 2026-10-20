@@ -90,6 +90,14 @@ Source = "https://github.com/Kataglyphis/WebDavClient"
 # wsgidav caps bcrypt<5 (4.x: no free-threaded or win_arm64 wheel), 5.0.0 has no cp315t wheel and its PyO3 0.26 refuses 3.15; the mock server runs without auth, so nothing imports it.
 override-dependencies = ["bcrypt>=5; python_full_version < '3.15'"]
 
+# The whole suite on the installed cp3XYt wheel, read by every lane: third_party/ANTfrastructure/docs/python-ci.md#the-suite-on-the-installed-wheel
+[tool.antfrastructure.free-threaded-wheel-tests]
+extra = "tests"
+copy = ["tests", "pytest.ini"]
+# Fails a module that came from the source tree instead of the wheel's extension.
+env = { KATAGLYPHIS_EXPECT_COMPILED = "1" }
+pytest-args = ["-v"]
+
 [tool.black]
 line-length = 88
 target-version = ['py311']

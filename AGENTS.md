@@ -133,8 +133,10 @@ written out rather than linked.
   3.14t venv, and the whole suite runs from a copy of `tests/` and `pytest.ini` that has no
   package directory beside it. `KATAGLYPHIS_EXPECT_COMPILED=1` makes
   `tests/unit/test_free_threading.py` fail when a module is not the compiled one, and on
-  any free-threaded leg it fails when importing the package turns the GIL back on. Both
-  Linux rows run it; the Windows lanes do not yet.
+  any free-threaded leg it fails when importing the package turns the GIL back on. The
+  copy, the extra and the env live in `pyproject.toml`'s
+  `[tool.antfrastructure.free-threaded-wheel-tests]`, which both Linux rows, the hub's
+  Windows x64 build and the `windows-11-arm` stage (`wheel-tests-3.15t.cmd`) read.
 - **Module state is shared between threads, so it is locked.** The modules hold one piece
   of mutable state, the set of loguru file sinks in `webdavclient.py`. Before 2026-10-11
   every `WebDavClient()` added another sink on the same file, so each line was written
