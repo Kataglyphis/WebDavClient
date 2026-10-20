@@ -1,6 +1,6 @@
 name: Windows arm64 · test + wheels
 
-# Configuration for the hub's reusable lane only: its runner-native windows-11-arm job, tests then the win_arm64 wheels.
+# Configuration for the hub's reusable lane only: :winarm64 stages the legs and wheels, windows-11-arm runs them.
 
 # On request only (https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/branch-and-release-strategy.md): on-request.yml or by hand.
 on:
@@ -21,10 +21,14 @@ jobs:
     with:
       build-python-package: false
       arm64-tests: true
-      # Built and loaded on the runner itself: the hub's arm64 container cross-builds no GIL Cython wheel.
+      # Cross-built with :winarm64's VS and clang-cl, proved on the device, then uploaded.
       arm64-wheels: true
       # The pinned X.Y and X.Yt, as on Linux: X.Yt syncs only the tests extra; py-spy and line_profiler stay off ARM64 (pyproject.toml).
       arm64-python-versions: 'pinned pinnedt'
       free-threaded-extras: tests
+      # The legs test the installed cp315/cp315t wheels, so every module must be the compiled one.
+      arm64-test-env: KATAGLYPHIS_EXPECT_COMPILED=1
       # Full history: this repo's packaging derives its version from git.
       fetch-depth: 0
+    secrets:
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}

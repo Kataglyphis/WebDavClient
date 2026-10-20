@@ -178,7 +178,7 @@ pwsh -NoProfile -File .\third_party\ANTfrastructure\windows\scripts\python\Invok
 | --- | --- |
 | `.github/workflows/linux-x64.yml`, `linux-arm64.yml` | the two rows of one hub reusable lane, `arches` picking the row; keep their Python versions equal |
 | `.github/workflows/windows-x64.yml` | Windows x64 · build + test |
-| `.github/workflows/windows-arm64.yml` | the hub's runner-native `windows-11-arm` pytest job: no container, wheels only, so a dependency without a `win_arm64` wheel needs `platform_machine != 'ARM64'` |
+| `.github/workflows/windows-arm64.yml` | the hub's staged arm64 job: `:winarm64` cross-builds the cp315/cp315t `win_arm64` wheels and stages each leg on the image's interpreters, and `windows-11-arm` runs the suite on the installed wheels with `KATAGLYPHIS_EXPECT_COMPILED=1`, installing nothing; a dependency with no `win_arm64` wheel for a leg needs `platform_machine != 'ARM64'` |
 | `.github/workflows/lint-gates.yml` | the lint gates; `scripts/linux/run-lint-gates.sh` is the same lint lane for a local run |
 
 Every one of them is configuration for an ANTfrastructure reusable workflow; do not

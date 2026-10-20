@@ -73,9 +73,10 @@ jobs:
       name: WebDavClient
       version-file: VERSION.txt
       dry-run: ${{ inputs.dry-run == true }}
-      # Every lane builds the pure wheel and the sdist under one name; Linux x64's copy ships.
+      # Every lane builds the pure wheel and the sdist under one name; Linux x64's copy ships. The arm64 stage is the device's input, not a deliverable.
       collect: |
         --skip test-reports-*
+        --skip python-windows-arm64-stage
         --include *.whl
         --include *.tar.gz
         --exclude */docs/*

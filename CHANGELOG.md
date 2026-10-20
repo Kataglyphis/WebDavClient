@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Windows arm64 runs on `:winarm64`'s interpreters and builds its wheels with the image's
+  toolchain** (hub CON113). The hub's job installed uv and downloaded CPython 3.15.0 and
+  3.15.0+freethreaded on `windows-11-arm` (run 39336879640), then built the wheels with the
+  runner's Visual Studio. Now a `windows-2025` job stages both legs in `:winarm64`: the
+  cp315 and cp315t `win_arm64` wheels cross-built with its VS 2026 and clang-cl, the image's target
+  interpreters and the lock's set; `windows-11-arm` runs the suite on the installed wheels
+  (`arm64-test-env: KATAGLYPHIS_EXPECT_COMPILED=1`), proves each wheel alone and uploads them. The
+  release skips the stage artifact, whose interpreters carry ensurepip's pip wheel.
 - **Dependabot is off** (owner, 2026-10-20: dependency upgrades go only through Renovate as a local
   CLI, ANTfrastructure's `docs/dependency-updates.md`). `.github/dependabot.yml` (uv) is deleted,
   its open PR #31 closed and the repository's Dependabot security-update PRs disabled; Dependabot
