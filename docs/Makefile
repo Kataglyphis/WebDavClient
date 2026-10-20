@@ -16,8 +16,12 @@ help:
 theme:
 	uv pip install --quiet --no-deps -e "$(THEME)"
 
-.PHONY: help theme Makefile
+# The root README.md and CHANGELOG.md are the one source; the pages are untracked copies.
+sources:
+	cp ../README.md ../CHANGELOG.md "$(SOURCEDIR)/"
+
+.PHONY: help theme sources Makefile
 
 # Route every unknown target to Sphinx's "make mode"; $(O) is a shortcut for $(SPHINXOPTS).
-%: Makefile theme
+%: Makefile theme sources
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)

@@ -11,6 +11,9 @@ __pycache__/
 *.so
 
 docs/test_results
+# docs/Makefile copies the repo-root files over these before every build.
+/docs/source/README.md
+/docs/source/CHANGELOG.md
 
 kataglyphis_webdavclient/**/*.c
 

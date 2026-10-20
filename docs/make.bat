@@ -32,6 +32,13 @@ if errorlevel 1 (
 	exit /b 1
 )
 
+REM The root README.md and CHANGELOG.md are the one source, as docs/Makefile copies them.
+copy /Y ..\README.md %SOURCEDIR%\ >NUL && copy /Y ..\CHANGELOG.md %SOURCEDIR%\ >NUL
+if errorlevel 1 (
+	popd
+	exit /b 1
+)
+
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 goto end
 

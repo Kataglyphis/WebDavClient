@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **`docs/source/README.md` and `docs/source/CHANGELOG.md` are no longer tracked** (hub CON117).
+  Both were hand-synced copies of the root files and had drifted (the CHANGELOG copy lacked
+  5dad56c's and 970353a's entries). `docs/Makefile` and `make.bat` now copy the root files in
+  before every build, as the hub's `ci_build_docs.sh` does; `.gitignore` holds the copies, and
+  `doc-link-roots.allow` lets the hub's doc-links gate resolve `getting-started.md`'s
+  `README.md#quick-start` from the repo root. The third_party/ANTfrastructure gitlink moves to the
+  hub commit that reads that file.
 - **Windows arm64 runs on `:winarm64`'s interpreters and builds its wheels with the image's
   toolchain** (hub CON113). The hub's job installed uv and downloaded CPython 3.15.0 and
   3.15.0+freethreaded on `windows-11-arm` (run 39336879640), then built the wheels with the

@@ -201,12 +201,12 @@ them and tags nothing: `gh workflow run release.yml --ref develop -f dry-run=tru
 **Write docs like a developer: short and precise** (owner, 2026-10-19). Say what a thing does,
 how to run it and what breaks; no filler, no marketing, no repetition.
 
-- Sphinx sources in `docs/`. `docs/source/README.md` and
-  `docs/source/CHANGELOG.md` are copies: the docs driver copies the root
-  `README.md` and `CHANGELOG.md` over them before every build, so edit the root
-  files. They stay tracked because `docs/Makefile` and `make.bat` build without
-  that copy; re-sync them in the commit that changes the root file. A new page
-  goes into `docs/source/index.rst`'s toctree.
+- Sphinx sources in `docs/`. `docs/source/README.md` and `docs/source/CHANGELOG.md` are
+  gitignored copies of the root files: `docs/Makefile` and `make.bat` copy them before every
+  build, as the hub's `ci_build_docs.sh` does, so edit only the root files. A docs page links
+  them as siblings (`README.md#quick-start`); `doc-link-roots.allow` lets the hub's
+  `verify_doc_links.py --root` resolve those from the repo root. A new page goes into
+  `docs/source/index.rst`'s toctree.
 - `conf.py` calls the family theme's `setup_theme()`, which `docs/Makefile` and `make.bat`
   install editable from the hub's vendored DocumANTation before every build. It is not a uv
   path source: a checkout without that submodule would then fail every `uv sync --locked`.

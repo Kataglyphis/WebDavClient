@@ -1,0 +1,2 @@
+# docs/Makefile copies the root README.md and CHANGELOG.md into docs/source/, so its pages link them as siblings.
+docs/source/*.md | .
