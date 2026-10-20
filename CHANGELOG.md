@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Dependabot is off** (owner, 2026-10-20: dependency upgrades go only through Renovate as a local
+  CLI, ANTfrastructure's `docs/dependency-updates.md`). `.github/dependabot.yml` (uv) is deleted,
+  its open PR #31 closed and the repository's Dependabot security-update PRs disabled; Dependabot
+  alerts stay on.
 - **Every lane tests and packages only the pinned CPython, once with the GIL and once
   free-threaded** (owner, 2026-10-20). Windows x64 ran 3.13, 3.14 and 3.14t and packaged on 3.14,
   so `uv python install` downloaded 3.13 and 3.14 into `:winamd64`, which carries 3.15.0 (dry run
