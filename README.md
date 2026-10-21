@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://jonasheinle.de">
-    <img src="https://raw.githubusercontent.com/Kataglyphis/WebDavClient/develop/images/logo.png" alt="logo" width="200" />
+    <img src="https://raw.githubusercontent.com/Kataglyphis/WebDavClient/develop/images/logo.svg" alt="WebDavClient logo: an ant carrying a file down from a cloud" width="200" />
   </a>
 
 # WebDavClient

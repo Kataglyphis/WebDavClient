@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **The README header shows WebDavClient's own logo, `images/logo.svg`** (2026-10-21, owner): an
+  ant carrying a file down from a cloud, from the family set DocumANTation's
+  `scripts/make_repo_logos.py` draws. `images/logo.png` is unchanged.
 - **Windows runs the suite on the installed cp3XYt wheel too** (hub CON122). The subset moved from
   `scripts/linux/ci_packaging.sh`'s flags into `pyproject.toml`'s
   `[tool.antfrastructure.free-threaded-wheel-tests]`, unchanged; the Linux twin, the hub's Windows
