@@ -27,4 +27,5 @@ setup_theme(
 
 # The repository's own logo, in place of setup_theme()'s shared default.
 html_logo = "../../images/logo.svg"
+# Sphinx reads html_favicon; vulture is told to ignore it in pyproject.toml.
 html_favicon = html_logo
