@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The README header shows WebDavClient's own logo, `images/logo.svg`** (2026-10-21, owner): an
   ant carrying a file down from a cloud, from the family set DocumANTation's
   `scripts/make_repo_logos.py` draws. `images/logo.png` is rendered from it at 256 px.
+- **The docs site shows WebDavClient's own logo** (2026-10-21, owner): `docs/source/conf.py` sets
+  `html_logo` and `html_favicon` to `images/logo.svg` after `setup_theme()`, in place of the theme's
+  shared wireframe.
 - **Windows runs the suite on the installed cp3XYt wheel too** (hub CON122). The subset moved from
   `scripts/linux/ci_packaging.sh`'s flags into `pyproject.toml`'s
   `[tool.antfrastructure.free-threaded-wheel-tests]`, unchanged; the Linux twin, the hub's Windows

@@ -24,3 +24,7 @@ setup_theme(
     ],
     myst_enable_extensions=["dollarmath", "amsmath", "colon_fence", "deflist"],
 )
+
+# The repository's own logo, in place of setup_theme()'s shared default.
+html_logo = "../../images/logo.svg"
+html_favicon = html_logo
