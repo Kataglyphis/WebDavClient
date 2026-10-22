@@ -18,6 +18,7 @@ this does not set the lane apart.
 | Path | What lives there |
 | --- | --- |
 | `kataglyphis_webdavclient/` | The package — `webdavclient.py` is the substance |
+| `build_support/kataglyphis_wheel.py` | The hub-owned, manifest-checked wheel rewriter; `MANIFEST.in` ships it in the sdist |
 | `tests/` | `test_webdav_client.py` and the `mock_webdav_server.py` it starts, plus `unit/`, `integration/`, `fuzzy/` and `remote/` (the mock server's document root) |
 | `bench/`, `demo/` | Benchmarks and a runnable example |
 | `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh` |
@@ -98,6 +99,16 @@ first): [`adopting-in-a-new-project.md` § *Putting every checkout on its branch
 
 Everything here is false or meaningless in another repo — that is why it is
 written out rather than linked.
+
+- **All downloads use the client's validated, atomic path.** `download_files` and
+  `download_all_files_iterative` accept the keyword-only `extension` suffix and return a file
+  count. Preserve decoded-path validation, same-origin/remote-prefix checks, resolved local
+  containment and failure propagation. `tests/unit/test_download_safety.py` covers traversal,
+  Windows path syntax, existing symlink escapes and interrupted filtered transfers.
+- **Do not fork wheel rewriting in `setup.py`.** Change
+  `ANTfrastructure/shared/python/kataglyphis_wheel.py`, then refresh this repo's
+  `build_support/kataglyphis_wheel.py` copy. The `python-wheel-rewrite` shared asset checks it;
+  the sdist must keep including the helper so builds work without submodules.
 
 - **`ci_packaging.sh` installs `patchelf` before delegating, a duplicate step.** The binary
   wheel needs it (`auditwheel repair` rewrites the wheel's RPATHs), but upstream's driver

@@ -2,19 +2,19 @@
 
 """Build configuration for packaging and optional Cython compilation."""
 
-import base64
-import hashlib
 import logging
 import os
-import shutil
+import runpy
 import sys
-import tempfile
-import zipfile
 from pathlib import Path
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
+
+rewrite_wheel = runpy.run_path(
+    str(Path(__file__).parent / "build_support/kataglyphis_wheel.py")
+)["rewrite_wheel"]
 
 LOGGER = logging.getLogger(__name__)
 
@@ -60,96 +60,9 @@ class StripWheel(_bdist_wheel if _bdist_wheel is not None else object):
                 continue
             self._strip_wheel(wheel_path)
 
-    def _strip_wheel(self, wheel_path: Path | str) -> None:
-        wheel_path = Path(wheel_path)
-        dirname = wheel_path.parent
-        tmpfd, tmpname = tempfile.mkstemp(suffix=".whl", dir=dirname)
-        os.close(tmpfd)
-        tmp_path = Path(tmpname)
-
-        try:
-            with zipfile.ZipFile(wheel_path, "r") as zin:
-                zin_infos = zin.infolist()
-
-                dist_info_record = next(
-                    (
-                        zi.filename
-                        for zi in zin_infos
-                        if zi.filename.endswith(".dist-info/RECORD")
-                    ),
-                    None,
-                )
-                if dist_info_record is None:
-                    # try to find dist-info directory if RECORD missing (very unlikely)
-                    dist_info_dir = next(
-                        (
-                            zi.filename
-                            for zi in zin_infos
-                            if zi.filename.endswith(".dist-info/")
-                        ),
-                        None,
-                    )
-                    if dist_info_dir is None:
-                        error_message = (
-                            "Could not locate .dist-info directory inside wheel"
-                        )
-                        raise RuntimeError(error_message)
-                    dist_info_record = dist_info_dir + "RECORD"
-                else:
-                    dist_info_dir = dist_info_record.rsplit("/", 1)[0] + "/"
-
-                kept_infos = []  # list of (ZipInfo, data)
-
-                for zi in zin_infos:
-                    name = zi.filename
-                    if name.endswith("/"):
-                        continue
-                    # skip the original RECORD (we regenerate it)
-                    if name == dist_info_record:
-                        continue
-                    # skip signature files under dist-info (they would be invalid after we modify RECORD)
-                    if name.startswith(dist_info_dir) and name.lower().endswith(
-                        (".jws", ".asc", ".sig")
-                    ):
-                        continue
-                    if any(name.endswith(suf) for suf in self.exclude_suffixes):
-                        continue
-                    data = zin.read(name)
-                    kept_infos.append((zi, data))
-
-            record_lines = []
-            with zipfile.ZipFile(
-                tmpname, "w", compression=zipfile.ZIP_DEFLATED
-            ) as zout:
-                for zi, data in kept_infos:
-                    new_zi = zipfile.ZipInfo(filename=zi.filename)
-                    # Keep the original timestamps and permissions.
-                    new_zi.date_time = zi.date_time
-                    new_zi.external_attr = zi.external_attr
-
-                    zout.writestr(new_zi, data)
-
-                    h = hashlib.sha256(data).digest()
-                    b64 = base64.urlsafe_b64encode(h).rstrip(b"=").decode("ascii")
-                    size = str(len(data))
-                    record_lines.append(f"{zi.filename},sha256={b64},{size}")
-
-                # RECORD lists itself with an empty hash and size.
-                record_content = "\n".join(
-                    [*record_lines, f"{dist_info_dir}RECORD,,"]
-                ).encode("utf-8")
-
-                record_zi = zipfile.ZipInfo(filename=dist_info_dir + "RECORD")
-                record_zi.date_time = (1980, 1, 1, 0, 0, 0)
-                # set rw-r--r-- permissions
-                record_zi.external_attr = (0o644 & 0xFFFF) << 16
-                zout.writestr(record_zi, record_content)
-
-            shutil.move(tmpname, wheel_path)
-            LOGGER.info("Stripped wheel written: %s", wheel_path)
-        finally:
-            if tmp_path.exists():
-                tmp_path.unlink()
+    def _strip_wheel(self, wheel_path: Path) -> None:
+        """Delegate the archive rewrite to the shared, sdist-bundled helper."""
+        rewrite_wheel(wheel_path, self.exclude_suffixes)
 
 
 class ClangBuildExt(build_ext):

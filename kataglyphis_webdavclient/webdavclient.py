@@ -37,6 +37,61 @@ def _join_remote_url(*parts: str) -> str:
     return "/".join(cleaned_parts)
 
 
+def _remote_relative_path(href: str, base_url: str) -> tuple[str, ...]:
+    """Return validated, decoded path components below the same-origin DAV base."""
+    if any(ord(char) < 32 for char in href):
+        message = "WebDAV href contains control characters"
+        raise ValueError(message)
+    raw_path = urllib.parse.unquote(urllib.parse.urlsplit(href).path, errors="strict")
+    if any(part in {".", ".."} for part in raw_path.split("/")):
+        message = "WebDAV href contains an unsafe path component"
+        raise ValueError(message)
+    base = urllib.parse.urlsplit(base_url.rstrip("/") + "/")
+    remote = urllib.parse.urlsplit(urllib.parse.urljoin(base.geturl(), href))
+    if (remote.scheme, remote.netloc) != (base.scheme, base.netloc):
+        message = "WebDAV href belongs to another origin"
+        raise ValueError(message)
+    if remote.query or remote.fragment:
+        message = "WebDAV href contains a query or fragment"
+        raise ValueError(message)
+    path = urllib.parse.unquote(remote.path, errors="strict")
+    base_path = urllib.parse.unquote(base.path, errors="strict").rstrip("/")
+    parts = tuple(path.strip("/").split("/")) if path.strip("/") else ()
+    base_parts = tuple(base_path.strip("/").split("/")) if base_path else ()
+    # Validate before prefix matching so neither dot segments nor Windows syntax can change the destination.
+    if any(
+        not part
+        or part in {".", ".."}
+        or any(ord(char) < 32 or char in '\\:<>"|?*' for char in part)
+        or part.endswith((".", " "))
+        or part.split(".", 1)[0].rstrip(" ").upper()
+        in {
+            "CON",
+            "PRN",
+            "AUX",
+            "NUL",
+            *(f"COM{i}" for i in "123456789¹²³"),
+            *(f"LPT{i}" for i in "123456789¹²³"),
+        }
+        for part in parts
+    ):
+        message = "WebDAV href contains an unsafe path component"
+        raise ValueError(message)
+    if parts[: len(base_parts)] != base_parts:
+        message = "WebDAV href is outside the remote base path"
+        raise ValueError(message)
+    return parts[len(base_parts) :]
+
+
+def _download_target(base: Path, relative: tuple[str, ...]) -> Path:
+    """Resolve existing symlinks and reject a destination outside the download root."""
+    target = base.joinpath(*relative).resolve()
+    if not relative or not target.is_relative_to(base):
+        message = "WebDAV download target is outside the local base path"
+        raise ValueError(message)
+    return target
+
+
 def _replace(part: Path, target: Path) -> None:
     # Windows refuses a replace while another thread replaces the same target (PermissionError); it clears in milliseconds.
     attempts = 40 if sys.platform == "win32" else 1
@@ -79,28 +134,32 @@ class WebDavClient:
         self.ensure_folder_exists(str(Path(LOG_FILE).parent))
         _add_log_sink(LOG_FILE)
 
-    def list_files(self, url: str) -> list[str]:
-        """List the files directly below a WebDAV URL; OSError unless PROPFIND answers 207."""
+    def _hrefs(self, url: str) -> list[str]:
         headers: dict[str, str] = {"Content-Type": "application/xml", "Depth": "1"}
-        response: requests.Response = requests.request(
+        with requests.request(
             "PROPFIND",
             url,
             auth=self.auth,
             headers=headers,
             timeout=REQUEST_TIMEOUT_SECONDS,
-        )
-        if response.status_code != 207:
-            error_message: str = "Failed to list directory contents via requests: "
-            logger.error(
-                "Error message {} with code {}", error_message, response.status_code
-            )
-            error_details = f"{error_message}{response.status_code}"
-            raise OSError(error_details)
+        ) as response:
+            if response.status_code != 207:
+                message = f"Failed to list {url}: HTTP {response.status_code}"
+                raise OSError(message)
+            tree = ElementTree.fromstring(response.content)
+        hrefs = []
+        for item in tree.findall("{DAV:}response"):
+            href = item.findtext("{DAV:}href")
+            if not href:
+                message = "WebDAV listing contains a response without an href"
+                raise ValueError(message)
+            hrefs.append(href)
+        return hrefs
 
-        tree = ElementTree.fromstring(response.content)
+    def list_files(self, url: str) -> list[str]:
+        """List the files directly below a WebDAV URL; OSError unless PROPFIND answers 207."""
         files = []
-        for response in tree.findall("{DAV:}response"):
-            href = response.find("{DAV:}href").text
+        for href in self._hrefs(url):
             if not href.endswith("/"):
                 logger.debug("Found file: {} for the following url: {}", href, url)
                 files.append(href)
@@ -108,38 +167,19 @@ class WebDavClient:
 
     def list_folders(self, remote_base_path: str) -> list[str]:
         """List the non-hidden folders directly below a remote base path; OSError unless PROPFIND answers 207."""
-        headers = {"Content-Type": "application/xml", "Depth": "1"}
         url: str = _join_remote_url(self.hostname, remote_base_path)
-        response = requests.request(
-            "PROPFIND",
-            url,
-            auth=self.auth,
-            headers=headers,
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
-        if response.status_code != 207:
-            error_message = "Failed to list directory contents: "
-            logger.error("{} {}", error_message, response.status_code)
-            error_details = f"{error_message}{response.status_code}"
-            raise OSError(error_details)
-
-        tree = ElementTree.fromstring(response.content)
         folders = []
-        for response in tree.findall("{DAV:}response"):
-            href = response.find("{DAV:}href").text
-            folder = PurePosixPath(href.rstrip("/")).name
-            is_folder = href.endswith("/")
-            is_not_remote_base_path = (
-                href != url + "/"
-            ) and folder != remote_base_path.rsplit("/", maxsplit=1)[-1]
-            is_hidden_folder = folder.startswith(".")
-            if is_folder and is_not_remote_base_path and not is_hidden_folder:
-                logger.debug(
-                    "Found folder: {} in the parent folder: {}",
-                    folder,
-                    remote_base_path,
-                )
-                folders.append(folder)
+        for href in self._hrefs(url):
+            if not href.endswith("/"):
+                continue
+            relative = _remote_relative_path(href, url)
+            if not relative:
+                continue
+            if len(relative) != 1:
+                message = "WebDAV folder is not a direct child of its parent"
+                raise ValueError(message)
+            if not relative[0].startswith("."):
+                folders.append(urllib.parse.quote(relative[0], safe=""))
         return folders
 
     def filter_after_global_base_path(self, path: str, remote_base_path: str) -> str:
@@ -216,82 +256,57 @@ class WebDavClient:
         global_remote_base_path: str,
         remote_base_path: str,
         local_base_path: str,
-    ) -> None:
-        """Download the files directly below remote_base_path, without subfolders.
-
-        Args:
-            global_remote_base_path: Root folder the local folder structure is relative to.
-            remote_base_path: Remote folder whose files are downloaded.
-            local_base_path: Local folder the files land under.
-        """
-        if not Path(local_base_path).exists():
-            logger.info("Dir {} will be created", local_base_path)
-            Path(local_base_path).mkdir(parents=True, exist_ok=True)
+        *,
+        extension: str | None = None,
+    ) -> int:
+        """Atomically download matching files, preserving paths below the global base; return the count."""
+        base = Path(local_base_path).resolve()
+        base.mkdir(parents=True, exist_ok=True)
+        global_url = _join_remote_url(self.hostname, global_remote_base_path)
         url = _join_remote_url(self.hostname, remote_base_path)
         files_on_host = self.list_files(url)
-
-        if len(files_on_host) == 0:
-            logger.info("Found no files on remote_base_path: {}", remote_base_path)
-
+        written = 0
         for file_path in files_on_host:
-            logger.info("Found the file: {} on current remote_base_path", file_path)
-            file_name = self.filter_after_global_base_path(file_path, remote_base_path)
-            logger.info("The pure of filename of this file is: {}", file_name)
-            decoded_filename = urllib.parse.unquote(file_name)
-            logger.info("The decoded filename version is: {}", decoded_filename)
-            remote_file_url = _join_remote_url(
-                self.hostname,
-                remote_base_path,
-                file_name,
-            )
-            logger.info("The remote file url is: {}", remote_file_url)
-            sub_path = self.get_sub_path(file_path, global_remote_base_path)
-
-            if sub_path.endswith(decoded_filename):
-                sub_path = sub_path[: len(sub_path) - len(decoded_filename)]
-
-            if sub_path == decoded_filename:
-                sub_path = ""
-
-            logger.debug("The current sub path is: {}", sub_path)
-            local_file_path = Path(local_base_path) / sub_path / decoded_filename
-            logger.debug(
-                "The current file that is stored has the full path: {}", local_file_path
-            )
+            relative = _remote_relative_path(file_path, global_url)
+            local_file_path = _download_target(base, relative)
+            if extension and not relative[-1].lower().endswith(extension.lower()):
+                continue
+            remote_file_url = urllib.parse.urljoin(url.rstrip("/") + "/", file_path)
             with requests.get(
                 remote_file_url,
                 auth=self.auth,
                 stream=True,
                 timeout=REQUEST_TIMEOUT_SECONDS,
             ) as response:
-                if response.status_code == 200:
-                    self.ensure_folder_exists(str(local_file_path.parent))
-                    _write_atomically(local_file_path, response)
-                else:
-                    logger.debug(
-                        "Failed to download {}: {}",
-                        remote_file_url,
-                        response.status_code,
-                    )
+                if response.status_code != 200:
+                    message = f"Failed to download {remote_file_url}: HTTP {response.status_code}"
+                    raise OSError(message)
+                local_file_path.parent.mkdir(parents=True, exist_ok=True)
+                _write_atomically(_download_target(base, relative), response)
+            written += 1
+        return written
 
     def download_all_files_iterative(
         self,
         remote_base_path: str,
         local_base_path: str,
-    ) -> None:
-        """Download everything below remote_base_path into local_base_path, keeping the folder structure."""
+        *,
+        extension: str | None = None,
+    ) -> int:
+        """Download a tree with an optional case-insensitive suffix; fail on any error and return the count."""
         stack: list[str] = [remote_base_path]
-
+        written = 0
         global_remote_base_path: str = remote_base_path
 
         while stack:
             current_remote_path: str = stack.pop()
             logger.debug("Current remote path is: {}", current_remote_path)
 
-            self.download_files(
+            written += self.download_files(
                 global_remote_base_path,
                 current_remote_path,
                 local_base_path,
+                extension=extension,
             )
 
             folders: list[str] = self.list_folders(current_remote_path)
@@ -300,6 +315,14 @@ class WebDavClient:
                     "Found no subfolders for current folder: {}", current_remote_path
                 )
             for folder in folders:
+                # Folder listings return one encoded component, never a remote path to traverse.
+                relative = _remote_relative_path(
+                    folder,
+                    _join_remote_url(self.hostname, current_remote_path),
+                )
+                if len(relative) != 1:
+                    message = "WebDAV folder is not a direct child of its parent"
+                    raise ValueError(message)
                 logger.info(
                     "Found subfolder {} for current folder: {}.",
                     folder,
@@ -309,3 +332,4 @@ class WebDavClient:
                     PurePosixPath(current_remote_path) / folder
                 )
                 stack.append(relative_folder_path)
+        return written

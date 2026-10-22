@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Validate decoded WebDAV paths before writing, including parent segments, Windows path syntax
+  and existing symlink escapes. GET/listing failures now reach callers; responses close on errors.
+- Preserve existing files when filtered downloads fail mid-transfer, and compress rewritten
+  binary-wheel entries instead of storing them uncompressed.
+
 ### Changed
+- `download_files` and `download_all_files_iterative` accept a keyword-only `extension` suffix
+  and return a download count. The hub uses this API for filtered and whole-tree downloads.
+- Wheel rewriting is shared with OrchestrANT through ANTfrastructure's manifest-checked
+  `build_support/kataglyphis_wheel.py` copy, included in every sdist without a hub import.
 - **The README header shows WebDavClient's own logo, `images/logo.svg`** (2026-10-21, owner): an
   ant carrying a file down from a cloud, from the family set DocumANTation's
   `scripts/make_repo_logos.py` draws. `images/logo.png` is rendered from it at 256 px.
