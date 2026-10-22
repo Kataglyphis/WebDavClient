@@ -7,5 +7,3 @@
 #
 # Length is weak evidence on its own. Both rows below are a queue entry, not an
 # accusation; each names the seam it would be split at and what is missing.
-
-setup.py | StripWheel._strip_wheel | 90 | 104 -> 90 on 2026-09-30: comment sweep. PRIOR: Frozen 2026-09-15 at adoption, reviewed KEEP: one wheel rewrite that has to stay a single transaction. It mkstemp's a sibling .whl, reads the input zip and selects the entries to keep (dropping directory entries, the old RECORD, dist-info signatures and the configured exclude_suffixes), writes those into the temp wheel while accumulating each entry's sha256 and size, appends the regenerated RECORD, then shutil.move's over the original under a finally: that unlinks the temp. The phases do not separate: the RECORD lines are produced BY the write loop, because a hash only means anything once the entry set is final, and the temp-file lifetime has to span all of it. An early return between the phases leaves a half-written wheel, which is worse than a long function

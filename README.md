@@ -55,6 +55,7 @@ webdevclient = WebDavClient(hostname, username, password)
 webdevclient.download_all_files_iterative(remote_base_path, local_base_path)
 ```
 
+Filter with `extension=".md"`; downloads raise on HTTP, listing or unsafe-path errors.
 Release wheels, logging, the demo script and the tests:
 [docs/source/getting-started.md](https://github.com/Kataglyphis/WebDavClient/blob/develop/docs/source/getting-started.md).
 

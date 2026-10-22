@@ -5,6 +5,7 @@
 import threading
 from collections.abc import Callable
 from pathlib import Path
+from types import TracebackType
 from uuid import uuid4
 
 import pytest
@@ -33,6 +34,18 @@ class FakeResponse:
         """Hold the status and the body the client parses."""
         self.status_code = status_code
         self.content = content
+
+    def __enter__(self) -> "FakeResponse":  # noqa: PYI034 -- Keep the test double importable on Python 3.10.
+        """Return the response used by the client's request context."""
+        return self
+
+    def __exit__(
+        self,
+        _exc_type: type[BaseException] | None,
+        _exc: BaseException | None,
+        _traceback: TracebackType | None,
+    ) -> None:
+        """Match requests.Response's context-manager interface."""
 
 
 @pytest.fixture

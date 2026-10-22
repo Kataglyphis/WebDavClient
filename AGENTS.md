@@ -18,6 +18,7 @@ this does not set the lane apart.
 | Path | What lives there |
 | --- | --- |
 | `kataglyphis_webdavclient/` | The package — `webdavclient.py` is the substance |
+| `build_support/kataglyphis_wheel.py` | The hub-owned, manifest-checked wheel rewriter; `MANIFEST.in` ships it in the sdist |
 | `tests/` | `test_webdav_client.py` and the `mock_webdav_server.py` it starts, plus `unit/`, `integration/`, `fuzzy/` and `remote/` (the mock server's document root) |
 | `bench/`, `demo/` | Benchmarks and a runnable example |
 | `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh` |
@@ -99,6 +100,16 @@ first): [`adopting-in-a-new-project.md` § *Putting every checkout on its branch
 Everything here is false or meaningless in another repo — that is why it is
 written out rather than linked.
 
+- **All downloads use the client's validated, atomic path.** `download_files` and
+  `download_all_files_iterative` accept the keyword-only `extension` suffix and return a file
+  count. Preserve decoded-path validation, same-origin/remote-prefix checks, resolved local
+  containment and failure propagation. `tests/unit/test_download_safety.py` covers traversal,
+  Windows path syntax, existing symlink escapes and interrupted filtered transfers.
+- **Do not fork wheel rewriting in `setup.py`.** Change
+  `ANTfrastructure/shared/python/kataglyphis_wheel.py`, then refresh this repo's
+  `build_support/kataglyphis_wheel.py` copy. The `python-wheel-rewrite` shared asset checks it;
+  the sdist must keep including the helper so builds work without submodules.
+
 - **`ci_packaging.sh` installs `patchelf` before delegating, a duplicate step.** The binary
   wheel needs it (`auditwheel repair` rewrites the wheel's RPATHs), but upstream's driver
   has installed it itself since the file's first commit (hub `fc4df858`, 2026-06-12), two
@@ -130,8 +141,10 @@ written out rather than linked.
   module (`free-threaded-wheel.py prove`), never runs it. So `ci_packaging.sh` runs the hub
   driver as a child, then the hub's `test-free-threaded-wheel.sh` (a local script until
   2026-10-12): the locked `tests` extra and the `cp314t` wheel from `dist/` go into a fresh
-  3.14t venv, and the whole suite runs from a copy of `tests/` and `pytest.ini` that has no
-  package directory beside it. `KATAGLYPHIS_EXPECT_COMPILED=1` makes
+  3.14t venv, and the whole suite runs from a copy of `tests/`, `pytest.ini` and the wheel
+  rewriter's `setup.py`/`build_support` fixtures, with no package directory beside them.
+  Keep those build fixtures: the wheel rewrite regression reads the real build class.
+  `KATAGLYPHIS_EXPECT_COMPILED=1` makes
   `tests/unit/test_free_threading.py` fail when a module is not the compiled one, and on
   any free-threaded leg it fails when importing the package turns the GIL back on. The
   copy, the extra and the env live in `pyproject.toml`'s

@@ -38,7 +38,18 @@ runtime set plus the `tests` and `docs` extras) and locked in `uv.lock`.
 
 The usage example is the README's [Quick start](README.md#quick-start).
 `download_all_files_iterative` downloads everything below the remote path into the local one,
-keeping the folder structure. Creating a `WebDavClient` also creates `logs/` in the current
+keeping the folder structure, and returns the number of downloaded files. Pass
+`extension=".md"` to download only that suffix, case-insensitively. `download_files` accepts
+the same option for one directory. Both use the same atomic file writer: an interrupted
+transfer removes its partial file and preserves an existing destination.
+
+HTTP and listing failures raise errors; unsafe decoded paths raise `ValueError`. The client
+rejects remote paths outside the requested tree, parent segments, Windows drives, UNC/alternate
+stream syntax, reserved names and existing symlinks that resolve outside the local root. Remote
+URLs must use the configured server's origin. PROPFIND and GET responses close on success and
+failure. Callers should handle errors explicitly and retry the operation when appropriate.
+
+Creating a `WebDavClient` also creates `logs/` in the current
 working directory and logs to `logs/downloadMd_s.log` there. `demo/download_markdown_files.py`
 is the same example as a command-line script:
 
@@ -58,6 +69,21 @@ host is needed. Every CI lane runs the whole suite on the pinned CPython (ANTfra
 | Linux x64, arm64 | the image's X.Y and X.Yt: 3.14 and 3.14t in `:latest` (2026-10-19), 3.15 after its rebuild | the hub's default, no version named |
 | Windows x64 | 3.15 and 3.15t, the `:winamd64` image's | `PythonVersions = 'pinned pinnedt'` in `scripts/windows/python-ci.psd1` |
 | Windows arm64 | 3.15 and 3.15t, installed by uv on the runner | `arm64-python-versions: 'pinned pinnedt'` in `.github/workflows/windows-arm64.yml` |
+
+## Building wheels
+
+`CYTHONIZE=1` enables the compiled wheel. `setup.py` delegates its archive rewrite to
+`build_support/kataglyphis_wheel.py`, copied from ANTfrastructure's shared Python helper and
+checked by `.antfrastructure-shared.manifest`. Update the upstream helper and copy it back;
+project metadata and compiler options remain in `setup.py`.
+
+`MANIFEST.in` includes the helper in the source distribution, so rebuilding an sdist needs no
+submodule or hub import. The rewrite removes sources and invalidated signatures, compresses
+retained entries and rebuilds their `RECORD` hashes before replacing the wheel atomically.
+
+The installed-wheel suite copies `setup.py` and the rewriter alongside its tests so the
+archive regression exercises the build class there too. It copies no package sources;
+the compiled-module assertions still check imports from the installed wheel.
 
 ## Static analysis
 
