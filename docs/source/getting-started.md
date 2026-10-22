@@ -81,6 +81,10 @@ project metadata and compiler options remain in `setup.py`.
 submodule or hub import. The rewrite removes sources and invalidated signatures, compresses
 retained entries and rebuilds their `RECORD` hashes before replacing the wheel atomically.
 
+The installed-wheel suite copies `setup.py` and the rewriter alongside its tests so the
+archive regression exercises the build class there too. It copies no package sources;
+the compiled-module assertions still check imports from the installed wheel.
+
 ## Static analysis
 
 ```bash

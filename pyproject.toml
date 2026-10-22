@@ -93,7 +93,7 @@ override-dependencies = ["bcrypt>=5; python_full_version < '3.15'"]
 # The whole suite on the installed cp3XYt wheel, read by every lane: third_party/ANTfrastructure/docs/python-ci.md#the-suite-on-the-installed-wheel
 [tool.antfrastructure.free-threaded-wheel-tests]
 extra = "tests"
-copy = ["tests", "pytest.ini"]
+copy = ["tests", "pytest.ini", "setup.py", "build_support/kataglyphis_wheel.py"]
 # Fails a module that came from the source tree instead of the wheel's extension.
 env = { KATAGLYPHIS_EXPECT_COMPILED = "1" }
 pytest-args = ["-v"]

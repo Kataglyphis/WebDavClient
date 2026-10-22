@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Include the build-class fixtures in isolated installed-wheel tests, preserving the
+  compression/RECORD regression and compiled-package import checks in the same run.
 - Mark unused response-fixture exception arguments and remove the obsolete setup logger
   left after wheel-helper extraction so the existing Vulture gate passes.
 - Validate decoded WebDAV paths before writing, including parent segments, Windows path syntax

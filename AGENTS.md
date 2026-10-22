@@ -141,8 +141,10 @@ written out rather than linked.
   module (`free-threaded-wheel.py prove`), never runs it. So `ci_packaging.sh` runs the hub
   driver as a child, then the hub's `test-free-threaded-wheel.sh` (a local script until
   2026-10-12): the locked `tests` extra and the `cp314t` wheel from `dist/` go into a fresh
-  3.14t venv, and the whole suite runs from a copy of `tests/` and `pytest.ini` that has no
-  package directory beside it. `KATAGLYPHIS_EXPECT_COMPILED=1` makes
+  3.14t venv, and the whole suite runs from a copy of `tests/`, `pytest.ini` and the wheel
+  rewriter's `setup.py`/`build_support` fixtures, with no package directory beside them.
+  Keep those build fixtures: the wheel rewrite regression reads the real build class.
+  `KATAGLYPHIS_EXPECT_COMPILED=1` makes
   `tests/unit/test_free_threading.py` fail when a module is not the compiled one, and on
   any free-threaded leg it fails when importing the package turns the GIL back on. The
   copy, the extra and the env live in `pyproject.toml`'s
