@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Mark unused response-fixture exception arguments and remove the obsolete setup logger
+  left after wheel-helper extraction so the existing Vulture gate passes.
 - Validate decoded WebDAV paths before writing, including parent segments, Windows path syntax
   and existing symlink escapes. GET/listing failures now reach callers; responses close on errors.
 - Preserve existing files when filtered downloads fail mid-transfer, and compress rewritten

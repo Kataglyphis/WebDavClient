@@ -2,7 +2,6 @@
 
 """Build configuration for packaging and optional Cython compilation."""
 
-import logging
 import os
 import runpy
 import sys
@@ -15,9 +14,6 @@ from setuptools.command.build_ext import build_ext
 rewrite_wheel = runpy.run_path(
     str(Path(__file__).parent / "build_support/kataglyphis_wheel.py")
 )["rewrite_wheel"]
-
-LOGGER = logging.getLogger(__name__)
-
 
 try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
