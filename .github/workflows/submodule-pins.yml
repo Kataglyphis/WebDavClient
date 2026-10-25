@@ -1,0 +1,23 @@
+name: Submodule pins
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - .gitmodules
+      - 'third_party/**'
+      - .github/workflows/submodule-pins.yml
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - .gitmodules
+      - 'third_party/**'
+      - .github/workflows/submodule-pins.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pins:
+    uses: Kataglyphis/ANTfrastructure/.github/workflows/submodule-pins.yml@develop

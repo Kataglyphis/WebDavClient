@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   binary-wheel entries instead of storing them uncompressed.
 
 ### Changed
+- Add shared CI quality reports, Ruff/ty analysis, PowerShell lint and complexity reporting,
+  a manual Python refactor preview and a submodule pin check. Generated local reports stay
+  under ignored `logs/`.
 - `download_files` and `download_all_files_iterative` accept a keyword-only `extension` suffix
   and return a download count. The hub uses this API for filtered and whole-tree downloads.
 - Wheel rewriting is shared with OrchestrANT through ANTfrastructure's manifest-checked

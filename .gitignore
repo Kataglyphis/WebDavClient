@@ -146,3 +146,5 @@ cython_debug/
 # The unanchored `lib/` above also hides scripts/linux/lib/; git re-includes files only after their directory.
 !scripts/linux/lib/
 !scripts/linux/lib/**
+
+/logs/
