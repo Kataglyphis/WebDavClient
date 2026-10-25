@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   binary-wheel entries instead of storing them uncompressed.
 
 ### Changed
+- Pin ANTfrastructure to the Renovate driver that updates direct submodules to their
+  remote default branches and initializes missing checkouts on apply.
 - Add a one-command local Renovate wrapper for manifests, lockfiles and the ANTfrastructure
   gitlink, with dry-run and exit-code instructions.
 - Add shared CI quality reports, Ruff/ty analysis, PowerShell lint and complexity reporting,
