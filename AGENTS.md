@@ -44,6 +44,7 @@ reorganisation.
 | The Windows image, its entrypoint and known traps | `docs/windows-builds.md` |
 | Bind mount vs tar-pipe, Dev Drive filter setup, container reuse | `docs/windows-container-build-performance.md` |
 | Python CI lanes and the uv traps | [`docs/python-ci.md`](third_party/ANTfrastructure/docs/python-ci.md) |
+| Dependency updates and Renovate exit codes | [`docs/dependency-updates.md`](third_party/ANTfrastructure/docs/dependency-updates.md) |
 | The five shell-safety bug classes | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md) § *Shell safety conventions* |
 | Code comments: one line, only the why; API docs short; gated | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md#comments-one-line-only-the-why) § *Comments: one line, only the why* |
 | Searching the tree: `rg`, not `grep -r` | [`third_party/ANTfrastructure/AGENTS.md`](third_party/ANTfrastructure/AGENTS.md) § *Searching the tree: ripgrep (`rg`)* |
@@ -67,6 +68,11 @@ checks and how a freeze file works:
 This repo freezes rows in `comment-size.allow`, `function-size.allow` and
 `code-complexity.allow`, and budgets the passages it shares with a hub page in
 `doc-dupes-hub.allow`; a gate with no file here has nothing frozen.
+
+**`scripts/linux/renovate-local.sh` calls the hub's local Renovate driver.** Run it with
+`--apply --dry-run` to review changes, then `--apply` to update manifests, locks and the tracked
+ANTfrastructure gitlink. The wrapper supplies this repo's root; the shared driver owns token
+discovery, updates and refusal behavior.
 
 **The two bootstrap copies**, `scripts/windows/Resolve-BuildModule.ps1` and its bash twin
 `scripts/linux/lib/antfrastructure.sh`, cannot live upstream, because they are what *find*

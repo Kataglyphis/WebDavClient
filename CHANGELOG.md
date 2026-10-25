@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   binary-wheel entries instead of storing them uncompressed.
 
 ### Changed
+- Add a one-command local Renovate wrapper for manifests, lockfiles and the ANTfrastructure
+  gitlink, with dry-run and exit-code instructions.
 - Add shared CI quality reports, Ruff/ty analysis, PowerShell lint and complexity reporting,
   a manual Python refactor preview and a submodule pin check. Generated local reports stay
   under ignored `logs/`.

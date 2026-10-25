@@ -96,6 +96,17 @@ non-zero on a finding, which the redirect hides
 ([ANTfrastructure `python-ci.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/python-ci.md#working-on-a-python-consumer-locally): the hook, the gate, binary-only wheels, the tools). The
 other CI scripts are in [`AGENTS.md` § 4](https://github.com/Kataglyphis/WebDavClient/blob/develop/AGENTS.md#4-build-run-test).
 
+## Dependency updates
+
+Run `bash scripts/linux/renovate-local.sh --apply --dry-run` to review planned updates, then
+`bash scripts/linux/renovate-local.sh --apply` to update this repository's manifests, lockfiles and
+the ANTfrastructure submodule. The wrapper uses the pinned Renovate driver in the initialized
+`third_party/ANTfrastructure` checkout and reads `.github/renovate.json`. Authenticate with
+`gh auth login` or set `GITHUB_COM_TOKEN` so GitHub-hosted dependency lookups are complete.
+The shared [dependency update guide](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/dependency-updates.md)
+explains refusals and exit codes; the driver stages and commits nothing.
+The read-only `renovate-entrypoint.yml` workflow checks this entrypoint on pushes and pull requests.
+
 ## Literature
 
 * <https://de.wikipedia.org/wiki/WebDAV>
