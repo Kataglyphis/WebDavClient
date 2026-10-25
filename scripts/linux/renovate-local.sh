@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Keep behavior in the hub driver; see docs/dependency-updates.md.
+# Keep policy in the hub driver; see docs/source/getting-started.md#dependency-updates.
 set -euo pipefail
 
 _SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
