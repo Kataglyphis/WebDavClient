@@ -6,10 +6,11 @@
 #   bash third_party/ANTfrastructure/shared/config/sync-shared-config.sh --repo-root . --check
 #
 # An asset NOT listed here is this repo own and is never compared. This repo
-# carries the two bootstrap templates; its .pre-commit-config.yaml is a Python
+# carries both bootstrap templates and the Git-mode companion; its .pre-commit-config.yaml is a Python
 # ruff config, not ANTfrastructure's C++ one, so the `pre-commit` asset is not
 # declared.
 
 antfrastructure-sh
+renovate-git-mode-sh
 resolve-build-module
 python-wheel-rewrite

@@ -76,9 +76,9 @@ discovery, updates and refusal behavior.
 
 **The two bootstrap copies**, `scripts/windows/Resolve-BuildModule.ps1` and its bash twin
 `scripts/linux/lib/antfrastructure.sh`, cannot live upstream, because they are what *find*
-the submodule. `.antfrastructure-shared.manifest` declares them (`antfrastructure-sh`,
-`resolve-build-module`), and the shared-config gate compares them with the hub's templates
-on every lint run: re-copy them from the templates, never edit them here
+the submodule. The exact `scripts/linux/lib/renovate-git-mode.sh` companion must sit beside
+the bash copy. `.antfrastructure-shared.manifest` declares all three, and the shared-config
+gate compares them with the hub's templates on every lint run: re-copy after an upstream change
 ([the hub's `shared/config/README.md`](third_party/ANTfrastructure/shared/config/README.md#the-template-trees-are-owners-too)).
 
 **The Windows x64 build is the hub's** (2026-10-19): `python-ci-windows.yml` runs

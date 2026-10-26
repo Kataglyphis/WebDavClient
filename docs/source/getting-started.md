@@ -102,7 +102,8 @@ Run `bash scripts/linux/renovate-local.sh --apply --dry-run` to review planned u
 `bash scripts/linux/renovate-local.sh --apply` to update this repository's manifests, lockfiles and
 the ANTfrastructure submodule. The wrapper uses the pinned Renovate driver and reads
 `.github/renovate.json`. A real `--apply` initializes a missing hub checkout; report and dry-run
-leave it uninitialized. Authenticate with
+leave it uninitialized. From WSL over a Windows Git checkout, the bootstrap uses `git.exe` for
+CRLF-sensitive checks. Authenticate with
 `gh auth login` or set `GITHUB_COM_TOKEN` so GitHub-hosted dependency lookups are complete.
 The shared [dependency update guide](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/dependency-updates.md)
 explains refusals and exit codes; the driver stages and commits nothing.
