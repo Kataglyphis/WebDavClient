@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   binary-wheel entries instead of storing them uncompressed.
 
 ### Changed
+- Pin ANTfrastructure's shared Bash/PowerShell reuse scanner so CI reports
+  consumer-to-hub overlap candidates.
 - Pin ANTfrastructure to the Renovate driver that updates direct submodules to their
   remote default branches and initializes missing checkouts on apply, including WSL over
   Windows Git checkouts.
