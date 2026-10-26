@@ -96,6 +96,13 @@ non-zero on a finding, which the redirect hides
 ([ANTfrastructure `python-ci.md`](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/python-ci.md#working-on-a-python-consumer-locally): the hook, the gate, binary-only wheels, the tools). The
 other CI scripts are in [`AGENTS.md` § 4](https://github.com/Kataglyphis/WebDavClient/blob/develop/AGENTS.md#4-build-run-test).
 
+## Shared scripts
+
+Before adding Bash or PowerShell behavior, search this repository and its direct submodules,
+including ANTfrastructure. Reuse or extend the existing owner with WebDavClient-specific values;
+[AGENTS.md](https://github.com/Kataglyphis/WebDavClient/blob/develop/AGENTS.md)
+holds the contributor rule.
+
 ## Dependency updates
 
 Run `bash scripts/linux/renovate-local.sh --apply --dry-run` to review planned updates, then

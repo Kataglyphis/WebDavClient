@@ -67,7 +67,7 @@ Release wheels, logging, the demo script and the tests:
 | CI quality reports, Ruff/ty, PowerShell checks and refactor previews | [Shared quality tooling](https://github.com/Kataglyphis/ANTfrastructure/blob/develop/docs/code-quality-tooling.md) |
 | Update dependencies with Renovate | [docs/source/getting-started.md](https://github.com/Kataglyphis/WebDavClient/blob/develop/docs/source/getting-started.md#dependency-updates) |
 | The API | [docs/source/webdavclient.rst](https://github.com/Kataglyphis/WebDavClient/blob/develop/docs/source/webdavclient.rst), rendered on the [docs site](https://webdavclient.jonasheinle.de/) |
-| Rules for agents and contributors | [AGENTS.md](https://github.com/Kataglyphis/WebDavClient/blob/develop/AGENTS.md) |
+| Rules for agents and contributors, including shared Bash/PowerShell reuse | [AGENTS.md](https://github.com/Kataglyphis/WebDavClient/blob/develop/AGENTS.md) |
 | Changes | [CHANGELOG.md](https://github.com/Kataglyphis/WebDavClient/blob/develop/CHANGELOG.md) |
 
 ## Contributing and contact
