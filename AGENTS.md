@@ -184,8 +184,8 @@ uv sync
 
 # Every lane runs the pinned X.Y and X.Yt; Linux follows :latest's X.Y (3.14 and 3.14t on
 # 2026-10-19). X.Yt syncs only the tests extra (free-threaded-extras) and gates like X.Y. Two changes
-# made that leg possible: atheris is gone (no cp314t wheel, nothing used it), and bcrypt is
-# overridden to >=5 (wsgidav caps it below 5, and 4.x has no cp314t wheel).
+# made that leg possible: atheris is gone (no cp314t wheel, nothing used it), and wsgidav 4.4
+# dropped bcrypt, whose 4.x had no cp314t wheel.
 FREE_THREADED_SYNC_EXTRAS=tests bash scripts/linux/ci_tests.sh kataglyphis_webdavclient  # X.Y and X.Yt: whole suite + coverage
 bash scripts/linux/ci_static_analysis.sh x64       # codespell, bandit, vulture, ruff, ty (X.Y)
 bash scripts/linux/ci_build_docs.sh                # Sphinx, with X.Y's coverage

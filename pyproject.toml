@@ -62,7 +62,7 @@ tests = [
     "bandit",           # find security vulnerabilities
     "vulture",          # find dead code
     # Pinned to versions.env RUFF_VERSION, which the consumer-pins gate checks; unpinned, local ruff drifts from CI's.
-    "ruff==0.17.0",      # replacement for flake8
+    "ruff==0.17.3",      # replacement for flake8
     "ty",               # type checking
     "wsgidav",
     "cheroot",
@@ -85,10 +85,6 @@ packaging = [
 [project.urls]
 Homepage = "https://webdavclient.jonas.heinle.de"
 Source = "https://github.com/Kataglyphis/WebDavClient"
-
-[tool.uv]
-# wsgidav caps bcrypt<5 (4.x: no free-threaded or win_arm64 wheel), 5.0.0 has no cp315t wheel and its PyO3 0.26 refuses 3.15; the mock server runs without auth, so nothing imports it.
-override-dependencies = ["bcrypt>=5; python_full_version < '3.15'"]
 
 # The whole suite on the installed cp3XYt wheel, read by every lane: third_party/ANTfrastructure/docs/python-ci.md#the-suite-on-the-installed-wheel
 [tool.antfrastructure.free-threaded-wheel-tests]
