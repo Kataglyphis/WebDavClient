@@ -8,9 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **Dependencies from the hub's local Renovate run**: ruff 0.17.0 → 0.17.3 (pin and pre-commit hook),
-  and a refreshed `uv.lock` (wsgidav 4.4.0, pytest 9.2.0, ty 0.0.92, sphinx 9.2.0, setuptools 84.2.1).
-  wsgidav 4.4.0 no longer depends on bcrypt or passlib, so the `bcrypt>=5` override is gone.
+- **Dependencies from the hub's local Renovate run**: a refreshed `uv.lock` (wsgidav 4.4.0, pytest 9.2.0, ty 0.0.92, sphinx 9.2.0, setuptools 84.2.1).
+  wsgidav 4.4.0 no longer depends on bcrypt or passlib, so the `bcrypt>=5` override is gone. ruff stays
+  at the hub's `RUFF_VERSION` (0.17.0) until the hub moves it; the consumer-pins gate holds the two equal.
 
 ### Fixed
 - Include the build-class fixtures in isolated installed-wheel tests, preserving the
