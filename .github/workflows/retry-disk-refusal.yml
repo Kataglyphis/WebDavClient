@@ -4,8 +4,8 @@ name: CI · retry a runner disk refusal
 on:
   workflow_run:
     workflows:
-      - "Linux x64 · build + test"
-      - "Linux arm64 · build + test"
+      - 'Linux x64 · build \+ test'
+      - 'Linux arm64 · build \+ test'
     types: [completed]
 
 permissions:
