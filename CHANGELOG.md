@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   at the hub's `RUFF_VERSION` (0.17.0) until the hub moves it; the consumer-pins gate holds the two equal.
 
 ### Fixed
+- **The docs match the tree again; no code changed.** `AGENTS.md` lists seven `scripts/linux/` wrappers
+  (`renovate-local.sh` was missing), drops the stale counts of tests and lint gates, names 3.15 and 3.15t for the
+  Linux lanes and a release's wheels, syncs with `--python 3.15` as getting-started does, and says the `ci_*.sh`
+  wrappers run in the family image and that `ci_packaging.sh` installs a missing `patchelf` with `sudo apt-get`.
+  getting-started's lane table gives Linux 3.15 and 3.15t too.
 - Include the build-class fixtures in isolated installed-wheel tests, preserving the
   compression/RECORD regression and compiled-package import checks in the same run.
 - Mark unused response-fixture exception arguments and remove the obsolete setup logger

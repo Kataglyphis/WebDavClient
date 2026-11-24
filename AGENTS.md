@@ -27,7 +27,7 @@ this does not set the lane apart.
 | `build_support/kataglyphis_wheel.py` | The hub-owned, manifest-checked wheel rewriter; `MANIFEST.in` ships it in the sdist |
 | `tests/` | `test_webdav_client.py` and the `mock_webdav_server.py` it starts, plus `unit/`, `integration/`, `fuzzy/` and `remote/` (the mock server's document root) |
 | `bench/`, `demo/` | Benchmarks and a runnable example |
-| `scripts/linux/` | Six thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh` and `run-lint-gates.sh` |
+| `scripts/linux/` | Seven thin wrappers over ANTfrastructure drivers: the four Python CI lanes, plus `setup-dependencies.sh`, `run-lint-gates.sh` and `renovate-local.sh` |
 | `scripts/windows/` | `python-ci.psd1` (the hub's Windows build driver reads it, § 2), the `Resolve-BuildModule.ps1` bootstrap, and `setup-dependencies.ps1`, a winget/scoop host-toolchain installer no lane calls |
 | `third_party/ANTfrastructure` | The submodule owning every reusable script, module and doc |
 
@@ -68,7 +68,7 @@ made in the wrapper is a fix the other Python consumers never get.
 | `ci_packaging.sh` | `python/ci_packaging.sh` | installs `patchelf` — see § 3; then runs the hub's `python/test-free-threaded-wheel.sh` |
 
 **`run-lint-gates.sh` runs the hub lint aggregator with `--ratchets`**, the same call
-`.github/workflows/lint-gates.yml` makes with `ratchets: true`. What each of its eight gates
+`.github/workflows/lint-gates.yml` makes with `ratchets: true`. What each of its gates
 checks and how a freeze file works:
 [`code-quality-tooling.md`](third_party/ANTfrastructure/docs/code-quality-tooling.md#the-scan-root-contract).
 This repo freezes rows in `comment-size.allow`, `function-size.allow` and
@@ -142,18 +142,18 @@ written out rather than linked.
   `tests/test_webdav_client.py` starts that server from a module-scoped fixture and asserts
   on the files under `tests/remote/data`, so edit those and the tests change. The paths are
   relative, so run `pytest` from the repo root. Every CI lane runs the whole configured
-  suite, `testpaths = tests`, all 10 tests, since 2026-10-01.
+  suite, `testpaths = tests`, since 2026-10-01.
   - Linux: the hub's `ci_tests.sh` passes pytest no path of its own.
   - Windows: the hub's driver runs a bare `pytest`, since `python-ci.psd1` sets no `TestPaths`.
   - Until then every lane had run `tests/unit` only. That narrowing came with the arm64
     and Windows lanes (2025-10-20), so `test_webdav_client.py` and `tests/integration/`
     ran on no lane, and coverage came from the dummy tests alone.
-- **The 3.14t test leg tests the sources, not the Cython build.** The hub's `ci_tests.sh`
+- **The X.Yt test leg tests the sources, not the Cython build.** The hub's `ci_tests.sh`
   syncs the project uncompiled, and the hub's packaging proof only *creates* each compiled
   module (`free-threaded-wheel.py prove`), never runs it. So `ci_packaging.sh` runs the hub
   driver as a child, then the hub's `test-free-threaded-wheel.sh` (a local script until
-  2026-10-12): the locked `tests` extra and the `cp314t` wheel from `dist/` go into a fresh
-  3.14t venv, and the whole suite runs from a copy of `tests/`, `pytest.ini` and the wheel
+  2026-10-12): the locked `tests` extra and the `cpXYt` wheel from `dist/` go into a fresh
+  X.Yt venv, and the whole suite runs from a copy of `tests/`, `pytest.ini` and the wheel
   rewriter's `setup.py`/`build_support` fixtures, with no package directory beside them.
   Keep those build fixtures: the wheel rewrite regression reads the real build class.
   `KATAGLYPHIS_EXPECT_COMPILED=1` makes
@@ -179,19 +179,23 @@ written out rather than linked.
 
 ## 4. Build, run, test
 
-```bash
-uv sync
+Run the `ci_*.sh` wrappers in the family Linux image, as CI does, for example
+`bash third_party/ANTfrastructure/linux/scripts/run-in-ci-image.sh . -- env FREE_THREADED_SYNC_EXTRAS=tests bash scripts/linux/ci_tests.sh kataglyphis_webdavclient`.
+On a host without `patchelf`, `ci_packaging.sh` installs it with `sudo apt-get`.
 
-# Every lane runs the pinned X.Y and X.Yt; Linux follows :latest's X.Y (3.14 and 3.14t on
-# 2026-10-19). X.Yt syncs only the tests extra (free-threaded-extras) and gates like X.Y. Two changes
-# made that leg possible: atheris is gone (no cp314t wheel, nothing used it), and wsgidav 4.4
-# dropped bcrypt, whose 4.x had no cp314t wheel.
+Every lane runs the pinned X.Y and X.Yt, 3.15 and 3.15t. X.Yt syncs only the tests extra
+(free-threaded-extras) and gates like X.Y. Two changes made that leg possible: atheris is gone
+(no cp314t wheel, nothing used it), and wsgidav 4.4 dropped bcrypt, whose 4.x had no cp314t wheel.
+
+```bash
+uv sync --all-extras --python 3.15   # the pinned CPython; 3.15t for the free-threaded build
+
 FREE_THREADED_SYNC_EXTRAS=tests bash scripts/linux/ci_tests.sh kataglyphis_webdavclient  # X.Y and X.Yt: whole suite + coverage
 bash scripts/linux/ci_static_analysis.sh x64       # codespell, bandit, vulture, ruff, ty (X.Y)
 bash scripts/linux/ci_build_docs.sh                # Sphinx, with X.Y's coverage
 bash scripts/linux/ci_packaging.sh                 # sdist + cpXY and proved cpXYt wheels, then the suite on the cpXYt one
 
-bash scripts/linux/run-lint-gates.sh     # the eight lint gates, ratchets included
+bash scripts/linux/run-lint-gates.sh     # the lint gates, ratchets included
 ```
 
 Windows:
@@ -217,7 +221,7 @@ the two Linux files split `ubuntu-26.04-amd64-arm64.yml` on 2026-09-25.
 [`branch-and-release-strategy.md`](third_party/ANTfrastructure/docs/branch-and-release-strategy.md)
 (here since 2026-10-16). A push or PR runs Linux x64 and the lint gates; Linux arm64,
 Windows x64 and Windows arm64 run on request (`[ci arm64]`, `[ci windows]`, `[ci all]`). A
-push to `main` releases the `VERSION.txt` version with a cp314 and a cp314t binary wheel from
+push to `main` releases the `VERSION.txt` version with a cp315 and a cp315t binary wheel from
 each lane (Linux x86_64 and aarch64, Windows amd64 and arm64), Linux x64's pure wheel and
 sdist, and the hub publisher's `SHA256SUMS`: `release.yml` calls the hub's `release-publish.yml`,
 which collects them with its `collect` options (since 2026-10-19). A dry run collects and lists

@@ -66,7 +66,7 @@ host is needed. Every CI lane runs the whole suite on the pinned CPython (ANTfra
 
 | Lane | Python | Set by |
 | --- | --- | --- |
-| Linux x64, arm64 | the image's X.Y and X.Yt: 3.14 and 3.14t in `:latest` (2026-10-19), 3.15 after its rebuild | the hub's default, no version named |
+| Linux x64, arm64 | 3.15 and 3.15t, the hub's pinned X.Y and X.Yt | the hub's default, no version named |
 | Windows x64 | 3.15 and 3.15t, the `:winamd64` image's | `PythonVersions = 'pinned pinnedt'` in `scripts/windows/python-ci.psd1` |
 | Windows arm64 | 3.15 and 3.15t, installed by uv on the runner | `arm64-python-versions: 'pinned pinnedt'` in `.github/workflows/windows-arm64.yml` |
 
