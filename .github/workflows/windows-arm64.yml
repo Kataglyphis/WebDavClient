@@ -28,6 +28,8 @@ jobs:
       free-threaded-extras: tests
       # The legs test the installed cp315/cp315t wheels, so every module must be the compiled one.
       arm64-test-env: KATAGLYPHIS_EXPECT_COMPILED=1
+      # The wheel-rewriter test reads setup.py and its helper, which the default stage leaves out.
+      arm64-test-files: tests pytest.ini pyproject.toml setup.py build_support/kataglyphis_wheel.py
       # Full history: this repo's packaging derives its version from git.
       fetch-depth: 0
     secrets:
